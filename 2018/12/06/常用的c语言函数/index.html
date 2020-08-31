@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="FYSBlog, shiyuefei, yfshi">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="FYSBlog" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="日志相关// 把标准错误和标准输出重定位到文件bool setLogFile(const char *logFile)&amp;#123;    if ((Logfilefd = open(Logfile, O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)     &amp;#123;           fprintf(stderr, &quot;Open logfile %s f">
+<meta property="og:type" content="article">
+<meta property="og:title" content="常用的c语言函数">
+<meta property="og:url" content="http://shiyuefei.top/2018/12/06/常用的c语言函数/index.html">
+<meta property="og:site_name" content="FYSBlog">
+<meta property="og:description" content="日志相关// 把标准错误和标准输出重定位到文件bool setLogFile(const char *logFile)&amp;#123;    if ((Logfilefd = open(Logfile, O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)     &amp;#123;           fprintf(stderr, &quot;Open logfile %s f">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-08-31T08:27:12.189Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="常用的c语言函数">
+<meta name="twitter:description" content="日志相关// 把标准错误和标准输出重定位到文件bool setLogFile(const char *logFile)&amp;#123;    if ((Logfilefd = open(Logfile, O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)     &amp;#123;           fprintf(stderr, &quot;Open logfile %s f">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://shiyuefei.top/2018/12/06/常用的c语言函数/">
+
+
+
+
+
+  <title>常用的c语言函数 | FYSBlog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?842071952d3d3b6387fa2207f3c39fc0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">FYSBlog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Code is art</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://shiyuefei.top/2018/12/06/常用的c语言函数/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="syf">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="FYSBlog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">常用的c语言函数</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-06T14:45:14+08:00">
+                2018-12-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018/12/06/常用的c语言函数/" class="leancloud_visitors" data-flag-title="常用的c语言函数">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2,061
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  13
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="日志相关"><a href="#日志相关" class="headerlink" title="日志相关"></a>日志相关</h1><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 把标准错误和标准输出重定位到文件</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">setLogFile</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *logFile)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> ((Logfilefd = <span class="built_in">open</span>(Logfile, O_WRONLY | O_CREAT | O_APPEND, <span class="number">0644</span>)) == <span class="number">-1</span>) </span><br><span class="line">    &#123;   </span><br><span class="line">        <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">"Open logfile %s failed.\n"</span>, Logfile);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;   </span><br><span class="line"></span><br><span class="line">    <span class="built_in">close</span>(<span class="number">1</span>);</span><br><span class="line">    <span class="built_in">close</span>(<span class="number">2</span>);</span><br><span class="line">    dup2(Logfilefd, <span class="number">1</span>); </span><br><span class="line">    dup2(Logfilefd, <span class="number">2</span>); </span><br><span class="line">    <span class="built_in">close</span>(Logfilefd);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> LOG(fmt, ...) \</span></span><br><span class="line">    <span class="keyword">do</span> &#123; \</span><br><span class="line">        <span class="built_in">fprintf</span>(<span class="built_in">stdout</span>, <span class="string">"%s [LOG]:--"</span>fmt<span class="string">"--%s:%d\n"</span>, \</span><br><span class="line">                GetCurrentTime(), ##__VA_ARGS__, __FILE__, __LINE__); \</span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELOG(fmt, ...) \</span></span><br><span class="line">    <span class="keyword">do</span> &#123; \</span><br><span class="line">        <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">"%s [ERROR]:--"</span>fmt<span class="string">"--%s:%d\n"</span>, \</span><br><span class="line">                GetCurrentTime(), ##__VA_ARGS__, __FILE__, __LINE__); \</span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> DLOG(fmt, ...) \</span></span><br><span class="line">    <span class="keyword">do</span> &#123; \</span><br><span class="line">        <span class="keyword">if</span> (EnableDebug) \</span><br><span class="line">            <span class="built_in">fprintf</span>(<span class="built_in">stdout</span>, <span class="string">"%s [DEBUG]:--"</span>fmt<span class="string">"--%s:%d\n"</span>, \</span><br><span class="line">                    GetCurrentTime(), ##__VA_ARGS__, __FILE__, __LINE__); \</span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"># 二进制转十六机制</span><br><span class="line"></span><br><span class="line">```c</span><br><span class="line"><span class="comment">// 把二进制转换成十六进制并以字符串形式写到文件</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> Bin2HexFp(fp,src,n) \</span></span><br><span class="line">    <span class="keyword">do</span> &#123; \</span><br><span class="line">        <span class="keyword">int</span> _bi; \</span><br><span class="line">        <span class="keyword">for</span> (_bi=<span class="number">0</span>; _bi&lt;n; _bi++) <span class="built_in">fprintf</span>(fp, <span class="string">"%02X"</span>, (src)[_bi]); \</span><br><span class="line">        <span class="built_in">fprintf</span>(fp, <span class="string">"\n"</span>); \</span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+<h1 id="阻塞"><a href="#阻塞" class="headerlink" title="阻塞"></a>阻塞</h1><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">SetNonblock</span><span class="params">(<span class="keyword">int</span> socket)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> flag = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> ((flag = fcntl(socket, F_GETFL, <span class="number">0</span>)) &lt; <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">if</span> (fcntl(socket, F_SETFL, flag | O_NONBLOCK) &lt; <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">ssize_t</span> <span class="title">BlockRead</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">void</span> *buf, <span class="keyword">size_t</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">size_t</span> nleft;</span><br><span class="line">    <span class="keyword">ssize_t</span> nread;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> *pb;</span><br><span class="line"></span><br><span class="line">    pb = buf;</span><br><span class="line">    nleft = n;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (nleft &gt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> ((nread = <span class="built_in">read</span>(fd, pb, nleft)) &lt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (errno == EINTR)</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (nread == <span class="number">0</span>) <span class="comment">/* Peer close the connection */</span></span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        nleft -= nread;</span><br><span class="line">        pb += nread;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> n - nleft;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">ssize_t</span> <span class="title">BlockWrite</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">void</span> *buf, <span class="keyword">size_t</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">size_t</span> nleft;</span><br><span class="line">    <span class="keyword">ssize_t</span> nwritten;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> *pb;</span><br><span class="line"></span><br><span class="line">    pb = buf;</span><br><span class="line">    nleft = n;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (nleft &gt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> ((nwritten = <span class="built_in">write</span>(fd, pb, nleft)) &lt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (errno == EINTR)</span><br><span class="line">                nwritten = <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (nwritten == <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        nleft -= nwritten;</span><br><span class="line">        pb += nwritten;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> n - nleft;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="程序运行"><a href="#程序运行" class="headerlink" title="程序运行"></a>程序运行</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">const char *GetProgname(const char *argv0)</span><br><span class="line">&#123;</span><br><span class="line">    char *p;</span><br><span class="line"></span><br><span class="line">    p = strrchr(argv0, '/');</span><br><span class="line">    if (p == NULL)</span><br><span class="line">        return argv0;</span><br><span class="line">    else</span><br><span class="line">        return p+1;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">char *MakeAbsolutePath(const char *path)</span><br><span class="line">&#123;</span><br><span class="line">    char *new;</span><br><span class="line"></span><br><span class="line">    if (path == NULL)</span><br><span class="line">        return NULL;</span><br><span class="line"></span><br><span class="line">    if (path[0] == '/')</span><br><span class="line">    &#123;</span><br><span class="line">        new = strdup(path);</span><br><span class="line">        if (new == NULL)</span><br><span class="line">            return NULL;</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">        char *buf;</span><br><span class="line">        size_t bufLen;</span><br><span class="line"></span><br><span class="line">        bufLen = 1024;</span><br><span class="line">        for (;;)</span><br><span class="line">        &#123;</span><br><span class="line">            buf = malloc(bufLen);</span><br><span class="line">            if (buf == NULL)</span><br><span class="line">                return NULL;</span><br><span class="line"></span><br><span class="line">            if (getcwd(buf, bufLen))</span><br><span class="line">                break;</span><br><span class="line">            else if (errno == ERANGE)</span><br><span class="line">            &#123;</span><br><span class="line">                free(buf);</span><br><span class="line">                bufLen *= 2;</span><br><span class="line">                continue;</span><br><span class="line">            &#125;</span><br><span class="line">            else</span><br><span class="line">          	&#123;</span><br><span class="line">                free(buf);</span><br><span class="line">                return NULL;</span><br><span class="line">            &#125;   </span><br><span class="line">        &#125;   </span><br><span class="line">        </span><br><span class="line">        new = malloc(strlen(buf) + strlen(path) + 2);</span><br><span class="line">        if (new == NULL)</span><br><span class="line">        &#123;</span><br><span class="line">            free(buf);</span><br><span class="line">            return NULL;</span><br><span class="line">        &#125;   </span><br><span class="line">        sprintf(new, "%s/%s", buf, path);</span><br><span class="line">        free(buf);</span><br><span class="line">    &#125;   </span><br><span class="line">    </span><br><span class="line">    return new;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">bool IsAlreadyRunning(const char *path)</span><br><span class="line">&#123;</span><br><span class="line">    int          fd;</span><br><span class="line">    char         buf[16];</span><br><span class="line">    struct flock fl;</span><br><span class="line"></span><br><span class="line">    if ((fd = open(path, O_RDWR | O_CREAT, 0644)) == -1)</span><br><span class="line">        return true;</span><br><span class="line"></span><br><span class="line">    fl.l_type = F_WRLCK;</span><br><span class="line">    fl.l_whence = SEEK_SET;</span><br><span class="line">    fl.l_start = 0;</span><br><span class="line">    fl.l_len = 0;</span><br><span class="line">    fl.l_pid = getpid();</span><br><span class="line">    if (fcntl(fd, F_SETLK, &amp;fl) == -1)</span><br><span class="line">    &#123;</span><br><span class="line">        close(fd);</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ftruncate(fd, 0);</span><br><span class="line">    snprintf(buf, 16, "%ld", (long)getpid());</span><br><span class="line">    write(fd, buf, strlen(buf)+1);</span><br><span class="line"></span><br><span class="line">    return false;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="随机数"><a href="#随机数" class="headerlink" title="随机数"></a>随机数</h1><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">GenerateString</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">char</span> *dest, <span class="keyword">int</span> len)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">char</span> allChar[] = <span class="string">"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"</span>;</span><br><span class="line">    <span class="keyword">int</span> cLen = <span class="built_in">strlen</span>(allChar);</span><br><span class="line"></span><br><span class="line">    srand(time(<span class="literal">NULL</span>));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (i=<span class="number">0</span>; i&lt;len<span class="number">-1</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        *dest = allChar[rand() % cLen];</span><br><span class="line">        dest++;</span><br><span class="line">    &#125;</span><br><span class="line">    *dest = <span class="string">'\0'</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="时间相关"><a href="#时间相关" class="headerlink" title="时间相关"></a>时间相关</h1><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">char</span> *<span class="title">GetCurrentTime</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">char</span> _CurrentTime[<span class="number">27</span>];</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timeval</span> <span class="title">tv</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tm</span> *<span class="title">tp</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">snprintf</span>(_CurrentTime, <span class="number">27</span>, <span class="string">"unknown time"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (gettimeofday(&amp;tv, <span class="literal">NULL</span>) == <span class="number">-1</span>)</span><br><span class="line">        <span class="keyword">return</span> _CurrentTime;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ((tp = localtime(&amp;tv.tv_sec)) == <span class="literal">NULL</span>)</span><br><span class="line">        <span class="keyword">return</span> _CurrentTime;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">snprintf</span>(_CurrentTime, <span class="number">27</span>, <span class="string">"%04d-%02d-%02d %02d:%02d:%02d.%06ld"</span>,</span><br><span class="line">            tp-&gt;tm_year+<span class="number">1900</span>, tp-&gt;tm_mon+<span class="number">1</span>, tp-&gt;tm_mday,</span><br><span class="line">            tp-&gt;tm_hour, tp-&gt;tm_min, tp-&gt;tm_sec, tv.tv_usec);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> _CurrentTime;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="数字判断"><a href="#数字判断" class="headerlink" title="数字判断"></a>数字判断</h1><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">IsDigitals</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *s)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *p = s;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (s == <span class="literal">NULL</span> || *s == <span class="string">'\0'</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (*p == <span class="string">'-'</span>)</span><br><span class="line">        p++;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (; *p!=<span class="string">'\0'</span>; p++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (*p &lt; <span class="string">'0'</span> || *p &gt; <span class="string">'9'</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">IsNonnegativeInteger</span><span class="params">(<span class="keyword">char</span> *data)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> *p;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (data == <span class="literal">NULL</span> || data[<span class="number">0</span>] == <span class="string">'\0'</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    p = data;</span><br><span class="line">    <span class="keyword">for</span> (p=data; *p!=<span class="string">'\0'</span>; p++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (*p&lt;<span class="string">'0'</span> || *p&gt;<span class="string">'9'</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="mac地址"><a href="#mac地址" class="headerlink" title="mac地址"></a>mac地址</h1><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 根据socket获取mac地址</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">GetLocalMac</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">char</span> delimiter, <span class="keyword">char</span> *mac, <span class="keyword">size_t</span> macLen)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ifaddrs</span> *<span class="title">ifaddr</span> = <span class="title">NULL</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ifaddrs</span> *<span class="title">ifp</span> = <span class="title">NULL</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ifreq</span>    <span class="title">ifr</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> *<span class="title">inp</span>;</span></span><br><span class="line">    <span class="keyword">char</span> *ifname;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">in</span>;</span></span><br><span class="line">    <span class="keyword">socklen_t</span> inLen;</span><br><span class="line"></span><br><span class="line">    inLen = <span class="keyword">sizeof</span>(in);</span><br><span class="line">    <span class="built_in">memset</span>(&amp;in, <span class="number">0</span>, inLen);</span><br><span class="line">    <span class="keyword">if</span> (getsockname(fd, (struct sockaddr*)&amp;in, &amp;inLen) != <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (getifaddrs(&amp;ifaddr) != <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (ifp=ifaddr; ifp!=<span class="literal">NULL</span>; ifp=ifp-&gt;ifa_next)</span><br><span class="line">    &#123;   </span><br><span class="line">        inp = (struct sockaddr_in*)ifp-&gt;ifa_addr;</span><br><span class="line">        <span class="keyword">if</span> (inp != <span class="literal">NULL</span> &amp;&amp;</span><br><span class="line">                inp-&gt;sin_family == in.sin_family &amp;&amp;</span><br><span class="line">                inp-&gt;sin_addr.s_addr == in.sin_addr.s_addr)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (ifp == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;   </span><br><span class="line">        freeifaddrs(ifaddr);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ifname = ifp-&gt;ifa_name;</span><br><span class="line">  	<span class="built_in">strncpy</span>(ifr.ifr_name, ifname, IFNAMSIZ);</span><br><span class="line">    <span class="keyword">if</span> (ioctl(fd, SIOCGIFHWADDR, &amp;ifr) == <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        freeifaddrs(ifaddr);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    freeifaddrs(ifaddr);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">snprintf</span>(mac, macLen, <span class="string">"%02X%c%02X%c%02X%c%02X%c%02X%c%02X"</span>,</span><br><span class="line">            (<span class="keyword">unsigned</span> <span class="keyword">char</span>)ifr.ifr_hwaddr.sa_data[<span class="number">0</span>], delimiter,</span><br><span class="line">            (<span class="keyword">unsigned</span> <span class="keyword">char</span>)ifr.ifr_hwaddr.sa_data[<span class="number">1</span>], delimiter,</span><br><span class="line">            (<span class="keyword">unsigned</span> <span class="keyword">char</span>)ifr.ifr_hwaddr.sa_data[<span class="number">2</span>], delimiter,</span><br><span class="line">            (<span class="keyword">unsigned</span> <span class="keyword">char</span>)ifr.ifr_hwaddr.sa_data[<span class="number">3</span>], delimiter,</span><br><span class="line">            (<span class="keyword">unsigned</span> <span class="keyword">char</span>)ifr.ifr_hwaddr.sa_data[<span class="number">4</span>], delimiter,</span><br><span class="line">            (<span class="keyword">unsigned</span> <span class="keyword">char</span>)ifr.ifr_hwaddr.sa_data[<span class="number">5</span>]);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 根据socket获取对端mac地址</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">GetPeerMac</span><span class="params">(<span class="keyword">int</span> fd, struct sockaddr *from,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">socklen_t</span> fromLen, <span class="keyword">char</span> delimiter, <span class="keyword">char</span> *mac, <span class="keyword">size_t</span> macLen)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ifaddrs</span> *<span class="title">ifaddr</span> = <span class="title">NULL</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ifaddrs</span> *<span class="title">ifp</span> = <span class="title">NULL</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> *<span class="title">inp</span>;</span></span><br><span class="line">    <span class="keyword">char</span> *ifname;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">in</span>;</span></span><br><span class="line">    <span class="keyword">socklen_t</span> inLen;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">arpreq</span> <span class="title">arp</span>;</span></span><br><span class="line"></span><br><span class="line">    inLen = <span class="keyword">sizeof</span>(in);</span><br><span class="line">    <span class="built_in">memset</span>(&amp;in, <span class="number">0</span>, inLen);</span><br><span class="line">    <span class="keyword">if</span> (getsockname(fd, (struct sockaddr*)&amp;in, &amp;inLen) != <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (getifaddrs(&amp;ifaddr) != <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (ifp=ifaddr; ifp!=<span class="literal">NULL</span>; ifp=ifp-&gt;ifa_next)</span><br><span class="line">    &#123;</span><br><span class="line">        inp = (struct sockaddr_in*)ifp-&gt;ifa_addr;</span><br><span class="line">        <span class="keyword">if</span> (inp != <span class="literal">NULL</span> &amp;&amp;</span><br><span class="line">                inp-&gt;sin_family == in.sin_family &amp;&amp;</span><br><span class="line">                inp-&gt;sin_addr.s_addr == in.sin_addr.s_addr)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (ifp == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        freeifaddrs(ifaddr);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ifname = ifp-&gt;ifa_name;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">memset</span>(&amp;arp, <span class="number">0</span>, <span class="keyword">sizeof</span>(arp));</span><br><span class="line">    <span class="built_in">memcpy</span>(&amp;arp.arp_pa, from, fromLen);</span><br><span class="line">  	<span class="built_in">strncpy</span>(arp.arp_dev, ifname, <span class="number">16</span>);</span><br><span class="line">    <span class="keyword">if</span> (ioctl(fd, SIOCGARP, &amp;arp) == <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        freeifaddrs(ifaddr);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    freeifaddrs(ifaddr);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">snprintf</span>(mac, macLen, <span class="string">"%02X%c%02X%c%02X%c%02X%c%02X%c%02X"</span>,</span><br><span class="line">            arp.arp_ha.sa_data[<span class="number">0</span>], delimiter,</span><br><span class="line">            arp.arp_ha.sa_data[<span class="number">1</span>], delimiter,</span><br><span class="line">            arp.arp_ha.sa_data[<span class="number">2</span>], delimiter,</span><br><span class="line">            arp.arp_ha.sa_data[<span class="number">3</span>], delimiter,</span><br><span class="line">            arp.arp_ha.sa_data[<span class="number">4</span>], delimiter,</span><br><span class="line">            arp.arp_ha.sa_data[<span class="number">5</span>]);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="参数处理"><a href="#参数处理" class="headerlink" title="参数处理"></a>参数处理</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">include &lt;fcntl.h&gt;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">include &lt;getopt.h&gt;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">include &lt;signal.h&gt;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">include &lt;stdio.h&gt;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">include &lt;stdlib.h&gt;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">include &lt;string.h&gt;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">include &lt;unistd.h&gt;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">include &lt;errno.h&gt;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">include &lt;time.h&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">ifndef bool</span></span><br><span class="line">typedef unsigned char bool;</span><br><span class="line"><span class="meta">#</span><span class="bash">define <span class="literal">true</span> 1</span></span><br><span class="line"><span class="meta">#</span><span class="bash">define <span class="literal">false</span> 0</span></span><br><span class="line"><span class="meta">#</span><span class="bash">endif</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">define _(x) (x)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">define ELOG(fmt, args...) \</span></span><br><span class="line">    do &#123; \</span><br><span class="line">        fprintf(stderr, "[ERROR]:--"fmt"--%s:%d\n", \</span><br><span class="line">                ##args, __FILE__, __LINE__); \</span><br><span class="line">    &#125; while (0)</span><br><span class="line"></span><br><span class="line">static const char *Progname;</span><br><span class="line">static const char *SubProgram = NULL;</span><br><span class="line">static char       *Opts;</span><br><span class="line">static void       (*Func)(void);</span><br><span class="line"></span><br><span class="line">static int    ProductionLimit = -1;</span><br><span class="line">static int    ConnectionLimit = -1;</span><br><span class="line">static time_t Deadline = 0xFFFFFFFF;</span><br><span class="line">static char  *UpdateFile = "./update.bin";</span><br><span class="line">static char  *Hid = NULL;</span><br><span class="line">static char  *Logo = "";</span><br><span class="line">static char  *Protocol = "CCID";</span><br><span class="line">static bool   SetNetwork = false;</span><br><span class="line">static bool   SetLogo = false;</span><br><span class="line">static bool   SetDeadline = false;</span><br><span class="line">static bool   SetUnlock = false;</span><br><span class="line">static bool   SetMotherMode = false;</span><br><span class="line">static bool   IsEmpty = false;</span><br><span class="line">static bool   EnableVerbose = false;</span><br><span class="line">static bool   EnableDebug = false;</span><br><span class="line"></span><br><span class="line">static void Usage(void);</span><br><span class="line">static void FormLogo(char *logo);</span><br><span class="line">static bool StrToTime(const char *str, time_t *t);</span><br><span class="line">static bool IsDigitals(const char *str);</span><br><span class="line">const char *GetProgname(const char *argv0);</span><br><span class="line"></span><br><span class="line">static void MCInit(void);</span><br><span class="line">static void Init(void);</span><br><span class="line">static void MakeUpdate(void);</span><br><span class="line">static void Update(void);</span><br><span class="line">static void Reset(void);</span><br><span class="line">static void List(void);</span><br><span class="line">static void SwitchProtocol(void);</span><br><span class="line"></span><br><span class="line">static struct ExecStringOpts</span><br><span class="line">&#123;</span><br><span class="line">    char    *string;</span><br><span class="line">    char    *opts;</span><br><span class="line">    void    (*func)(void);</span><br><span class="line">&#125; ExecStringOpts[] =</span><br><span class="line">&#123;</span><br><span class="line">    &#123;"mcinit", "H:F:P:", MCInit&#125;,</span><br><span class="line">    &#123;"init", "D:H:L:M:N:P:", Init&#125;,</span><br><span class="line">    &#123;"makeupdate", "D:F:H:L:N:U1", MakeUpdate&#125;,</span><br><span class="line">    &#123;"update", "H:F:", Update&#125;,</span><br><span class="line">    &#123;"reset", "H:", Reset&#125;,</span><br><span class="line">    &#123;"list", "H:v", List&#125;,</span><br><span class="line">    &#123;"switch", "H:P:", SwitchProtocol&#125;,</span><br><span class="line">    &#123;NULL, NULL, NULL&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">int main(int argc, char **argv)</span><br><span class="line">&#123;</span><br><span class="line">    static struct option long_options[] = &#123;</span><br><span class="line">        &#123;"debug", no_argument, NULL, 'd'&#125;,    /* enable debug */</span><br><span class="line">        &#123;"empty", no_argument, NULL, '1'&#125;,    /* is empty dongle */</span><br><span class="line">        &#123;"local", no_argument, NULL, '2'&#125;,    /* is empty dongle */</span><br><span class="line">        &#123;NULL, required_argument, NULL, 'D'&#125;, /* deadline */</span><br><span class="line">        &#123;NULL, required_argument, NULL, 'F'&#125;, /* update file path */</span><br><span class="line">        &#123;NULL, required_argument, NULL, 'H'&#125;, /* hid */</span><br><span class="line">        &#123;NULL, required_argument, NULL, 'L'&#125;, /* logo */</span><br><span class="line">        &#123;NULL, required_argument, NULL, 'M'&#125;, /* init a mother dongle? default child dongle */</span><br><span class="line">        &#123;NULL, required_argument, NULL, 'N'&#125;, /* network client number */</span><br><span class="line">        &#123;NULL, required_argument, NULL, 'P'&#125;, /* admin pin */</span><br><span class="line">        &#123;NULL , no_argument, NULL, 'U'&#125;,      /* unlock user pin */</span><br><span class="line">        &#123;NULL , no_argument, NULL, 'v'&#125;,      /* list dongle verbose information */</span><br><span class="line">        &#123;NULL, 0, NULL, 0&#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    int c, option_index;</span><br><span class="line">    int i;</span><br><span class="line"></span><br><span class="line">    Progname = GetProgname(argv[0]);</span><br><span class="line"></span><br><span class="line">    Opts = ExecStringOpts[i].opts;</span><br><span class="line">    Func = MCInit;</span><br><span class="line">    </span><br><span class="line">    if (argc &gt; 1)</span><br><span class="line">    &#123;</span><br><span class="line">        for (i=0; ExecStringOpts[i].string!=NULL; i++)</span><br><span class="line">        &#123;</span><br><span class="line">            if (strcasecmp(argv[1], ExecStringOpts[i].string) == 0)</span><br><span class="line">            &#123;</span><br><span class="line">                SubProgram = ExecStringOpts[i].string;</span><br><span class="line">                Opts = ExecStringOpts[i].opts;</span><br><span class="line">                Func = ExecStringOpts[i].func;</span><br><span class="line">                argc--;</span><br><span class="line">                argv++;</span><br><span class="line">                break;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (argc &gt; 1)</span><br><span class="line">    &#123;</span><br><span class="line">        if (strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-?") == 0)</span><br><span class="line">        &#123;</span><br><span class="line">            Usage();</span><br><span class="line">            exit(0);</span><br><span class="line">        &#125;</span><br><span class="line">        if (strcmp(argv[1], "--version") == 0 || strcmp(argv[1], "-V") == 0)</span><br><span class="line">        &#123;</span><br><span class="line">            exit(0);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    while ((c = getopt_long(argc, argv, Opts, long_options, &amp;option_index)) != -1)</span><br><span class="line">    &#123;</span><br><span class="line">        switch (c)</span><br><span class="line">        &#123;</span><br><span class="line">            case 'D':</span><br><span class="line">                SetDeadline = true;</span><br><span class="line">                if (!StrToTime(optarg, &amp;Deadline))</span><br><span class="line">                &#123;</span><br><span class="line">                    ELOG("Time format error");</span><br><span class="line">                    return 1;</span><br><span class="line">                &#125;</span><br><span class="line">                break;</span><br><span class="line">            case 'd':</span><br><span class="line">                EnableDebug = true;</span><br><span class="line">                break;</span><br><span class="line">            case 'F':</span><br><span class="line">                UpdateFile = optarg;</span><br><span class="line">                break;</span><br><span class="line">            case 'H':</span><br><span class="line">                Hid = optarg;</span><br><span class="line">                break;</span><br><span class="line">            case 'L':</span><br><span class="line">                SetLogo = true;</span><br><span class="line">                Logo = optarg;</span><br><span class="line">                FormLogo(Logo);</span><br><span class="line">                break;</span><br><span class="line">            case 'M':</span><br><span class="line">                SetMotherMode = true;</span><br><span class="line">                if (!IsDigitals(optarg))</span><br><span class="line">                &#123;</span><br><span class="line">                    ELOG("Option format error");</span><br><span class="line">                    return 1;</span><br><span class="line">                &#125;</span><br><span class="line">                ProductionLimit = atoi(optarg);</span><br><span class="line">                break;</span><br><span class="line">            case 'N':</span><br><span class="line">            	SetNetwork = true;</span><br><span class="line">                if (!IsDigitals(optarg))</span><br><span class="line">                &#123;</span><br><span class="line">                    ELOG("Option format error");</span><br><span class="line">                    return 1;</span><br><span class="line">                &#125;</span><br><span class="line">                ConnectionLimit = atoi(optarg);</span><br><span class="line">                break;</span><br><span class="line">            case 'P':</span><br><span class="line">                Protocol = optarg;</span><br><span class="line">                break;</span><br><span class="line">            case 'U':</span><br><span class="line">                SetUnlock = true;</span><br><span class="line">                break;</span><br><span class="line">            case 'v':</span><br><span class="line">                EnableVerbose = true;</span><br><span class="line">                break;</span><br><span class="line">            case '1':</span><br><span class="line">                IsEmpty = true;</span><br><span class="line">                break;</span><br><span class="line">            default:</span><br><span class="line">                if (SubProgram != NULL)</span><br><span class="line">                    fprintf(stderr, "Try \"%s %s --help\" for more information.\n",</span><br><span class="line">                            Progname, SubProgram);</span><br><span class="line">                else</span><br><span class="line">                    fprintf(stderr, "Try \"%s --help\" for more information.\n",</span><br><span class="line">                            Progname);</span><br><span class="line">                return 1;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    if (optind &lt; argc)</span><br><span class="line">    &#123;</span><br><span class="line">        fprintf(stderr, "Invalid argument: \"%s\".\n", argv[optind]);</span><br><span class="line">        return 1;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Func();</span><br><span class="line">    </span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">static void Usage(void)</span><br><span class="line">&#123;</span><br><span class="line">    printf(_("%s is a super dongle tool.\n\n"), Progname);</span><br><span class="line">    printf(_("Usage:\n"));</span><br><span class="line">    if (SubProgram == NULL || *SubProgram == '\0')</span><br><span class="line">    &#123;</span><br><span class="line">        printf(_("  %s [mcinit] [OPTION]\n"), Progname);</span><br><span class="line">        printf(_("  %s init [OPTION]\n"), Progname);</span><br><span class="line">        printf(_("  %s mamkeupdate [OPTION]\n"), Progname);</span><br><span class="line">        printf(_("  %s update [OPTION]\n"), Progname);</span><br><span class="line">        printf(_("  %s reset [OPTION]\n"), Progname);</span><br><span class="line">        printf(_("  %s list [OPTION]\n"), Progname);</span><br><span class="line">        printf(_("  %s switch [OPTION]\n"), Progname);</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">        printf(_("  %s %s [OPTION]\n"), Progname, SubProgram);</span><br><span class="line">    printf(_("\nOptions:\n"));</span><br><span class="line">    if (strchr(Opts, 'D') != NULL)</span><br><span class="line">    &#123;</span><br><span class="line">        printf(_("  -D DEADLINE          set expiration time\n"));</span><br><span class="line">        printf(_("                       \"unlimited\"\n"));</span><br><span class="line">        printf(_("                       \"yyyy-mm-dd hh:mm:ss\" (1977-06-23 23:00:00 ~ 2038-01-19 11:14:07)\n"));</span><br><span class="line">        printf(_("                       \"hours\" (1 ~ 65535)\n"));</span><br><span class="line">    &#125;</span><br><span class="line">    if (strchr(Opts, 'F') != NULL)</span><br><span class="line">        printf(_("  -F FILE              update file path (default %s)\n"), UpdateFile);</span><br><span class="line">    if (strchr(Opts, 'H') != NULL)</span><br><span class="line">        printf(_("  -H HID               dongle hid\n"));</span><br><span class="line">    if (strchr(Opts, 'L') != NULL)</span><br><span class="line">    &#123;</span><br><span class="line">        printf(_("  -L LOGO              logo separated by \";\"\n"));</span><br><span class="line">        printf(_("                       \"CustomerName: xxx;ProjectCode: 0x123;ProjectName: yyy\"\n"));</span><br><span class="line">    &#125;</span><br><span class="line">    if (strchr(Opts, 'M') != NULL)</span><br><span class="line">        printf(_("  -M NUM               initialize a mother dongle\n"));</span><br><span class="line">    if (strchr(Opts, 'N') != NULL)</span><br><span class="line">    	printf(_("  -N NUM               set to network mode, and set connection limit"</span><br><span class="line">                    "(default local mode)\n"));</span><br><span class="line">    if (strchr(Opts, 'P') != NULL)</span><br><span class="line">        printf(_("  -P PROTOCOL          communication protocol, default CCID\n"));</span><br><span class="line">    if (strchr(Opts, 'U') != NULL)</span><br><span class="line">        printf(_("  -U                   unlock user pin\n"));</span><br><span class="line">    if (strchr(Opts, 'v') != NULL)</span><br><span class="line">        printf(_("  -v                   view details\n"));</span><br><span class="line">    if (strchr(Opts, '1') != NULL)</span><br><span class="line">        printf(_("  --empty              empty dongle\n"), UpdateFile);</span><br><span class="line">    printf(_("  -?,--help            show help\n"));</span><br><span class="line">&#125;</span><br><span class="line">static void FormLogo(char *logo)</span><br><span class="line">&#123;&#125;</span><br><span class="line">static bool StrToTime(const char *str, time_t *t)</span><br><span class="line">&#123;</span><br><span class="line">    struct tm tm; </span><br><span class="line"></span><br><span class="line">    if (strcasecmp(str, "unlimited") == 0) /* unlimited */</span><br><span class="line">    &#123;   </span><br><span class="line">        *t = 0xFFFFFFFF;</span><br><span class="line">        return true;</span><br><span class="line">    &#125;   </span><br><span class="line"></span><br><span class="line">    if (sscanf(str, "%d-%d-%d %d:%d:%d",</span><br><span class="line">                &amp;tm.tm_year, &amp;tm.tm_mon, &amp;tm.tm_mday,</span><br><span class="line">                &amp;tm.tm_hour, &amp;tm.tm_min, &amp;tm.tm_sec) == 6) /* xxxx-xx-xx xx:xx:xx */</span><br><span class="line">    &#123;   </span><br><span class="line">        if (tm.tm_year &lt; 1977 || tm.tm_year &gt; 2038 ||</span><br><span class="line">                tm.tm_mon &lt; 1 || tm.tm_mon &gt; 12 ||</span><br><span class="line">                tm.tm_mday &lt; 1 || tm.tm_mday &gt; 31 ||</span><br><span class="line">                tm.tm_hour &gt; 24 || tm.tm_min &gt; 60 || tm.tm_sec &gt; 60) </span><br><span class="line">            return false;</span><br><span class="line"></span><br><span class="line">        if (tm.tm_year == 1977 &amp;&amp;</span><br><span class="line">                (tm.tm_mon &lt; 6 ||</span><br><span class="line">                 (tm.tm_mon == 6 &amp;&amp;</span><br><span class="line">                  (tm.tm_mday &lt; 23 ||</span><br><span class="line">                   (tm.tm_mday == 23 &amp;&amp;</span><br><span class="line">                    (tm.tm_hour &lt; 23))))))</span><br><span class="line">                return false;</span><br><span class="line"></span><br><span class="line">        if (tm.tm_year == 2038 &amp;&amp;</span><br><span class="line">                (tm.tm_mon &gt; 1 ||</span><br><span class="line">                 (tm.tm_mon == 1 &amp;&amp;</span><br><span class="line">                  (tm.tm_mday &gt; 19 ||</span><br><span class="line">                   (tm.tm_mday == 19 &amp;&amp;</span><br><span class="line">                    (tm.tm_hour &gt; 11 ||</span><br><span class="line">                     (tm.tm_hour == 11 &amp;&amp;</span><br><span class="line">                      (tm.tm_min &gt; 14 ||</span><br><span class="line">                       (tm.tm_min == 14 &amp;&amp;</span><br><span class="line">                        (tm.tm_sec &gt; 7))))))))))</span><br><span class="line">                return false;</span><br><span class="line"></span><br><span class="line">        tm.tm_year -= 1900;</span><br><span class="line">        tm.tm_mon--;</span><br><span class="line">        tm.tm_isdst = -1;</span><br><span class="line">        if ((*t = mktime(&amp;tm)) == -1)</span><br><span class="line">            return false;</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /* xxx hours */</span><br><span class="line">    if (!IsDigitals(str))</span><br><span class="line">        return false;</span><br><span class="line"></span><br><span class="line">    *t = atoi(str);</span><br><span class="line">    if (*t &lt; 1 || *t &gt; 0xFFFF)</span><br><span class="line">        return false;</span><br><span class="line"></span><br><span class="line">    return true;</span><br><span class="line">&#125;</span><br><span class="line">static bool IsDigitals(const char *str)</span><br><span class="line">&#123;</span><br><span class="line">  	return true;</span><br><span class="line">&#125;</span><br><span class="line">const char *GetProgname(const char *argv0)</span><br><span class="line">&#123;</span><br><span class="line">    char *p;</span><br><span class="line"></span><br><span class="line">    p = strrchr(argv0, '/');</span><br><span class="line">    if (p == NULL)</span><br><span class="line">        return argv0;</span><br><span class="line">    else</span><br><span class="line">        return p+1;</span><br><span class="line">&#125;</span><br><span class="line">static void MCInit(void)</span><br><span class="line">&#123;&#125;</span><br><span class="line">static void Init(void)</span><br><span class="line">&#123;&#125;</span><br><span class="line">static void MakeUpdate(void)</span><br><span class="line">&#123;&#125;</span><br><span class="line">static void Update(void)</span><br><span class="line">&#123;&#125;</span><br><span class="line">static void Reset(void)</span><br><span class="line">&#123;&#125;</span><br><span class="line">static void List(void)</span><br><span class="line">&#123;&#125;</span><br><span class="line">static void SwitchProtocol(void)</span><br><span class="line">&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+	<div>
+		
+			<div>  <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>  </div> 
+
+		
+	</div>
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="syf 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="syf 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    syf
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://shiyuefei.top/2018/12/06/常用的c语言函数/" title="常用的c语言函数">http://shiyuefei.top/2018/12/06/常用的c语言函数/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/30/Makefile/" rel="next" title="Makefile">
+                <i class="fa fa-chevron-left"></i> Makefile
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/27/linux终端快捷键/" rel="prev" title="linux终端快捷键">
+                linux终端快捷键 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODY2NC8xNTE5Mg"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="syf">
+            
+              <p class="site-author-name" itemprop="name">syf</p>
+              <p class="site-description motion-element" itemprop="description">FYSBlog</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yfshi" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i></a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:389726148@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i></a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#日志相关"><span class="nav-number">1.</span> <span class="nav-text">日志相关</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#阻塞"><span class="nav-number">2.</span> <span class="nav-text">阻塞</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#程序运行"><span class="nav-number">3.</span> <span class="nav-text">程序运行</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#随机数"><span class="nav-number">4.</span> <span class="nav-text">随机数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#时间相关"><span class="nav-number">5.</span> <span class="nav-text">时间相关</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数字判断"><span class="nav-number">6.</span> <span class="nav-text">数字判断</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#mac地址"><span class="nav-number">7.</span> <span class="nav-text">mac地址</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参数处理"><span class="nav-number">8.</span> <span class="nav-text">参数处理</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">syf</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">24.9k</span>
+  
+</div>
+
+
+
+
+
+
+
+
+  <div class="footer-custom"><a target="_blank" href="https://pages.github.com">生命不止 | 奋斗不息</a></div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=64042317";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_sphere.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('-1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("0u7lJb1mcU1WrSpXiCBhjD2U-gzGzoHsz", "5lY33m1Uey4z1cy0aJvsv2Qm");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

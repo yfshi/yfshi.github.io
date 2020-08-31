@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="PostgreSQL,Greenplum,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="FYSBlog" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="操作系统：centos6.4 x64最小安装  添加用户$ useradd gpadmin$ passwd gpadmin 把gpadmin加入sudoer，之后的操作都在gpadmin用户下完成。 搭建开发环境# linux基本环境$ sudo yum install -y bzip2 cmake gcc gcc-c++ gdb git libtool lrzsz make man net-t">
+<meta name="keywords" content="PostgreSQL,Greenplum">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Greenplum编译">
+<meta property="og:url" content="http://shiyuefei.top/2018/07/10/Greenplum编译/index.html">
+<meta property="og:site_name" content="FYSBlog">
+<meta property="og:description" content="操作系统：centos6.4 x64最小安装  添加用户$ useradd gpadmin$ passwd gpadmin 把gpadmin加入sudoer，之后的操作都在gpadmin用户下完成。 搭建开发环境# linux基本环境$ sudo yum install -y bzip2 cmake gcc gcc-c++ gdb git libtool lrzsz make man net-t">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-08-31T08:27:12.187Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Greenplum编译">
+<meta name="twitter:description" content="操作系统：centos6.4 x64最小安装  添加用户$ useradd gpadmin$ passwd gpadmin 把gpadmin加入sudoer，之后的操作都在gpadmin用户下完成。 搭建开发环境# linux基本环境$ sudo yum install -y bzip2 cmake gcc gcc-c++ gdb git libtool lrzsz make man net-t">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://shiyuefei.top/2018/07/10/Greenplum编译/">
+
+
+
+
+
+  <title>Greenplum编译 | FYSBlog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?842071952d3d3b6387fa2207f3c39fc0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">FYSBlog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Code is art</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://shiyuefei.top/2018/07/10/Greenplum编译/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="syf">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="FYSBlog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Greenplum编译</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-10T19:34:45+08:00">
+                2018-07-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Database/" itemprop="url" rel="index">
+                    <span itemprop="name">Database</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018/07/10/Greenplum编译/" class="leancloud_visitors" data-flag-title="Greenplum编译">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,915
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  11
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>操作系统：centos6.4 x64最小安装</p>
+</blockquote>
+<h1 id="添加用户"><a href="#添加用户" class="headerlink" title="添加用户"></a>添加用户</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> useradd gpadmin</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> passwd gpadmin</span></span><br></pre></td></tr></table></figure>
+<p>把gpadmin加入sudoer，之后的操作都在gpadmin用户下完成。</p>
+<h1 id="搭建开发环境"><a href="#搭建开发环境" class="headerlink" title="搭建开发环境"></a>搭建开发环境</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> linux基本环境</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo yum install -y bzip2 cmake gcc gcc-c++ gdb git libtool lrzsz make man net-tools sysstat unzip vim wget zip</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 数据库开发环境</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo yum install -y apr-devel apr-util-devel bison bzip2-devel c-ares-devel flex java-1.8.0-openjdk java-1.8.0-openjdk-devel json-c-devel krb5-devel libcurl-devel libevent-devel libkadm5 libxml2-devel libxslt-devel libyaml-devel openldap-devel openssl-devel pam-devel perl perl-devel perl-ExtUtils-Embed readline-devel unixODBC-devel zlib-devel</span></span><br></pre></td></tr></table></figure>
+<p>一般来说，上面安装的开发包足够一般的数据库编译或安装使用了。</p>
+<blockquote>
+<p>如果Greenplum版本较新(&gt;=5X_STABLE)，CentOS 6.4官方的开发包版本可能无法满足Greenplum（比如glibc不支持C11标准，python版本较低、cmake版本较低等）,也可能会缺少一些其他的包。</p>
+<p>可以通过源码编译或者非官方yum源安装合适的版本。</p>
+</blockquote>
+<h1 id="编译开发包"><a href="#编译开发包" class="headerlink" title="编译开发包"></a>编译开发包</h1><h2 id="gcc-4-8-5"><a href="#gcc-4-8-5" class="headerlink" title="gcc-4.8.5"></a>gcc-4.8.5</h2><p>Greenplum较新的代码要用到C11/C++11标准，要求gcc版本4.7以上。由于系统自带或yum安装的gcc版本是4.4.7，需要编译更高版本的gcc。</p>
+<p>编译gcc需要先编译gmp、mpfr、mpc，按照顺序编译安装。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 编译gmp</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> wget https://gmplib.org/download/gmp/gmp-6.1.0.tar.bz2</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> tar -jxf gmp-6.1.0.tar.bz2</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> gmp-6.1.0</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./configure --prefix=/home/gpadmin/BuildEnv/gcc</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> make &amp;&amp; make install</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 编译mpfr</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> wget https://www.mpfr.org/mpfr-3.1.4/mpfr-3.1.4.tar.bz2</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> tar -jxf mpfr-3.1.4.tar.bz2</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> mpfr-3.1.4</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./configure --prefix=/home/gpadmin/BuildEnv/gcc --with-gmp=/home/gpadmin/BuildEnv/gcc</span></span><br><span class="line">make &amp;&amp; make install</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 编译mpc</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> wget https://ftp.gnu.org/gnu/mpc/mpc-1.0.3.tar.gz</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> tar -zxf mpc-1.0.3.tar.gz</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> mpc-1.0.3</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./configure --prefix=/home/gpadmin/BuildEnv/gcc --with-gmp=/home/gpadmin/BuildEnv/gcc --with-mpfr=/home/gpadmin/BuildEnv/gcc</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> make &amp;&amp; make install</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 编译gcc</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> wget ftp://gcc.gnu.org/pub/gcc/releases/gcc-4.8.5/gcc-4.8.5.tar.bz2</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> tar -jxf gcc-4.8.5.tar.bz2</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> gcc-4.8.5</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">export</span> LD_LIBRARY_PATH=/home/gpadmin/BuildEnv/gcc/lib:<span class="variable">$LD_LIBRARY_PATH</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./configure --prefix=/home/gpadmin/BuildEnv/gcc --with-gmp=/home/gpadmin/BuildEnv/gcc --with-mpfr=/home/gpadmin/BuildEnv/gcc --with-mpc=/home/gpadmin/BuildEnv/gcc --<span class="built_in">disable</span>-multilib</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> make &amp;&amp; make install</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置环境变量</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> vi ~/.bashrc</span></span><br><span class="line">export LD_LIBRARY_PATH=/home/gpadmin/BuildEnv/gcc/lib:/home/gpadmin/BuildEnv/gcc/lib64:$LD_LIBRARY_PATH</span><br><span class="line">export PATH=/home/gpadmin/BuildEnv/gcc/bin:$PATH</span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">source</span> ~/.bashrc</span></span><br></pre></td></tr></table></figure>
+<h2 id="cmake3"><a href="#cmake3" class="headerlink" title="cmake3"></a>cmake3</h2><p>gporca要求cmake版本3.1以上，系统自带或者yum安装的cmake是cmake-2.8，需要编译更高版本cmake。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> wget https://cmake.org/files/v3.10/cmake-3.10.3.tar.gz</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> tar -zxf cmake-3.10.3.tar.gz</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> cmake-3.10.3</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./configure --prefix=/home/gpadmin/BuildEnv/cmake</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> make &amp;&amp; make install</span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> vi ~/.bashrc</span></span><br><span class="line">export LD_LIBRARY_PATH=/home/gpadmin/BuileEnv/cmake/lib:$LD_LIBRARY_PATH</span><br><span class="line">export PATH=/home/gpadmin/BuildEnv/cmake/bin:$PATH</span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">source</span> ~/.bashrc</span></span><br></pre></td></tr></table></figure>
+<h2 id="python-2-7"><a href="#python-2-7" class="headerlink" title="python-2.7"></a>python-2.7</h2><p>greeplum要求python 2.7以上，系统自带或yum安装的python是2.6，需要编译新版本。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 编译python</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> wget https://www.python.org/ftp/python/2.7.14/Python-2.7.14.tgz</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> tar -xf Python-2.7.14.tgz</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> Python-2.7.14</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./configure --prefix=/home/gpadmin/BuildEnv/python --<span class="built_in">enable</span>-optimizations -<span class="built_in">enable</span>-shared CFLAGS=-fPIC</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> make &amp;&amp; make install</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置环境变量</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> vi ~/.bashrc</span></span><br><span class="line">export LD_LIBRARY_PATH=/home/gpadmin/BuildEnv/python/lib:$LD_LIBRARY_PATH</span><br><span class="line">export PATH=/home/gpadmin/BuildEnv/python/bin:$PATH</span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">source</span> ~/.bashrc</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装pip</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> python -m ensurepip</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> pip install --upgrade pip</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装python模块</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> pip install psutil lockfile paramiko setuptools</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>python2.6+yum的使用：</p>
+<p>安装python和工具：sudo yum install -y python python-setuptools python-devel python-crypto python-paramiko</p>
+<p>安装python模块：<br>sudo easy_install lockfile<br>sudo easy_install psi</p>
+</blockquote>
+<h2 id="ninja"><a href="#ninja" class="headerlink" title="ninja"></a>ninja</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> wget https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-linux.zip</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> mkdir -p /home/gpadmin/BuildEnv/ninja/bin</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> unzip -d /home/gpadmin/BuildEnv/ninja/bin ninja-linux.zip</span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> vi ~/.bashrc</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">export</span> PATH=/home/gpadmin/BuildEnv/ninja/bin:<span class="variable">$PATH</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">source</span> ~/.bashrc</span></span><br></pre></td></tr></table></figure>
+<h2 id="geos-proj-gdal"><a href="#geos-proj-gdal" class="headerlink" title="geos+proj+gdal"></a>geos+proj+gdal</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> geos</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> wget http://download.osgeo.org/geos/geos-3.4.2.tar.bz2</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> tar xjf geos-3.4.2.tar.bz2</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> geos-3.4.2</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./configure --prefix=/home/gpadmin/BuildEnv/geos</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> make &amp;&amp; make install</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> proj</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> wget http://download.osgeo.org/proj/proj-4.9.1.tar.gz</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> tar xzf proj-4.9.1.tar.gz</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> proj-4.9.1</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./configure --prefix=/home/gpadmin/BuildEnv/proj</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> make &amp;&amp; make install</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> gdal</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> wget http://download.osgeo.org/gdal/1.11.2/gdal-1.11.2.tar.gz</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> tar xzf gdal-1.11.2.tar.gz</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> gdal-1.11.2</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./configure --prefix=/home/gpadmin/BuildEnv/gdal</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> make &amp;&amp; make install</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置环境变量</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> vi ~/.bashrc</span></span><br><span class="line">export LD_LIBRARY_PATH=/home/gpadmin/BuildEnv/geos/lib:/home/gpadmin/BuildEnv/proj/lib:/home/gpadmin/BuildEnv/gdal/lib:$LD_LIBRARY_PATH</span><br><span class="line">export PATH=/home/gpadmin/BuildEnv/geos/bin:/home/gpadmin/BuildEnv/proj/bin:/home/gpadmin/BuildEnv/gdal/bin:$PATH</span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">source</span> ~/.bashrc</span></span><br></pre></td></tr></table></figure>
+<h2 id="libevent"><a href="#libevent" class="headerlink" title="libevent"></a>libevent</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> wget https://github.com/downloads/libevent/libevent/libevent-2.0.20-stable.tar.gz</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> tar xf libevent-2.0.20-stable.tar.gz</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> libevent-2.0.20-stable</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./configure --prefix=/home/gpadmin/BuildEnv/libevent</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> make &amp;&amp; make install</span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> vi ~/.bashrc</span></span><br><span class="line">export LD_LIBRARY_PATH=/home/gpadmin/BuildEnv/libevent/lib:$LD_LIBRARY_PATH</span><br><span class="line">export PATH=/home/gpadmin/BuildEnv/libevent/bin:$PATH</span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">source</span> ~/.bashrc</span></span><br></pre></td></tr></table></figure>
+<h2 id="Apache-Maven"><a href="#Apache-Maven" class="headerlink" title="Apache Maven"></a>Apache Maven</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> wget http://mirrors.hust.edu.cn/apache/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> tar -zxf apache-maven-3.5.4-bin.tar.gz -C /home/gpadmin/BuildEnv/</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> mv /home/gpadmin/BuildEnv/apache-maven-3.5.4 /home/gpadmin/BuildEnv/apache-maven</span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> vi ~/.bashrc</span></span><br><span class="line">export PATH=/home/gpadmin/BuildEnv/apache-maven/bin:$PATH</span><br><span class="line"><span class="meta">$</span><span class="bash"> souce ~/.bashrc</span></span><br></pre></td></tr></table></figure>
+<h1 id="编译gporca"><a href="#编译gporca" class="headerlink" title="编译gporca"></a>编译gporca</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> gp-xerces</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">clone</span> git://github.com/Greenplum-db/gp-xerces.git</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> gp-xerces/</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> mkdir build</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> build</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ../configure --prefix=/home/gpadmin/gporca</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> make &amp;&amp; make install</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> gporca</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">clone</span> git://github.com/Greenplum-db/gporca.git</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> gporca</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> cmake -GNinja -D CMAKE_INSTALL_PREFIX=/home/gpadmin/gporca -D XERCES_LIBRARY=/home/gpadmin/gporca/lib/libxerces-c.so -D XERCES_INCLUDE_DIR=/home/gpadmin/gporca/include -H. -Bbuild</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ninja install -C build</span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> vi ~/.bashrc</span></span><br><span class="line">export LD_LIBRARY_PATH=/home/gpadmin/gporca/lib:$LD_LIBRARY_PATH</span><br><span class="line">export PATH=/home/gpadmin/gporca/bin:$PATH</span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">source</span> ~/.bashrc</span></span><br></pre></td></tr></table></figure>
+<h1 id="编译gpdb"><a href="#编译gpdb" class="headerlink" title="编译gpdb"></a>编译gpdb</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">clone</span> git://github.com/Greenplum-db/gpdb.git</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> gpdb</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">export</span> LIBRARY_PATH=/home/gpadmin/gporca/lib:<span class="variable">$LIBRARY_PATH</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">export</span> C_INCLUDE_PATH=/home/gpadmin/gporca/include:<span class="variable">$C_INCLUDE_PATH</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">export</span> CPLUS_INCLUDE_PATH=/home/gpadmin/gporca/include:<span class="variable">$CPLUS_INCLUDE_PATH</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./configure --with-perl --with-python --with-libxml --with-gssapi --prefix=/home/gpadmin/gpdb</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> make &amp;&amp; make install</span></span><br></pre></td></tr></table></figure>
+<h1 id="编译postgis"><a href="#编译postgis" class="headerlink" title="编译postgis"></a>编译postgis</h1><blockquote>
+<p>PostGIS 2.1.5 for GreenPlum 5.x+ </p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">clone</span> git://github.com/Greenplum-db/geospatial.git</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">source</span> /home/gpadmin/gpdb/greenplum_path.sh</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> geospatial/postgis/build/postgis-2.1.5/</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./configure --prefix=<span class="variable">$GPHOME</span> --with-pgconfig=<span class="variable">$GPHOME</span>/bin/pg_config --with-raster --without-topology --with-projdir=/home/gpadmin/BuildEnv/proj</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> make USE_PGXS=1 clean all install</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装postgis</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> psql -d postgres -f <span class="variable">$&#123;GPHOME&#125;</span>/share/postgresql/contrib/postgis-2.1/postgis.sql</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> psql -d postgres -f <span class="variable">$&#123;GPHOME&#125;</span>/share/postgresql/contrib/postgis-2.1/postgis_comments.sql</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> psql -d postgres -f <span class="variable">$&#123;GPHOME&#125;</span>/share/postgresql/contrib/postgis-2.1/rtpostgis.sql</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> psql -d postgres -f <span class="variable">$&#123;GPHOME&#125;</span>/share/postgresql/contrib/postgis-2.1/raster_comments.sql</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> psql -d postgres -f <span class="variable">$&#123;GPHOME&#125;</span>/share/postgresql/contrib/postgis-2.1/spatial_ref_sys.sql</span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> vi <span class="variable">$GPHOME</span>/greenplum_path.sh</span></span><br><span class="line">export GDAL_DATA=$GPHOME/share/gdal</span><br><span class="line">export POSTGIS_ENABLE_OUTDB_RASTERS=0</span><br><span class="line">export POSTGIS_GDAL_ENABLED_DRIVERS=DISABLE_ALL</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> gpstop –r	//重启数据库</span></span><br></pre></td></tr></table></figure>
+<h1 id="编译pgbouncer"><a href="#编译pgbouncer" class="headerlink" title="编译pgbouncer"></a>编译pgbouncer</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">clone</span> -b pgbouncer_1_8_1 git://github.com/Greenplum-db/pgbouncer.git</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> pgbouncer</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git submodule init</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git submodule update</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./autogen.sh</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./configure --prefix=/home/gpadmin/pgbouncer</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> make &amp;&amp; make install</span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> vi ~/.bashrc</span></span><br><span class="line">export PATH=/home/gpadmin/pgbouncer/bin:$PATH</span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">source</span> ~/.bashrc</span></span><br></pre></td></tr></table></figure>
+<h1 id="编译jdbc"><a href="#编译jdbc" class="headerlink" title="编译jdbc"></a>编译jdbc</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> wget https://jdbc.postgresql.org/download/postgresql-jdbc-42.2.2.src.tar.gz --no-check-certificate</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> tar -zxf postgresql-jdbc-42.2.2.src.tar.gz</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> postgresql-jdbc-42.2-2.src/pgjdbc/</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> mvn package –DskipTests</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> cp target/postgresql-42.2.2.jar /home/gpadmin/gpdb/lib</span></span><br></pre></td></tr></table></figure>
+<h1 id="编译odbc"><a href="#编译odbc" class="headerlink" title="编译odbc"></a>编译odbc</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> wget https://ftp.postgresql.org/pub/odbc/versions/src/psqlodbc-09.03.0400.tar.gz --no-check-certificate</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> tar -xf psqlodbc-09.03.0400.tar.gz</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> psqlodbc-09.03.0400</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./configure --prefix=/home/gpadmin/psqlodbc</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> make &amp;&amp; make install</span></span><br></pre></td></tr></table></figure>
+<p>测试：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo vi /etc/odbcinst.ini</span></span><br><span class="line">[PostgreSQL]</span><br><span class="line">Description   = ODBC for PostgreSQL</span><br><span class="line">Driver       = /home/gpadmin/psqlodbc/lib/psqlodbcw.so </span><br><span class="line">Setup       = /usr/lib/libodbcpsqlS.so</span><br><span class="line">Driver64     = /home/gpadmin/psqlodbc/lib/psqlodbcw.so </span><br><span class="line">Setup64     = /usr/lib64/libodbcpsqlS.so</span><br><span class="line">FileUsage	    = 1</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> vi ~/.odbc.ini</span></span><br><span class="line">[gp]</span><br><span class="line">Description = Test to gp</span><br><span class="line">Driver = PostgreSQL</span><br><span class="line">Database = postgres</span><br><span class="line">Servername = 127.0.0.1</span><br><span class="line">UserName = gpadmin</span><br><span class="line">Password = 111111</span><br><span class="line">Port = 5432</span><br><span class="line">ReadOnly = 0</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">source</span> /home/gpadmin/gpdb/greenplum_path.sh</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> isql gp</span></span><br></pre></td></tr></table></figure>
+<h1 id="附：CentOS-7-0编译gpdb"><a href="#附：CentOS-7-0编译gpdb" class="headerlink" title="附：CentOS 7.0编译gpdb"></a>附：CentOS 7.0编译gpdb</h1><blockquote>
+<p>CentOS 7.0最小化安装</p>
+</blockquote>
+<p>系统设置：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 关闭防火墙</span></span><br><span class="line">systemctl stop firewalld</span><br><span class="line">systemctl disable firewalld</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 关闭selinux</span></span><br><span class="line">setenforce 0</span><br><span class="line">vi /etc/selinux/config</span><br><span class="line">SELINUX=disabled</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置ip，网络等</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装基本环境</span></span><br><span class="line">yum install -y bzip2 git lrzsz sysstat unzip vim wget zip</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加用户</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> useadd gpadmin</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> passwd gpadmin</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> su - gpadmin</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 下载代码</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> mkdir /home/gpadmin/code</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> /home/gpadmin/code</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">clone</span> https://github.com/greenplum-db/gpdb.git</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装开发环境</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo ln -sf /bin/cmake3 /usr/<span class="built_in">local</span>/bin/cmake</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> /home/gpadmin/code/gpdb</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./README.CentOS.bash</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 系统配置</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo bash -c <span class="string">'cat &gt;&gt; /etc/sysctl.conf &lt;&lt;-EOF</span></span></span><br><span class="line">kernel.shmmax = 500000000</span><br><span class="line">kernel.shmmni = 4096</span><br><span class="line">kernel.shmall = 4000000000</span><br><span class="line">kernel.sem = 500 1024000 200 4096</span><br><span class="line">kernel.sysrq = 1</span><br><span class="line">kernel.core_uses_pid = 1</span><br><span class="line">kernel.msgmnb = 65536</span><br><span class="line">kernel.msgmax = 65536</span><br><span class="line">kernel.msgmni = 2048</span><br><span class="line">net.ipv4.tcp_syncookies = 1</span><br><span class="line">net.ipv4.ip_forward = 0</span><br><span class="line">net.ipv4.conf.default.accept_source_route = 0</span><br><span class="line">net.ipv4.tcp_tw_recycle = 1</span><br><span class="line">net.ipv4.tcp_max_syn_backlog = 4096</span><br><span class="line">net.ipv4.conf.all.arp_filter = 1</span><br><span class="line">net.ipv4.ip_local_port_range = 1025 65535</span><br><span class="line">net.core.netdev_max_backlog = 10000</span><br><span class="line">net.core.rmem_max = 2097152</span><br><span class="line">net.core.wmem_max = 2097152</span><br><span class="line">vm.overcommit_memory = 2</span><br><span class="line"></span><br><span class="line">EOF'</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo bash -c <span class="string">'cat &gt;&gt; /etc/security/limits.conf &lt;&lt;-EOF</span></span></span><br><span class="line">* soft nofile 65536</span><br><span class="line">* hard nofile 65536</span><br><span class="line">* soft nproc 131072</span><br><span class="line">* hard nproc 131072</span><br><span class="line"></span><br><span class="line">EOF'</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo bash -c <span class="string">'cat &gt;&gt; /etc/ld.so.conf &lt;&lt;-EOF</span></span></span><br><span class="line">/usr/local/lib</span><br><span class="line"></span><br><span class="line">EOF'</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 编译gporca</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> /home/gpadmin/code/gpdb/depends</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./configure --prefix=/home/gpadmin/gpdb</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> make &amp;&amp; make install</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 编译gpdb</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> LD_LIBRARY_PATH=/home/gpadmin/gpdb/lib ./configure \</span></span><br><span class="line">--with-libraries=/home/gpadmin/gpdb/lib \</span><br><span class="line">--with-includes=/home/gpadmin/gpdb/include \</span><br><span class="line">--with-perl --with-python --with-libxml --with-gssapi --prefix=/home/gpadmin/gpdb</span><br><span class="line"><span class="meta">$</span><span class="bash"> LD_LIBRARY_PATH=/home/gpadmin/gpdb/lib make install</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+	<div>
+		
+			<div>  <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>  </div> 
+
+		
+	</div>
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="syf 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="syf 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    syf
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://shiyuefei.top/2018/07/10/Greenplum编译/" title="Greenplum编译">http://shiyuefei.top/2018/07/10/Greenplum编译/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/PostgreSQL/" rel="tag"># PostgreSQL</a>
+          
+            <a href="/tags/Greenplum/" rel="tag"># Greenplum</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/09/PostgreSQL查询和计划树绘图工具/" rel="next" title="PostgreSQL查询和计划树绘图工具">
+                <i class="fa fa-chevron-left"></i> PostgreSQL查询和计划树绘图工具
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/10/Greenplum安装/" rel="prev" title="Greenplum安装">
+                Greenplum安装 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODY2NC8xNTE5Mg"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="syf">
+            
+              <p class="site-author-name" itemprop="name">syf</p>
+              <p class="site-description motion-element" itemprop="description">FYSBlog</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yfshi" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i></a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:389726148@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i></a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#添加用户"><span class="nav-number">1.</span> <span class="nav-text">添加用户</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#搭建开发环境"><span class="nav-number">2.</span> <span class="nav-text">搭建开发环境</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编译开发包"><span class="nav-number">3.</span> <span class="nav-text">编译开发包</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#gcc-4-8-5"><span class="nav-number">3.1.</span> <span class="nav-text">gcc-4.8.5</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cmake3"><span class="nav-number">3.2.</span> <span class="nav-text">cmake3</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#python-2-7"><span class="nav-number">3.3.</span> <span class="nav-text">python-2.7</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ninja"><span class="nav-number">3.4.</span> <span class="nav-text">ninja</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#geos-proj-gdal"><span class="nav-number">3.5.</span> <span class="nav-text">geos+proj+gdal</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#libevent"><span class="nav-number">3.6.</span> <span class="nav-text">libevent</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Apache-Maven"><span class="nav-number">3.7.</span> <span class="nav-text">Apache Maven</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编译gporca"><span class="nav-number">4.</span> <span class="nav-text">编译gporca</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编译gpdb"><span class="nav-number">5.</span> <span class="nav-text">编译gpdb</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编译postgis"><span class="nav-number">6.</span> <span class="nav-text">编译postgis</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编译pgbouncer"><span class="nav-number">7.</span> <span class="nav-text">编译pgbouncer</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编译jdbc"><span class="nav-number">8.</span> <span class="nav-text">编译jdbc</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编译odbc"><span class="nav-number">9.</span> <span class="nav-text">编译odbc</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#附：CentOS-7-0编译gpdb"><span class="nav-number">10.</span> <span class="nav-text">附：CentOS 7.0编译gpdb</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">syf</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">24.9k</span>
+  
+</div>
+
+
+
+
+
+
+
+
+  <div class="footer-custom"><a target="_blank" href="https://pages.github.com">生命不止 | 奋斗不息</a></div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=64042317";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_sphere.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('-1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("0u7lJb1mcU1WrSpXiCBhjD2U-gzGzoHsz", "5lY33m1Uey4z1cy0aJvsv2Qm");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

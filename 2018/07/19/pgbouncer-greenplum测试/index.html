@@ -1,0 +1,2069 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="PostgreSQL,pgbouncer,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="FYSBlog" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="测试环境系统：CentOS release 6.5 (Final) 节点：    节点 地址 角色     h1 192.168.2.114 master,seg0~seg7,mirror(seg8~seg15)   h2 192.168.2.115 standby,seg8~seg15,mirror(seg0~seg7)    连接数：  pgbouncer — 100 —&amp;gt; master">
+<meta name="keywords" content="PostgreSQL,pgbouncer">
+<meta property="og:type" content="article">
+<meta property="og:title" content="pgbouncer--greenplum测试">
+<meta property="og:url" content="http://shiyuefei.top/2018/07/19/pgbouncer-greenplum测试/index.html">
+<meta property="og:site_name" content="FYSBlog">
+<meta property="og:description" content="测试环境系统：CentOS release 6.5 (Final) 节点：    节点 地址 角色     h1 192.168.2.114 master,seg0~seg7,mirror(seg8~seg15)   h2 192.168.2.115 standby,seg8~seg15,mirror(seg0~seg7)    连接数：  pgbouncer — 100 —&amp;gt; master">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-08-31T08:27:12.188Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="pgbouncer--greenplum测试">
+<meta name="twitter:description" content="测试环境系统：CentOS release 6.5 (Final) 节点：    节点 地址 角色     h1 192.168.2.114 master,seg0~seg7,mirror(seg8~seg15)   h2 192.168.2.115 standby,seg8~seg15,mirror(seg0~seg7)    连接数：  pgbouncer — 100 —&amp;gt; master">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://shiyuefei.top/2018/07/19/pgbouncer-greenplum测试/">
+
+
+
+
+
+  <title>pgbouncer--greenplum测试 | FYSBlog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?842071952d3d3b6387fa2207f3c39fc0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">FYSBlog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Code is art</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://shiyuefei.top/2018/07/19/pgbouncer-greenplum测试/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="syf">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="FYSBlog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">pgbouncer--greenplum测试</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-19T15:53:57+08:00">
+                2018-07-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Database/" itemprop="url" rel="index">
+                    <span itemprop="name">Database</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018/07/19/pgbouncer-greenplum测试/" class="leancloud_visitors" data-flag-title="pgbouncer--greenplum测试">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2,101
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  9
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="测试环境"><a href="#测试环境" class="headerlink" title="测试环境"></a>测试环境</h1><p>系统：CentOS release 6.5 (Final)</p>
+<p>节点：</p>
+<table>
+<thead>
+<tr>
+<th>节点</th>
+<th>地址</th>
+<th>角色</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>h1</td>
+<td>192.168.2.114</td>
+<td>master,seg0~seg7,mirror(seg8~seg15)</td>
+</tr>
+<tr>
+<td>h2</td>
+<td>192.168.2.115</td>
+<td>standby,seg8~seg15,mirror(seg0~seg7)</td>
+</tr>
+</tbody>
+</table>
+<p>连接数：</p>
+<ul>
+<li>pgbouncer — 100 —&gt; master</li>
+<li>client — 1000 —&gt; pgbouncer</li>
+</ul>
+<p>用户：yfshi/123456</p>
+<h1 id="greenplum"><a href="#greenplum" class="headerlink" title="greenplum"></a>greenplum</h1><h2 id="配置交互key"><a href="#配置交互key" class="headerlink" title="配置交互key"></a>配置交互key</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> gpssh-exkeys -h h1 -h h2</span></span><br></pre></td></tr></table></figure>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>略</p>
+<h2 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h2><ul>
+<li><p>初始化数据目录</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> gpssh -h h1 -h h2</span></span><br><span class="line">=&gt; mkdir -p /home/yfshi/gpdata/master</span><br><span class="line">=&gt; mkdir -p /home/yfshi/gpdata/primary</span><br><span class="line">=&gt; mkdir -p /home/yfshi/gpdata/mirror</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>配置gpinitsystem_config</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ARRAY_NAME="Greenplum Data Platform"</span><br><span class="line">SEG_PREFIX=gpseg</span><br><span class="line">PORT_BASE=64300</span><br><span class="line">declare -a DATA_DIRECTORY=(/home/yfshi/gpdata/primary /home/yfshi/gpdata/primary /home/yfshi/gpdata/primary /home/yfshi/gpdata/primary /home/yfshi/gpdata/primary /home/yfshi/gpdata/primary /home/yfshi/gpdata/primary /home/yfshi/gpdata/primary)</span><br><span class="line">MASTER_HOSTNAME=h1</span><br><span class="line">MASTER_DIRECTORY=/home/yfshi/gpdata/master</span><br><span class="line">MASTER_PORT=65432</span><br><span class="line">TRUSTED_SHELL=ssh</span><br><span class="line">CHECK_POINT_SEGMENTS=8</span><br><span class="line">ENCODING=UNICODE</span><br><span class="line"></span><br><span class="line">MIRROR_PORT_BASE=64400</span><br><span class="line">REPLICATION_PORT_BASE=64500</span><br><span class="line">MIRROR_REPLICATION_PORT_BASE=64600</span><br><span class="line">declare -a MIRROR_DATA_DIRECTORY=(/home/yfshi/gpdata/mirror /home/yfshi/gpdata/mirror /home/yfshi/gpdata/mirror /home/yfshi/gpdata/mirror /home/yfshi/gpdata/mirror /home/yfshi/gpdata/mirror /home/yfshi/gpdata/mirror /home/yfshi/gpdata/mirror)</span><br><span class="line"></span><br><span class="line">MACHINE_LIST_FILE=/home/yfshi/config/hostfile_gpinitsystem</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>配置hostfile_gpinitsystem</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">h1</span><br><span class="line">h2</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>初始化并启动</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> gpinitsystem -c gpinitsystem_config -s h2</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="pgbouncer测试1000连接数"><a href="#pgbouncer测试1000连接数" class="headerlink" title="pgbouncer测试1000连接数"></a>pgbouncer测试1000连接数</h1><h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><ul>
+<li><p>pgbouncer.ini</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[databases]</span><br><span class="line">pgbench = host=127.0.0.1 dbname=pgbench user=yfshi port=65432</span><br><span class="line">postgres = host=127.0.0.1 dbname=pgbench user=yfshi port=65432</span><br><span class="line">[pgbouncer]</span><br><span class="line">logfile = /home/yfshi/pgbouncer/var/log/pgbouncer.log   # 日志文件</span><br><span class="line">pidfile = /home/yfshi/pgbouncer/var/log/pgbouncer.pid   # pid文件</span><br><span class="line">listen_addr = 127.0.0.1          # 监听地址</span><br><span class="line">listen_port = 6543               # 监听端口</span><br><span class="line">auth_type = trust</span><br><span class="line">auth_file = /home/yfshi/pgbouncer/etc/userlist.txt      # 用户认证文件</span><br><span class="line">pool_mode = session</span><br><span class="line">server_reset_query = DISCARD ALL</span><br><span class="line">max_client_conn = 1000           # pgbouncer的客户端最大连接数</span><br><span class="line">default_pool_size = 100          # 连接池大小</span><br><span class="line">admin_users = yfshi              # 管理员，pgbouncer内部使用</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>userlist.txt</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">"admin" "111111"</span><br><span class="line">"yfshi" "111111"</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> pgbouncer -d pgbouncer.ini</span></span><br></pre></td></tr></table></figure>
+<h2 id="管理"><a href="#管理" class="headerlink" title="管理"></a>管理</h2><blockquote>
+<p>pbouncer提供了类似连接到虚拟数据库pgbouncer,然后执行一些特殊命令的功能,这些命令就像是执行一个真正的SQL命令,让管理者能查询和管理pgbouncer的连接池信息,这个界面为pgbouncer的Console控制界面.一般使用psql命令连接到这个虚拟数据库上.<br><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> psql -p6543 pgbouncer</span></span><br><span class="line">psql (9.6.3, server 1.7.2/bouncer)</span><br><span class="line">Type "help" for help.</span><br><span class="line"></span><br><span class="line">pgbouncer=#</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>show help</p>
+<blockquote>
+<p>NOTICE:  Console usage<br>DETAIL:<br>    SHOW HELP|CONFIG|DATABASES|POOLS|CLIENTS|SERVERS|VERSION<br>    SHOW FDS|SOCKETS|ACTIVE_SOCKETS|LISTS|MEM<br>    SHOW DNS_HOSTS|DNS_ZONES<br>    SHOW STATS|STATS_TOTALS|STATS_AVERAGES<br>    SET key = arg<br>    RELOAD<br>    PAUSE [<db>]<br>    RESUME [<db>]<br>    DISABLE <db><br>    ENABLE <db><br>    KILL <db><br>    SUSPEND<br>    SHUTDOWN<br>SHOW</db></db></db></db></db></p>
+</blockquote>
+<p>show config</p>
+<blockquote>
+<p>显示当前配置设置,一个配置一行,字段如下:</p>
+<ul>
+<li>key：配置变量名称 </li>
+<li>value：配置值 </li>
+<li>changeable：yes 或 no,显示这个变量是否可以在运行时修改如果为 no,那么这个变量只能在启动的时候修改</li>
+</ul>
+</blockquote>
+<p>下表是执行show config;的结果。一下的key都可以在pgbouncer.ini的[pgbouncer]中配置：</p>
+<table>
+<thead>
+<tr>
+<th>key</th>
+<th>value</th>
+<th>changeable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>job_name</td>
+<td>pgbouncer</td>
+<td>no</td>
+</tr>
+<tr>
+<td>conffile</td>
+<td>pgbouncer.ini</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>logfile</td>
+<td>/home/yfshi/pgbouncer/pgbouncer.log</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>pidfile</td>
+<td>/home/yfshi/pgbouncer/pgbouncer.pid</td>
+<td>no</td>
+</tr>
+<tr>
+<td>listen_addr</td>
+<td>192.168.2.113</td>
+<td>no</td>
+</tr>
+<tr>
+<td>listen_port</td>
+<td>55556</td>
+<td>no</td>
+</tr>
+<tr>
+<td>listen_backlog</td>
+<td>128</td>
+<td>no</td>
+</tr>
+<tr>
+<td>unix_socket_dir</td>
+<td>/tmp</td>
+<td>no</td>
+</tr>
+<tr>
+<td>unix_socket_mode</td>
+<td>511</td>
+<td>no</td>
+</tr>
+<tr>
+<td>unix_socket_group</td>
+<td></td>
+<td>no</td>
+</tr>
+<tr>
+<td>auth_type</td>
+<td>trust</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>auth_file</td>
+<td>/home/yfshi/pgbouncer/userlist.txt</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>auth_hba_file</td>
+<td></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>auth_user</td>
+<td></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>auth_query</td>
+<td>SELECT usename, passwd FROM pg_shadow WHERE usename=$1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>pool_mode</td>
+<td>session</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>max_client_conn</td>
+<td>200</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>default_pool_size</td>
+<td>100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>min_pool_size</td>
+<td>0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>reserve_pool_size</td>
+<td>0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>reserve_pool_timeout</td>
+<td>5</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>max_db_connections</td>
+<td>0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>max_user_connections</td>
+<td>0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>syslog</td>
+<td>0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>syslog_facility</td>
+<td>daemon</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>syslog_ident</td>
+<td>pgbouncer</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>user</td>
+<td></td>
+<td>no</td>
+</tr>
+<tr>
+<td>autodb_idle_timeout</td>
+<td>3600</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>server_reset_query</td>
+<td>DISCARD ALL</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>server_reset_query_always</td>
+<td>0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>server_check_query</td>
+<td>select 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>server_check_delay</td>
+<td>30</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>query_timeout</td>
+<td>0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>query_wait_timeout</td>
+<td>120</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>client_idle_timeout</td>
+<td>0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>client_login_timeout</td>
+<td>60</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>idle_transaction_timeout</td>
+<td>0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>server_lifetime</td>
+<td>3600</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>server_idle_timeout</td>
+<td>600</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>server_connect_timeout</td>
+<td>15</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>server_login_retry</td>
+<td>15</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>server_round_robin</td>
+<td>0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>suspend_timeout</td>
+<td>10</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>ignore_startup_parameters</td>
+<td></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>disable_pqexec</td>
+<td>0</td>
+<td>no</td>
+</tr>
+<tr>
+<td>dns_max_ttl</td>
+<td>15</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>dns_nxdomain_ttl</td>
+<td>15</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>dns_zone_check_period</td>
+<td>0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>max_packet_size</td>
+<td>2147483647</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>pkt_buf</td>
+<td>4096</td>
+<td>no</td>
+</tr>
+<tr>
+<td>sbuf_loopcnt</td>
+<td>5</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>tcp_defer_accept</td>
+<td>1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>tcp_socket_buffer</td>
+<td>0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>tcp_keepalive</td>
+<td>1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>tcp_keepcnt</td>
+<td>0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>tcp_keepidle</td>
+<td>0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>tcp_keepintvl</td>
+<td>0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>verbose</td>
+<td>0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>admin_users</td>
+<td>yfshi</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>stats_users</td>
+<td></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>stats_period</td>
+<td>60</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>log_connections</td>
+<td>1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>log_disconnections</td>
+<td>1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>log_pooler_errors</td>
+<td>1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>application_name_add_host</td>
+<td>0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>client_tls_sslmode</td>
+<td>disable</td>
+<td>no</td>
+</tr>
+<tr>
+<td>client_tls_ca_file</td>
+<td></td>
+<td>no</td>
+</tr>
+<tr>
+<td>client_tls_cert_file</td>
+<td></td>
+<td>no</td>
+</tr>
+<tr>
+<td>client_tls_key_file</td>
+<td></td>
+<td>no</td>
+</tr>
+<tr>
+<td>client_tls_protocols</td>
+<td>all</td>
+<td>no</td>
+</tr>
+<tr>
+<td>client_tls_ciphers</td>
+<td>fast</td>
+<td>no</td>
+</tr>
+<tr>
+<td>client_tls_dheparams</td>
+<td>auto</td>
+<td>no</td>
+</tr>
+<tr>
+<td>client_tls_ecdhcurve</td>
+<td>auto</td>
+<td>no</td>
+</tr>
+<tr>
+<td>server_tls_sslmode</td>
+<td>disable</td>
+<td>no</td>
+</tr>
+<tr>
+<td>server_tls_ca_file</td>
+<td></td>
+<td>no</td>
+</tr>
+<tr>
+<td>server_tls_cert_file</td>
+<td></td>
+<td>no</td>
+</tr>
+<tr>
+<td>server_tls_key_file</td>
+<td></td>
+<td>no</td>
+</tr>
+<tr>
+<td>server_tls_protocols</td>
+<td>all</td>
+<td>no</td>
+</tr>
+<tr>
+<td>server_tls_ciphers</td>
+<td>HIGH:MEDIUM:+3DES:!aNULL</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<p>show pools</p>
+<blockquote>
+<p>列出连接池 </p>
+<ul>
+<li>database：数据库名 </li>
+<li>user：用户名</li>
+<li>cl_active：当前 active (活跃)的客户端连接的个数</li>
+<li>cl_waiting：当前 waiting (等待)的客户端连接个数</li>
+<li>sv_active：当前 active (活跃)的服务器连接个数</li>
+<li>sv_idle：当前 idle (空闲) 的服务器连接个数</li>
+<li>sv_used：当前 used (在使用)的服务器连接个数</li>
+<li>sv_tested：当前 tested (测试过)的服务器连接个数</li>
+<li>sv_login：当前 login (登录)到 PostgreSQL 服务器的个数</li>
+<li>maxwait：队列中第一个(最老的那个)客户端等待的时间长度,单位是秒.如果这个数值开始上升,那么就意味着当前的连接池中的服务器处理请求的速度不够快.原因可能是服务器过载,也可能只是 pool_size 太小</li>
+</ul>
+</blockquote>
+<p>show stats</p>
+<blockquote>
+<ul>
+<li>database：统计是根据每个数据库分比例的</li>
+<li>total_requests：连接池处理的SQL请求的总数</li>
+<li>total_received：接收到的网络流量的总字节数</li>
+<li>total_sent：发出的网络流量的总字节数</li>
+<li>total_query_time：活跃在与数据库上面的时间开销总数,单位是微秒</li>
+<li>avg_req：在最后一次统计过程中的每秒平均请求数</li>
+<li>avg_recv：每秒(从客户端)接收到的平均数据量</li>
+<li>avg_sent：每秒发送(给客户端)的平均数据量</li>
+<li>avg_query：平均的查询时间,单位是微秒</li>
+</ul>
+</blockquote>
+<p>show servers</p>
+<blockquote>
+<p>列出数据库与pgbouncer之间连接 </p>
+<ul>
+<li>type：S,表示服务器 </li>
+<li>user：gbouncer用于连接服务器的用户名 </li>
+<li>database：服务器端的数据库名 </li>
+<li>state：pgbouncer 服务器连接的状态 active、used、idle </li>
+<li>addr：PostgreSQL服务器的IP地址 </li>
+<li>port：PostgreSQL服务器的端口 </li>
+<li>local_addr：本地机器上的发起连接地址 </li>
+<li>local_port：本地机器上的发起连接端口 </li>
+<li>connect_time：连接建立的时间 </li>
+<li>request_time：请求发出的时间 </li>
+<li>ptr：这个连接的内部对象地址,用做唯一 ID </li>
+<li>link：这个服务器对应的客户端地址</li>
+</ul>
+</blockquote>
+<p>show clients</p>
+<blockquote>
+<p>列出客户端及客户端连接状态 </p>
+<ul>
+<li>type：C,表示客户端 </li>
+<li>user：客户端连接的用户 </li>
+<li>database：数据库名 </li>
+<li>state：客户端连接的状态 active、used、waiting或者idle之一 </li>
+<li>addr：客户端的 IP 地址 </li>
+<li>port：客户端连接去的端口 </li>
+<li>local_addr：本地机器上连接到的对端地址 </li>
+<li>local_port：本地机器上的连接到的对端端口 </li>
+<li>connect_time：最后的客户端连接的时间戳 </li>
+<li>request_time：最后的客户端请求的时间戳 </li>
+<li>ptr：这个连接的内部对象的地址,用做唯一 ID </li>
+<li>link：这个客户端连接对应的服务器的地址</li>
+</ul>
+</blockquote>
+<p>show lists</p>
+<blockquote>
+<p>显示连接池的计数信息 </p>
+<ul>
+<li>databases：数据库的个数 </li>
+<li>users：用户的个数 </li>
+<li>pools：连接池的个数 </li>
+<li>free_clients：空闲客户端的个数 </li>
+<li>used_clients：已用的客户端的个数 </li>
+<li>login_clients：处于已登录状态的客户端个数 </li>
+<li>free_servers：空闲服务器个数 </li>
+<li>used_servers：已用服务器个数</li>
+</ul>
+</blockquote>
+<p>show databases</p>
+<blockquote>
+<p>列出pgbouncer数据库别名及相关数据库 </p>
+<ul>
+<li>name：已配置的数据库名字记录 </li>
+<li>host：pgbouncer 连接到的主机名 </li>
+<li>port：pgbouncer 连接到的端口号 </li>
+<li>database：pgbouncer 实际连接的数据库名 </li>
+<li>force_user：当用户是连接字串的一部分的时候,在 pgbouncer 和 PostgreSQL 之间的连接会强制成给出的用户,不管 client user 是什么 </li>
+<li>pool_size：最大的服务器端连接数目</li>
+</ul>
+</blockquote>
+<p>show fds</p>
+<blockquote>
+<p>显示正在使用的 fd 列表如果连接的用户的用户名是 “pgbouncer”,那么通过 unix socket 连接,并且和运行的进程有同样的 UID,实际的 fd 列表是通过这个连接传递的这个机制用于做在线重启 </p>
+<ul>
+<li>fd：文件描述符的数字值 </li>
+<li>task：pooler,client 或 server 之一 </li>
+<li>user：使用该 FD 的连接用户 </li>
+<li>database：使用该 FD 的连接的数据库 </li>
+<li>addr：使用该 FD 的连接的 IP 地址,如果使用的是 unix socket,就是 unix </li>
+<li>port：使用该 FD 的连接的端口号 </li>
+<li>cancel：这个连接的取消键字 </li>
+<li>link：对应的服务器/客户端的 fd如果为 idle (空闲)则为 NULL</li>
+</ul>
+</blockquote>
+<p>DISABLE <db></db></p>
+<blockquote>
+<p>拒绝指定数据库上所有新客户端连接</p>
+</blockquote>
+<p>ENALBLE <db></db></p>
+<blockquote>
+<p>准许之前DISABLE命令之后的新客户端连接</p>
+</blockquote>
+<p>PAUSE [<db>]</db></p>
+<blockquote>
+<p>尝试从所有服务器断开连接(等待query完成),在所有query完成之前,此命令不会返回,在数据库重新启动时使用.如果给出了数据库名字则只对该数据库有用</p>
+</blockquote>
+<p>KILL <db></db></p>
+<blockquote>
+<p>立即删除给定数据库上所有客户端以及数据库连接</p>
+</blockquote>
+<p>SUPEND</p>
+<blockquote>
+<p>刷新所有socket缓存,并且停止监听,在缓存flush之前此命令不会有任何返回.使用场景:pgbouncer在线重新启动时使用</p>
+</blockquote>
+<p>RESUME [<db>]</db></p>
+<blockquote>
+<p>从之前PAUSE或者SUPEND命令恢复之前状态</p>
+</blockquote>
+<p>SHUTDOWN</p>
+<blockquote>
+<p>pgbouncer进程退出</p>
+</blockquote>
+<p>RELOAD</p>
+<blockquote>
+<p>重新加载其配置文件并更新配置</p>
+</blockquote>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><ul>
+<li><p>只读查询</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> pgbench -p6543 -i pgbench</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> pgbench -p6543 -n -S -c 1000 -t 1 pgbench</span></span><br><span class="line">transaction type: SELECT only</span><br><span class="line">scaling factor: 1</span><br><span class="line">query mode: simple</span><br><span class="line">number of clients: 1000</span><br><span class="line">number of threads: 1</span><br><span class="line">number of transactions per client: 1</span><br><span class="line">number of transactions actually processed: 1000/1000</span><br><span class="line">tps = 713.361402 (including connections establishing)</span><br><span class="line">tps = 866.376950 (excluding connections establishing)</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> psql -p6543 pgbench</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> SELECT count(*) from pg_stat_activity;</span></span><br><span class="line"> count </span><br><span class="line">-------</span><br><span class="line">   100</span><br><span class="line">(1 row)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>行存插入</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> psql -p6543 -c <span class="string">"create table table_h(id serial, n1 varchar(20), n2 varchar(20)) distributed by (id);"</span> pgbench;</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="string">"insert into table_h(n1,n2) values('n1','n2')"</span> &gt; test.sql</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> pgbench -p6543 -n -f test.sql -c 1000 -t 1 pgbench</span></span><br><span class="line">transaction type: Custom query</span><br><span class="line">scaling factor: 1</span><br><span class="line">query mode: simple</span><br><span class="line">number of clients: 1000</span><br><span class="line">number of threads: 1</span><br><span class="line">number of transactions per client: 1</span><br><span class="line">number of transactions actually processed: 1000/1000</span><br><span class="line">tps = 207.016064 (including connections establishing)</span><br><span class="line">tps = 217.756804 (excluding connections establishing)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>列存插入</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> psql -p6543 -c <span class="string">"create table table_c(id serial, n1 varchar(20), n2 varchar(20)) with (appendonly=true,orientation=column,compresstype=zlib,COMPRESSLEVEL=5) distributed by (id);"</span> pgbench;</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="string">"insert into table_c(n1,n2) values('n1','n2')"</span> &gt; test.sql</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> pgbench -p6543 -n -f test.sql -c 1000 -t 1 pgbench</span></span><br><span class="line">transaction type: Custom query</span><br><span class="line">scaling factor: 1</span><br><span class="line">query mode: simple</span><br><span class="line">number of clients: 1000</span><br><span class="line">number of threads: 1</span><br><span class="line">number of transactions per client: 1</span><br><span class="line">number of transactions actually processed: 1000/1000</span><br><span class="line">tps = 64.295818 (including connections establishing)</span><br><span class="line">tps = 65.290265 (excluding connections establishing)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+	<div>
+		
+			<div>  <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>  </div> 
+
+		
+	</div>
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="syf 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="syf 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    syf
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://shiyuefei.top/2018/07/19/pgbouncer-greenplum测试/" title="pgbouncer--greenplum测试">http://shiyuefei.top/2018/07/19/pgbouncer-greenplum测试/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/PostgreSQL/" rel="tag"># PostgreSQL</a>
+          
+            <a href="/tags/pgbouncer/" rel="tag"># pgbouncer</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/11/CentOS第三方库/" rel="next" title="CentOS第三方库">
+                <i class="fa fa-chevron-left"></i> CentOS第三方库
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/31/git/" rel="prev" title="git">
+                git <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODY2NC8xNTE5Mg"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="syf">
+            
+              <p class="site-author-name" itemprop="name">syf</p>
+              <p class="site-description motion-element" itemprop="description">FYSBlog</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yfshi" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i></a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:389726148@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i></a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#测试环境"><span class="nav-number">1.</span> <span class="nav-text">测试环境</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#greenplum"><span class="nav-number">2.</span> <span class="nav-text">greenplum</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置交互key"><span class="nav-number">2.1.</span> <span class="nav-text">配置交互key</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">2.2.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化"><span class="nav-number">2.3.</span> <span class="nav-text">初始化</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#pgbouncer测试1000连接数"><span class="nav-number">3.</span> <span class="nav-text">pgbouncer测试1000连接数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置"><span class="nav-number">3.1.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动"><span class="nav-number">3.2.</span> <span class="nav-text">启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#管理"><span class="nav-number">3.3.</span> <span class="nav-text">管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试"><span class="nav-number">3.4.</span> <span class="nav-text">测试</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">syf</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">24.9k</span>
+  
+</div>
+
+
+
+
+
+
+
+
+  <div class="footer-custom"><a target="_blank" href="https://pages.github.com">生命不止 | 奋斗不息</a></div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=64042317";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_sphere.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('-1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("0u7lJb1mcU1WrSpXiCBhjD2U-gzGzoHsz", "5lY33m1Uey4z1cy0aJvsv2Qm");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

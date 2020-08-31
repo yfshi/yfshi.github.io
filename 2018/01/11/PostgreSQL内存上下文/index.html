@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="PostgreSQL,内存管理,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="FYSBlog" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="内存管理体系结构  内存上下文内存上下文（MemoryContext）借鉴了操作系统的一些概念。 操作系统为每个进程分配了进程执行环境，进程之间互不影响，由操作系统来对环境进行切换，进程可以在其进程环境中调用内存操作函数：malloc、free、realloc等。 类似的，一个内存上下文实际上相当于一个进程环境，PostgreSQL以类似的方式提供了在内存上下文进行内存操作的函数：palloc、p">
+<meta name="keywords" content="PostgreSQL,内存管理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PostgreSQL内存上下文">
+<meta property="og:url" content="http://shiyuefei.top/2018/01/11/PostgreSQL内存上下文/index.html">
+<meta property="og:site_name" content="FYSBlog">
+<meta property="og:description" content="内存管理体系结构  内存上下文内存上下文（MemoryContext）借鉴了操作系统的一些概念。 操作系统为每个进程分配了进程执行环境，进程之间互不影响，由操作系统来对环境进行切换，进程可以在其进程环境中调用内存操作函数：malloc、free、realloc等。 类似的，一个内存上下文实际上相当于一个进程环境，PostgreSQL以类似的方式提供了在内存上下文进行内存操作的函数：palloc、p">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://shiyuefei.top/img/内存管理体系结构.png">
+<meta property="og:image" content="http://shiyuefei.top/img/内存上下文.jpg">
+<meta property="og:image" content="http://shiyuefei.top/img/内存上下文存储结构.jpg">
+<meta property="og:image" content="http://shiyuefei.top/img/内存上下文结构.png">
+<meta property="og:image" content="http://shiyuefei.top/img/内存上下文总体应用.png">
+<meta property="og:image" content="http://shiyuefei.top/img/palloc.png">
+<meta property="og:image" content="http://shiyuefei.top/img/pfree.png">
+<meta property="og:updated_time" content="2020-08-31T08:27:12.187Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PostgreSQL内存上下文">
+<meta name="twitter:description" content="内存管理体系结构  内存上下文内存上下文（MemoryContext）借鉴了操作系统的一些概念。 操作系统为每个进程分配了进程执行环境，进程之间互不影响，由操作系统来对环境进行切换，进程可以在其进程环境中调用内存操作函数：malloc、free、realloc等。 类似的，一个内存上下文实际上相当于一个进程环境，PostgreSQL以类似的方式提供了在内存上下文进行内存操作的函数：palloc、p">
+<meta name="twitter:image" content="http://shiyuefei.top/img/内存管理体系结构.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://shiyuefei.top/2018/01/11/PostgreSQL内存上下文/">
+
+
+
+
+
+  <title>PostgreSQL内存上下文 | FYSBlog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?842071952d3d3b6387fa2207f3c39fc0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">FYSBlog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Code is art</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://shiyuefei.top/2018/01/11/PostgreSQL内存上下文/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="syf">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="FYSBlog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">PostgreSQL内存上下文</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T15:05:42+08:00">
+                2018-01-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Database/" itemprop="url" rel="index">
+                    <span itemprop="name">Database</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018/01/11/PostgreSQL内存上下文/" class="leancloud_visitors" data-flag-title="PostgreSQL内存上下文">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,176
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  5
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="内存管理体系结构"><a href="#内存管理体系结构" class="headerlink" title="内存管理体系结构"></a>内存管理体系结构</h1><p><img src="/img/内存管理体系结构.png" alt></p>
+<hr>
+<h1 id="内存上下文"><a href="#内存上下文" class="headerlink" title="内存上下文"></a>内存上下文</h1><p>内存上下文（MemoryContext）借鉴了操作系统的一些概念。</p>
+<p>操作系统为每个进程分配了进程执行环境，进程之间互不影响，由操作系统来对环境进行切换，进程可以在其进程环境中调用内存操作函数：malloc、free、realloc等。</p>
+<p>类似的，一个内存上下文实际上相当于一个进程环境，PostgreSQL以类似的方式提供了在内存上下文进行内存操作的函数：palloc、pfree、repalloc等。</p>
+<p>每个进程/线程有多个私有的内存上下文，组成上下文树。</p>
+<hr>
+<h1 id="内存上下文树"><a href="#内存上下文树" class="headerlink" title="内存上下文树"></a>内存上下文树</h1><p><img src="/img/内存上下文.jpg" alt="内存上下文"></p>
+<ul>
+<li>每个线程都有多个内存上上下文，组成树形结构。线程所有的内存操作都在各种语义的上下文中进行。</li>
+<li>释放上下文节点会释放其所有的子节点。</li>
+<li>线程退出时释放TopMemoryContext。</li>
+</ul>
+<hr>
+<h1 id="术语"><a href="#术语" class="headerlink" title="术语"></a>术语</h1><ul>
+<li>MemoryContext</li>
+<li>AllocSetContext</li>
+<li>Block</li>
+<li>Chunk</li>
+<li>超大块</li>
+<li>Chunk Free List</li>
+</ul>
+<hr>
+<h1 id="内存上下文结构"><a href="#内存上下文结构" class="headerlink" title="内存上下文结构"></a>内存上下文结构</h1><p><img src="/img/内存上下文存储结构.jpg" alt></p>
+<hr>
+<h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><ul>
+<li>MemoryContext</li>
+<li>MemoryContextMethods</li>
+<li>AllocSet</li>
+<li>AllocBlockData</li>
+<li>AllocChunkData</li>
+</ul>
+<hr>
+<h2 id="MemoryContext"><a href="#MemoryContext" class="headerlink" title="MemoryContext"></a>MemoryContext</h2><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">MemoryContextData</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    NodeTag       type;         <span class="comment">/* identifies exacts kind of context */</span></span><br><span class="line">    MemoryContextMethods *methods;  <span class="comment">/* virtual function table */</span></span><br><span class="line">    MemoryContext parent;        <span class="comment">/* NULL if no parent (toplevel context) */</span></span><br><span class="line">    MemoryContext firstchild;    <span class="comment">/* head of linked list of children */</span></span><br><span class="line">    MemoryContext nextchild;     <span class="comment">/* next child of same parent */</span></span><br><span class="line">    <span class="keyword">char</span>         *name;          <span class="comment">/* context name (just for debugging) */</span></span><br><span class="line">&#125; MemoryContextData;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">MemoryContextData</span> *<span class="title">MemoryContext</span>;</span></span><br></pre></td></tr></table></figure>
+<p>MemoryContext中的methods字段是一个MemoryContextMethods类型，它是由一系列的函数指针组成的集合，其中包含了对内存上下文操作的函数。对不同的MemoryContext实现，可以设置不同的方法集合。目前MemoryContext中只有AllocSetContext一种实现，因此PostgreSQL中只有针对AllocSetContext的一种操作函数集合，由全局变量AllocSetMethods表示。</p>
+<hr>
+<h2 id="MemoryContextMethods"><a href="#MemoryContextMethods" class="headerlink" title="MemoryContextMethods"></a>MemoryContextMethods</h2><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">MemoryContextMethods</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">void</span>       *(*alloc) (MemoryContext context, Size <span class="built_in">size</span>);</span><br><span class="line">    <span class="comment">/* call this free_p in case someone #define's free() */</span></span><br><span class="line">    <span class="keyword">void</span>        (*free_p) (MemoryContext context, <span class="keyword">void</span> *pointer);</span><br><span class="line">    <span class="keyword">void</span>       *(*<span class="built_in">realloc</span>) (MemoryContext context, <span class="keyword">void</span> *pointer, Size <span class="built_in">size</span>);</span><br><span class="line">    <span class="keyword">void</span>        (*init) (MemoryContext context);</span><br><span class="line">    <span class="keyword">void</span>        (*reset) (MemoryContext context);</span><br><span class="line">    <span class="keyword">void</span>        (*<span class="keyword">delete</span>) (MemoryContext context);</span><br><span class="line">    <span class="keyword">void</span>        (*reuse) (MemoryContext context);</span><br><span class="line">    Size        (*get_chunk_space) (MemoryContext context, <span class="keyword">void</span> *pointer);</span><br><span class="line">    <span class="keyword">bool</span>        (*is_empty) (MemoryContext context);</span><br><span class="line">    <span class="keyword">void</span>        (*stats) (MemoryContext context);</span><br><span class="line">    <span class="keyword">bool</span>        (*is_realempty)(MemoryContext context);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> MEMORY_CONTEXT_CHECKING</span></span><br><span class="line">    <span class="keyword">void</span>        (*check) (MemoryContext context);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">&#125; MemoryContextMethods;</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="方法集"><a href="#方法集" class="headerlink" title="方法集"></a>方法集</h2><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">static</span> MemoryContextMethods AllocSetMethods = &#123;</span><br><span class="line">    AllocSetAlloc,</span><br><span class="line">    AllocSetFree,</span><br><span class="line">    AllocSetRealloc,</span><br><span class="line">    AllocSetInit,</span><br><span class="line">    AllocSetReset,</span><br><span class="line">    AllocSetDelete,</span><br><span class="line">    AllocSetReuse,</span><br><span class="line">    AllocSetGetChunkSpace,</span><br><span class="line">    AllocSetIsEmpty,</span><br><span class="line">    AllocSetStats,</span><br><span class="line">    AllocSetIsRealEmpty</span><br><span class="line">#ifdef MEMORY_CONTEXT_CHECKING</span><br><span class="line">    ,AllocSetCheck</span><br><span class="line">#endif</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<p>MemoryContext是一个抽象类，可以有多个实现，目前只有AllocSetContext一个实现。MemoryContext并不管理实际上的内存分配，仅仅用作对MemoryContext树的控制。管理一个内存上下文中的内存块时通过AllocSet结构来完成的，MemoryContext作为AllocSet的头部信息存在。</p>
+<hr>
+<h2 id="AllocSet"><a href="#AllocSet" class="headerlink" title="AllocSet"></a>AllocSet</h2><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">AllocSetContext</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    MemoryContextData header;  <span class="comment">/* Standard memory-context fields */</span></span><br><span class="line">    <span class="comment">/* Info about storage allocated in this context: */</span></span><br><span class="line">    AllocBlock  blocks;        <span class="comment">/* head of list of blocks in this set */</span></span><br><span class="line">    AllocChunk  freelist[ALLOCSET_NUM_FREELISTS]; <span class="comment">/* free chunk lists */</span></span><br><span class="line">    <span class="keyword">bool</span>        isReset;       <span class="comment">/* T = no space alloced since last reset */</span></span><br><span class="line">    <span class="comment">/* Allocation parameters for this context: */</span></span><br><span class="line">    Size        initBlockSize; <span class="comment">/* initial block size */</span></span><br><span class="line">    Size        maxBlockSize;  <span class="comment">/* maximum block size */</span></span><br><span class="line">    Size        nextBlockSize; <span class="comment">/* next block size to allocate */</span></span><br><span class="line">    AllocBlock  keeper;        <span class="comment">/* if not NULL, keep this block over resets */</span></span><br><span class="line">&#125; AllocSetContext;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> AllocSetContext *AllocSet;</span><br></pre></td></tr></table></figure>
+<p>blocks是内存块链表，freelist是内存片链表。AllocSet所管理的内存区域被分成若干个内存块（AllocBlockData结构），每个内存块又被分成多个内存片（AllocChunkData结构）。palloc申请到的内存实际上都是内存片（除了超大块）。</p>
+<hr>
+<h2 id="AllocBlockData"><a href="#AllocBlockData" class="headerlink" title="AllocBlockData"></a>AllocBlockData</h2><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">AllocBlockData</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    AllocSet    aset;     <span class="comment">/* aset that owns this block */</span></span><br><span class="line">    AllocBlock  next;     <span class="comment">/* next block in aset's blocks list */</span></span><br><span class="line">    <span class="keyword">char</span>       *freeptr;  <span class="comment">/* start of free space in this block */</span></span><br><span class="line">    <span class="keyword">char</span>       *endptr;   <span class="comment">/* end of space in this block */</span></span><br><span class="line">&#125; AllocBlockData;</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="AllocChunkData"><a href="#AllocChunkData" class="headerlink" title="AllocChunkData"></a>AllocChunkData</h2><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">AllocChunkData</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="comment">/* aset is the owning aset if allocated, or the freelist link if free */</span></span><br><span class="line">    <span class="keyword">void</span>       *aset;</span><br><span class="line">    <span class="comment">/* size is always the size of the usable space in the chunk */</span></span><br><span class="line">    Size        <span class="built_in">size</span>;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> MEMORY_CONTEXT_CHECKING</span></span><br><span class="line">    <span class="comment">/* when debugging memory usage, also store actual requested size */</span></span><br><span class="line">    <span class="comment">/* this is zero in a free chunk */</span></span><br><span class="line">    Size        requested_size;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">&#125; AllocChunkData;</span><br></pre></td></tr></table></figure>
+<hr>
+<p><img src="/img/内存上下文结构.png" alt></p>
+<hr>
+<h1 id="重要函数"><a href="#重要函数" class="headerlink" title="重要函数"></a>重要函数</h1><table>
+<thead>
+<tr>
+<th>函数</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MemoryContextCreate</td>
+<td>创建上下文节点</td>
+</tr>
+<tr>
+<td>AllocSetContextCreate</td>
+<td>创建上下文实例</td>
+</tr>
+<tr>
+<td>MemoryContextDelete</td>
+<td>删除内存上下文</td>
+</tr>
+<tr>
+<td>MemoryContextReset</td>
+<td>重置内存上下文</td>
+</tr>
+<tr>
+<td>MemoryContextSwitchTo</td>
+<td>切换当前上下文</td>
+</tr>
+<tr>
+<td>palloc</td>
+<td>在当前上下文中申请内存</td>
+</tr>
+<tr>
+<td>pfree</td>
+<td>释放内存</td>
+</tr>
+<tr>
+<td>repalloc</td>
+<td>在当前上下文中重新申请内存</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="总体流程"><a href="#总体流程" class="headerlink" title="总体流程"></a>总体流程</h2><p><img src="/img/内存上下文总体应用.png" alt></p>
+<hr>
+<h2 id="palloc流程"><a href="#palloc流程" class="headerlink" title="palloc流程"></a>palloc流程</h2><p><img src="/img/palloc.png" alt></p>
+<hr>
+<h2 id="pfree流程"><a href="#pfree流程" class="headerlink" title="pfree流程"></a>pfree流程</h2><p><img src="/img/pfree.png" alt></p>
+<hr>
+<h1 id="重要的内存上下文"><a href="#重要的内存上下文" class="headerlink" title="重要的内存上下文"></a>重要的内存上下文</h1><table>
+<thead>
+<tr>
+<th>内存上下文</th>
+<th>生命周期</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TopMemoryContext</td>
+<td>session</td>
+<td>根节点</td>
+</tr>
+<tr>
+<td>PostmasterContext</td>
+<td>session</td>
+<td>postmaster工作上下文</td>
+</tr>
+<tr>
+<td>CacheMemoryContext</td>
+<td>session</td>
+<td>backend的relcache、catcache等使用</td>
+</tr>
+<tr>
+<td>MessageContext</td>
+<td>session</td>
+<td>保存从前端传来的命令以及派生的存储，比如查询计划树和查询分析树</td>
+</tr>
+<tr>
+<td>TopTransactionContext</td>
+<td>transaction</td>
+<td>一般保存跨越多个子事务的状态和控制信息</td>
+</tr>
+<tr>
+<td>CurTransactionContext</td>
+<td>transaction</td>
+<td>当前事务上下文</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<table>
+<thead>
+<tr>
+<th>内存上下文</th>
+<th>生命周期</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PortalContext</td>
+<td>portal</td>
+<td>全局变量，指向当前portal</td>
+</tr>
+<tr>
+<td>ErrorContext</td>
+<td>session</td>
+<td>错误处理上下文， errstart、errfinish、errmsg等在此分配内存</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h1 id="打印内存上下文树"><a href="#打印内存上下文树" class="headerlink" title="打印内存上下文树"></a>打印内存上下文树</h1><p>in smmgr/aset.c, add <code>#include &quot;utils/memutils.h&quot;</code><br>in AllocSetContextCreate function, add<br><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">"pid=%d, Create Memory Context name is %s, parent context is %s\n"</span>,</span><br><span class="line">		MyProcPid, name, (parent == <span class="literal">NULL</span> ? <span class="string">"null"</span> : parent-&gt;name));</span><br></pre></td></tr></table></figure></p>
+<p>in mmgr/mcxt.c, add <code>#include &quot;miscadmin.h&quot;</code><br>in MemoryContextDelete function, add<br><figure class="highlight"><table><tr><td class="code"><pre><span class="line"><span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">"pid=%d, delete memory context name is %s, parent is %s\n"</span>,</span><br><span class="line">		MyProcPid, context-&gt;name, (context-&gt;parent == NULL? 'null' : context-&gt;parent-&gt;name));</span><br></pre></td></tr></table></figure></p>
+<p>in MemoryContextReset function, add<br><figure class="highlight"><table><tr><td class="code"><pre><span class="line"><span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">"pid=%d, reset memory context name is %s, parent is %s\n"</span>,</span><br><span class="line">		MyProcPid, context-&gt;name, (context-&gt;parent == NULL? 'null' : context-&gt;parent-&gt;name));</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="代码结构"><a href="#代码结构" class="headerlink" title="代码结构"></a>代码结构</h1><figure class="highlight dts"><table><tr><td class="code"><pre><span class="line">src<span class="meta-keyword">/backend/</span>utils<span class="meta-keyword">/mmgr/</span>mcxt.c</span><br><span class="line">src<span class="meta-keyword">/backend/</span>utils<span class="meta-keyword">/mmgr/</span>aset.c</span><br><span class="line">src<span class="meta-keyword">/include/</span>utils/memutils.h</span><br><span class="line">src<span class="meta-keyword">/include/</span>nodes/memnodes.h</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+	<div>
+		
+			<div>  <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>  </div> 
+
+		
+	</div>
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="syf 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="syf 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    syf
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://shiyuefei.top/2018/01/11/PostgreSQL内存上下文/" title="PostgreSQL内存上下文">http://shiyuefei.top/2018/01/11/PostgreSQL内存上下文/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/PostgreSQL/" rel="tag"># PostgreSQL</a>
+          
+            <a href="/tags/内存管理/" rel="tag"># 内存管理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/24/大数阶乘/" rel="next" title="大数阶乘">
+                <i class="fa fa-chevron-left"></i> 大数阶乘
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/11/PostgreSQL共享缓存区管理/" rel="prev" title="PostgreSQL共享缓存区管理">
+                PostgreSQL共享缓存区管理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODY2NC8xNTE5Mg"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="syf">
+            
+              <p class="site-author-name" itemprop="name">syf</p>
+              <p class="site-description motion-element" itemprop="description">FYSBlog</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yfshi" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i></a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:389726148@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i></a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#内存管理体系结构"><span class="nav-number">1.</span> <span class="nav-text">内存管理体系结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#内存上下文"><span class="nav-number">2.</span> <span class="nav-text">内存上下文</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#内存上下文树"><span class="nav-number">3.</span> <span class="nav-text">内存上下文树</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#术语"><span class="nav-number">4.</span> <span class="nav-text">术语</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#内存上下文结构"><span class="nav-number">5.</span> <span class="nav-text">内存上下文结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据结构"><span class="nav-number">6.</span> <span class="nav-text">数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#MemoryContext"><span class="nav-number">6.1.</span> <span class="nav-text">MemoryContext</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MemoryContextMethods"><span class="nav-number">6.2.</span> <span class="nav-text">MemoryContextMethods</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法集"><span class="nav-number">6.3.</span> <span class="nav-text">方法集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AllocSet"><span class="nav-number">6.4.</span> <span class="nav-text">AllocSet</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AllocBlockData"><span class="nav-number">6.5.</span> <span class="nav-text">AllocBlockData</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AllocChunkData"><span class="nav-number">6.6.</span> <span class="nav-text">AllocChunkData</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#重要函数"><span class="nav-number">7.</span> <span class="nav-text">重要函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#总体流程"><span class="nav-number">7.1.</span> <span class="nav-text">总体流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#palloc流程"><span class="nav-number">7.2.</span> <span class="nav-text">palloc流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pfree流程"><span class="nav-number">7.3.</span> <span class="nav-text">pfree流程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#重要的内存上下文"><span class="nav-number">8.</span> <span class="nav-text">重要的内存上下文</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#打印内存上下文树"><span class="nav-number">9.</span> <span class="nav-text">打印内存上下文树</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#代码结构"><span class="nav-number">10.</span> <span class="nav-text">代码结构</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">syf</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">24.9k</span>
+  
+</div>
+
+
+
+
+
+
+
+
+  <div class="footer-custom"><a target="_blank" href="https://pages.github.com">生命不止 | 奋斗不息</a></div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=64042317";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_sphere.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('-1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("0u7lJb1mcU1WrSpXiCBhjD2U-gzGzoHsz", "5lY33m1Uey4z1cy0aJvsv2Qm");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

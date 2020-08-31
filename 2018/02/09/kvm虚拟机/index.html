@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="kvm,虚拟机,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="FYSBlog" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="安装sudo apt-get install kvm qemu-kvm libvirt-bin bridge-utils  kvm 内核模块，实现cpu虚拟化和内存管理 libvirt-bin 管理虚拟机 qemu-kvm 是虚拟机 bridge-utils 管理网桥  如果只是使用命令行方式，上面的软件包已经足够。 下面是图形界面工具： sudo apt-get install virt-man">
+<meta name="keywords" content="kvm,虚拟机">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kvm虚拟机">
+<meta property="og:url" content="http://shiyuefei.top/2018/02/09/kvm虚拟机/index.html">
+<meta property="og:site_name" content="FYSBlog">
+<meta property="og:description" content="安装sudo apt-get install kvm qemu-kvm libvirt-bin bridge-utils  kvm 内核模块，实现cpu虚拟化和内存管理 libvirt-bin 管理虚拟机 qemu-kvm 是虚拟机 bridge-utils 管理网桥  如果只是使用命令行方式，上面的软件包已经足够。 下面是图形界面工具： sudo apt-get install virt-man">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-08-31T08:27:12.188Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="kvm虚拟机">
+<meta name="twitter:description" content="安装sudo apt-get install kvm qemu-kvm libvirt-bin bridge-utils  kvm 内核模块，实现cpu虚拟化和内存管理 libvirt-bin 管理虚拟机 qemu-kvm 是虚拟机 bridge-utils 管理网桥  如果只是使用命令行方式，上面的软件包已经足够。 下面是图形界面工具： sudo apt-get install virt-man">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://shiyuefei.top/2018/02/09/kvm虚拟机/">
+
+
+
+
+
+  <title>kvm虚拟机 | FYSBlog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?842071952d3d3b6387fa2207f3c39fc0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">FYSBlog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Code is art</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://shiyuefei.top/2018/02/09/kvm虚拟机/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="syf">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="FYSBlog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">kvm虚拟机</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-09T00:22:51+08:00">
+                2018-02-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/常用工具/" itemprop="url" rel="index">
+                    <span itemprop="name">常用工具</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018/02/09/kvm虚拟机/" class="leancloud_visitors" data-flag-title="kvm虚拟机">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,728
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  9
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo apt-get install kvm qemu-kvm libvirt-bin bridge-utils</span><br></pre></td></tr></table></figure>
+<ul>
+<li>kvm 内核模块，实现cpu虚拟化和内存管理</li>
+<li>libvirt-bin 管理虚拟机</li>
+<li>qemu-kvm 是虚拟机</li>
+<li>bridge-utils 管理网桥</li>
+</ul>
+<p>如果只是使用命令行方式，上面的软件包已经足够。</p>
+<p>下面是图形界面工具：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo apt-get install virt-manager python-spice-client-gtk</span><br></pre></td></tr></table></figure>
+<ul>
+<li>virt-manager 图形界面的虚拟机管理程序，需要用到python-spice-client-gtk</li>
+<li>python-spice-client-gtk</li>
+</ul>
+<h1 id="配置网桥"><a href="#配置网桥" class="headerlink" title="配置网桥"></a>配置网桥</h1><ol>
+<li>手动配置</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">brctl addbr br0</span><br><span class="line">brctl addif br0 eth0</span><br><span class="line">ip addr add 10.10.10.1/24 dev br0</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li><p>自动配置</p>
+<p><strong>ubuntu</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">vi /etc/network/interfaces</span><br><span class="line">auto br0</span><br><span class="line">iface br0 inet static</span><br><span class="line">	address 10.10.10.1</span><br><span class="line">	netmask 255.255.255.0</span><br><span class="line">	bridge_ports eth0</span><br><span class="line">	bridge_stp off</span><br><span class="line">	bridge_fd 0</span><br><span class="line">	bridge_maxwait 0</span><br></pre></td></tr></table></figure>
+<p><strong>centos</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">vi /etc/sysconfig/network-script/ifcfg-br0</span><br><span class="line">DEVICE=br0</span><br><span class="line">TYPE=Bridge</span><br><span class="line">BOOTPROTO=static</span><br><span class="line">IPADDR=10.10.10.2</span><br><span class="line">NETMASK=255.255.255.0</span><br><span class="line">ONBOOT=yes</span><br><span class="line">NM_CONTROLLED=no</span><br><span class="line">DELAY=0</span><br><span class="line"></span><br><span class="line">vi /etc/sysconfig/network-script/ifcfg-eth0</span><br><span class="line">DEVICE=eth0</span><br><span class="line">HWADDR=00:15:xx:xx:xx:xx</span><br><span class="line">TYPE=Ethernet</span><br><span class="line">ONBOOT=yes</span><br><span class="line">BOOTPROTO=none</span><br><span class="line">BRIDGE=br0</span><br><span class="line">NM_CONTROLLED=no</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="使用命令行创建虚拟机"><a href="#使用命令行创建虚拟机" class="headerlink" title="使用命令行创建虚拟机"></a>使用命令行创建虚拟机</h1><ol>
+<li><p>建立磁盘镜像</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">qemu-img create -f qcow2 centos7.0.img 20G</span><br></pre></td></tr></table></figure>
+<p>使用 qcow2 格式的磁盘镜像的好处就是它在创建之初并不会给它分配全部大小磁盘容量，而是随着虚拟机中文件的增加而逐渐增大。因此，它对空间的使用更加有效。</p>
+</li>
+<li><p>建立<code>xml</code>配置文件</p>
+<p><code>linux</code>默认有<code>virtio</code>驱动，磁盘总线、网卡等可以设置为<code>virtio</code>。</p>
+<p><code>windows</code>要使用<code>virtio</code>，需要安装<code>virtio</code>驱动。或者<code>windows</code>的<code>disk</code>的总线可以选择和宿主机一致比如是<code>sata</code>，网卡可以设置为<code>rt8139</code>，<code>&lt;hyperv&gt;...&lt;/hyperv&gt;</code>域是针对<code>windows</code>的优化。实际上使用时发现在机械硬盘是使用<code>windows</code>，<code>io</code>效率很低，无论是否使用<code>virtio</code>驱动，可能有什么地方需要优化没搞懂，后来把<code>windows</code>的存储放到<code>ssd</code>上了。</p>
+<p><strong>centos7.0.xml</strong></p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">domain</span> <span class="attr">type</span>=<span class="string">'kvm'</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">name</span>&gt;</span>centos7.0<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">memory</span> <span class="attr">unit</span>=<span class="string">'KiB'</span>&gt;</span>1048576<span class="tag">&lt;/<span class="name">memory</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">currentMemory</span> <span class="attr">unit</span>=<span class="string">'KiB'</span>&gt;</span>1048576<span class="tag">&lt;/<span class="name">currentMemory</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">vcpu</span> <span class="attr">placement</span>=<span class="string">'static'</span>&gt;</span>2<span class="tag">&lt;/<span class="name">vcpu</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">os</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">type</span> <span class="attr">arch</span>=<span class="string">'x86_64'</span>&gt;</span>hvm<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">boot</span> <span class="attr">dev</span>=<span class="string">'cdrom'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">boot</span> <span class="attr">dev</span>=<span class="string">'hd'</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">os</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">features</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">acpi</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">apic</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">vmport</span> <span class="attr">state</span>=<span class="string">'off'</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">features</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">cpu</span> <span class="attr">mode</span>=<span class="string">'host-model'</span> <span class="attr">check</span>=<span class="string">'partial'</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">model</span> <span class="attr">fallback</span>=<span class="string">'allow'</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">cpu</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">clock</span> <span class="attr">offset</span>=<span class="string">'utc'</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">timer</span> <span class="attr">name</span>=<span class="string">'rtc'</span> <span class="attr">tickpolicy</span>=<span class="string">'catchup'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">timer</span> <span class="attr">name</span>=<span class="string">'pit'</span> <span class="attr">tickpolicy</span>=<span class="string">'delay'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">timer</span> <span class="attr">name</span>=<span class="string">'hpet'</span> <span class="attr">present</span>=<span class="string">'no'</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">clock</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">on_poweroff</span>&gt;</span>destroy<span class="tag">&lt;/<span class="name">on_poweroff</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">on_reboot</span>&gt;</span>restart<span class="tag">&lt;/<span class="name">on_reboot</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">on_crash</span>&gt;</span>restart<span class="tag">&lt;/<span class="name">on_crash</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">pm</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">suspend-to-mem</span> <span class="attr">enabled</span>=<span class="string">'no'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">suspend-to-disk</span> <span class="attr">enabled</span>=<span class="string">'no'</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">pm</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">devices</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">emulator</span>&gt;</span>/usr/bin/kvm<span class="tag">&lt;/<span class="name">emulator</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">disk</span> <span class="attr">type</span>=<span class="string">'file'</span> <span class="attr">device</span>=<span class="string">'disk'</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">driver</span> <span class="attr">name</span>=<span class="string">'qemu'</span> <span class="attr">type</span>=<span class="string">'qcow2'</span> <span class="attr">cache</span>=<span class="string">'writeback'</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">source</span> <span class="attr">file</span>=<span class="string">'/vmhosts/kvm/centos7.0.qcow2'</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">target</span> <span class="attr">dev</span>=<span class="string">'vda'</span> <span class="attr">bus</span>=<span class="string">'virtio'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">disk</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">disk</span> <span class="attr">type</span>=<span class="string">'file'</span> <span class="attr">device</span>=<span class="string">'cdrom'</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">driver</span> <span class="attr">name</span>=<span class="string">'qemu'</span> <span class="attr">type</span>=<span class="string">'raw'</span> <span class="attr">cache</span>=<span class="string">'none'</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">source</span> <span class="attr">file</span>=<span class="string">'/iso/centos7.0.iso'</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">target</span> <span class="attr">dev</span>=<span class="string">'hda'</span> <span class="attr">bus</span>=<span class="string">'ide'</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">readonly</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">disk</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">interface</span> <span class="attr">type</span>=<span class="string">'bridge'</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">source</span> <span class="attr">bridge</span>=<span class="string">'br0'</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">model</span> <span class="attr">type</span>=<span class="string">'virtio'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">interface</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">'tablet'</span> <span class="attr">bus</span>=<span class="string">'usb'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">'mouse'</span> <span class="attr">bus</span>=<span class="string">'ps2'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">'keyboard'</span> <span class="attr">bus</span>=<span class="string">'ps2'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">graphics</span> <span class="attr">type</span>=<span class="string">'vnc'</span> <span class="attr">port</span>=<span class="string">'-1'</span> <span class="attr">autoport</span>=<span class="string">'yes'</span> <span class="attr">listen</span>=<span class="string">'0.0.0.0'</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">listen</span> <span class="attr">type</span>=<span class="string">'address'</span> <span class="attr">address</span>=<span class="string">'0.0.0.0'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">graphics</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">devices</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">domain</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p><strong>win7</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&lt;domain type='kvm'&gt;</span><br><span class="line">  &lt;name&gt;win7&lt;/name&gt;</span><br><span class="line">  &lt;memory unit='KiB'&gt;2097152&lt;/memory&gt;</span><br><span class="line">  &lt;currentMemory unit='KiB'&gt;2097152&lt;/currentMemory&gt;</span><br><span class="line">  &lt;vcpu placement='static'&gt;2&lt;/vcpu&gt;</span><br><span class="line">  &lt;os&gt;</span><br><span class="line">    &lt;type arch='x86_64'&gt;hvm&lt;/type&gt;</span><br><span class="line">    &lt;boot dev='cdrom'/&gt;</span><br><span class="line">    &lt;boot dev='hd'/&gt;</span><br><span class="line">  &lt;/os&gt;</span><br><span class="line">  &lt;features&gt;</span><br><span class="line">    &lt;acpi/&gt;</span><br><span class="line">    &lt;apic/&gt;</span><br><span class="line">    &lt;hyperv&gt;</span><br><span class="line">      &lt;relaxed state='on'/&gt;</span><br><span class="line">      &lt;vapic state='on'/&gt;</span><br><span class="line">      &lt;spinlocks state='on' retries='4096'/&gt;</span><br><span class="line">      &lt;vpindex state='on'/&gt;</span><br><span class="line">      &lt;runtime state='on'/&gt;</span><br><span class="line">      &lt;synic state='on'/&gt;</span><br><span class="line">      &lt;reset state='on'/&gt;</span><br><span class="line">    &lt;/hyperv&gt;</span><br><span class="line">    &lt;vmport state='off'/&gt;</span><br><span class="line">  &lt;/features&gt;</span><br><span class="line">  &lt;cpu mode='host-model' check='partial'&gt;</span><br><span class="line">    &lt;model fallback='allow'/&gt;</span><br><span class="line">  &lt;/cpu&gt;</span><br><span class="line">  &lt;clock offset='localtime'&gt;</span><br><span class="line">    &lt;timer name='rtc' tickpolicy='catchup'/&gt;</span><br><span class="line">    &lt;timer name='pit' tickpolicy='delay'/&gt;</span><br><span class="line">    &lt;timer name='hpet' present='no'/&gt;</span><br><span class="line">    &lt;timer name='hypervclock' present='yes'/&gt;</span><br><span class="line">  &lt;/clock&gt;</span><br><span class="line">  &lt;on_poweroff&gt;destroy&lt;/on_poweroff&gt;</span><br><span class="line">  &lt;on_reboot&gt;restart&lt;/on_reboot&gt;</span><br><span class="line">  &lt;on_crash&gt;restart&lt;/on_crash&gt;</span><br><span class="line">  &lt;pm&gt;</span><br><span class="line">    &lt;suspend-to-mem enabled='no'/&gt;</span><br><span class="line">    &lt;suspend-to-disk enabled='no'/&gt;</span><br><span class="line">  &lt;/pm&gt;</span><br><span class="line">  &lt;devices&gt;</span><br><span class="line">    &lt;emulator&gt;/usr/bin/kvm&lt;/emulator&gt;</span><br><span class="line">    &lt;disk type='file' device='disk'&gt;</span><br><span class="line">      &lt;driver name='qemu' type='qcow2' cache='writeback'/&gt;</span><br><span class="line">      &lt;source file='/vmhosts/kvm/centos7.0.qcow2'/&gt;</span><br><span class="line">      &lt;target dev='sda' bus='sata'/&gt;</span><br><span class="line">    &lt;/disk&gt;</span><br><span class="line">    &lt;disk type='file' device='cdrom'&gt;</span><br><span class="line">      &lt;driver name='qemu' type='raw' cache='none'/&gt;</span><br><span class="line">      &lt;source file='/iso/win7.iso'/&gt;</span><br><span class="line">      &lt;target dev='hda' bus='ide'/&gt;</span><br><span class="line">      &lt;readonly/&gt;</span><br><span class="line">    &lt;/disk&gt;</span><br><span class="line">    &lt;interface type='bridge'&gt;</span><br><span class="line">      &lt;source bridge='br0'/&gt;</span><br><span class="line">      &lt;model type='rt8139'/&gt;</span><br><span class="line">    &lt;/interface&gt;</span><br><span class="line">    &lt;input type='tablet' bus='usb'/&gt;</span><br><span class="line">    &lt;input type='mouse' bus='ps2'/&gt;</span><br><span class="line">    &lt;input type='keyboard' bus='ps2'/&gt;</span><br><span class="line">    &lt;graphics type='vnc' port='-1' autoport='yes' listen='0.0.0.0'&gt;</span><br><span class="line">      &lt;listen type='address' address='0.0.0.0'/&gt;</span><br><span class="line">    &lt;/graphics&gt;</span><br><span class="line">  &lt;/devices&gt;</span><br><span class="line">&lt;/domain&gt;</span><br></pre></td></tr></table></figure>
+<p>​</p>
+</li>
+<li><p>定义虚拟机</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">virsh define centos7.0.xml</span><br><span class="line">virsh list --all</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动虚拟机</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">virsh start centos7.0</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装系统</p>
+<p>通过vnc客户端连接</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">vncviwer localhost:5900</span><br></pre></td></tr></table></figure>
+<p>安装好系统，装完必要的环境之后可以把存储(centos7.0.qcow2)备份。之后再需要系统时直接拷贝过来使用即可。</p>
+</li>
+<li><p>常用命令</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">virsh list #显示本地活动虚拟机</span><br><span class="line">virsh list –-all #显示本地所有的虚拟机（活动的+不活动的）</span><br><span class="line">virsh define ubuntu.xml #通过配置文件定义一个虚拟机（这个虚拟机还不是活动的）</span><br><span class="line">virsh start ubuntu #启动名字为ubuntu的非活动虚拟机</span><br><span class="line">virsh create ubuntu.xml # 创建虚拟机（创建后，虚拟机立即执行，成为活动主机）</span><br><span class="line">virsh suspend ubuntu # 暂停虚拟机</span><br><span class="line">virsh resume ubuntu # 启动暂停的虚拟机</span><br><span class="line">virsh shutdown ubuntu # 正常关闭虚拟机</span><br><span class="line">virsh destroy ubuntu # 强制关闭虚拟机</span><br><span class="line">virsh dominfo ubuntu #显示虚拟机的基本信息</span><br><span class="line">virsh domname 2 # 显示id号为2的虚拟机名</span><br><span class="line">virsh domid ubuntu # 显示虚拟机id号</span><br><span class="line">virsh domuuid ubuntu # 显示虚拟机的uuid</span><br><span class="line">virsh domstate ubuntu # 显示虚拟机的当前状态</span><br><span class="line">virsh dumpxml ubuntu # 显示虚拟机的当前配置文件（可能和定义虚拟机时的配置不同，因为当虚拟机启动时，需要给虚拟机分配id号、uuid、vnc端口号等等）</span><br><span class="line">virsh setmem ubuntu 512000 #给不活动虚拟机设置内存大小</span><br><span class="line">virsh setvcpus ubuntu 4 # 给不活动虚拟机设置cpu个数</span><br><span class="line">virsh edit ubuntu # 编辑配置文件（一般是在刚定义完虚拟机之后）</span><br><span class="line"></span><br><span class="line">libvirt还提供了一个shell:virsh，直接执行名virsh即可获得一个特殊的shell:virsh，在这个virsh里面可以执行上面的命令与本地libvirt交互，还可以通过命令connect命令连接远程libvirt，与之交互，例如：connect xen+ssh://root@10.0.0.11。另外可以只执行一条远程libvirt命令：virsh –c xen+ssh://root@10.0.0.11 list –all</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="快照管理"><a href="#快照管理" class="headerlink" title="快照管理"></a>快照管理</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> virsh --<span class="built_in">help</span> | grep snapshot</span></span><br><span class="line">snapshot-create                Create a snapshot from XML</span><br><span class="line">snapshot-create-as             Create a snapshot from a set of args</span><br><span class="line">snapshot-current               Get or set the current snapshot</span><br><span class="line">snapshot-delete                Delete a domain snapshot</span><br><span class="line">snapshot-dumpxml               Dump XML for a domain snapshot</span><br><span class="line">snapshot-edit                  edit XML for a snapshot</span><br><span class="line">snapshot-info                  snapshot information</span><br><span class="line">snapshot-list                  List snapshots for a domain</span><br><span class="line">snapshot-parent                Get the name of the parent of a snapshot</span><br><span class="line">snapshot-revert                Revert a domain to a snapshot</span><br></pre></td></tr></table></figure>
+<p>举例：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> virsh list</span></span><br><span class="line"> Id    Name                           State</span><br><span class="line">----------------------------------------------------</span><br><span class="line"> 1     win7                           running</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> virsh snapshot-create-as win7 snapshot-haozip_360_npp_wps</span></span><br><span class="line">Domain snapshot snapshot-haozip_360_npp_wps created</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> qemu-img info win7.qcow2</span></span><br><span class="line">image: win7.qcow2</span><br><span class="line">file format: qcow2</span><br><span class="line">virtual size: 100G (107374182400 bytes)</span><br><span class="line">disk size: 14G</span><br><span class="line">cluster_size: 65536</span><br><span class="line">Snapshot list:</span><br><span class="line">ID        TAG                 VM SIZE                DATE       VM CLOCK</span><br><span class="line">1         snapshot-haozip_360_npp_wps   1.8G 2018-03-07 10:14:03   01:15:31.438</span><br><span class="line">Format specific information:</span><br><span class="line">    compat: 1.1</span><br><span class="line">    lazy refcounts: false</span><br><span class="line">    refcount bits: 16</span><br><span class="line">    corrupt: false</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> virsh snapshot-list win7</span></span><br><span class="line"> Name                 Creation Time             State</span><br><span class="line">------------------------------------------------------------</span><br><span class="line"> snapshot-haozip_360_npp_wps 2018-03-07 10:14:03 +0800 running</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> virsh snapshot-info win7 --snapshotname snapshot-haozip_360_npp_wps</span></span><br><span class="line">Name:           snapshot-haozip_360_npp_wps</span><br><span class="line">Domain:         win7</span><br><span class="line">Current:        yes</span><br><span class="line">State:          running</span><br><span class="line">Location:       internal</span><br><span class="line">Parent:         -</span><br><span class="line">Children:       0</span><br><span class="line">Descendants:    0</span><br><span class="line">Metadata:       yes</span><br></pre></td></tr></table></figure>
+<h1 id="虚拟磁盘扩容"><a href="#虚拟磁盘扩容" class="headerlink" title="虚拟磁盘扩容"></a>虚拟磁盘扩容</h1><p>磁盘扩容或添加之后要到虚拟机内部做分区、格式化、自动挂在等操作。</p>
+<ol>
+<li><p>磁盘扩容</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> qemu-img resize win7.qcow +10G</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>磁盘添加</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> qemu-img create -f qcow2 win7_1 10G</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> virsh shutdown win7</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> virsh edit win7</span></span><br><span class="line">&lt;disk&gt;&lt;/disk&gt;在原有的disk下面添加一个disk配置：</span><br><span class="line">-- 修改file路径</span><br><span class="line">-- target中的dev修改为vdb</span><br><span class="line">-- 删除address</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="图形界面"><a href="#图形界面" class="headerlink" title="图形界面"></a>图形界面</h1><p>通过执行名virt-manager，启动libvirt的图形界面，在图形界面下可以一步一步的创建虚拟机，管理虚拟机，还可以直接控制虚拟机的桌面。​</p>
+
+      
+    </div>
+    
+    
+    
+
+	<div>
+		
+			<div>  <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>  </div> 
+
+		
+	</div>
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="syf 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="syf 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    syf
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://shiyuefei.top/2018/02/09/kvm虚拟机/" title="kvm虚拟机">http://shiyuefei.top/2018/02/09/kvm虚拟机/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/kvm/" rel="tag"># kvm</a>
+          
+            <a href="/tags/虚拟机/" rel="tag"># 虚拟机</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/11/PostgreSQL共享缓存区管理/" rel="next" title="PostgreSQL共享缓存区管理">
+                <i class="fa fa-chevron-left"></i> PostgreSQL共享缓存区管理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/20/win10通过hyper-v安装虚拟机/" rel="prev" title="win10通过hyper-v安装虚拟机">
+                win10通过hyper-v安装虚拟机 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODY2NC8xNTE5Mg"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="syf">
+            
+              <p class="site-author-name" itemprop="name">syf</p>
+              <p class="site-description motion-element" itemprop="description">FYSBlog</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yfshi" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i></a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:389726148@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i></a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安装"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置网桥"><span class="nav-number">2.</span> <span class="nav-text">配置网桥</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用命令行创建虚拟机"><span class="nav-number">3.</span> <span class="nav-text">使用命令行创建虚拟机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#快照管理"><span class="nav-number">4.</span> <span class="nav-text">快照管理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#虚拟磁盘扩容"><span class="nav-number">5.</span> <span class="nav-text">虚拟磁盘扩容</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#图形界面"><span class="nav-number">6.</span> <span class="nav-text">图形界面</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">syf</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">24.9k</span>
+  
+</div>
+
+
+
+
+
+
+
+
+  <div class="footer-custom"><a target="_blank" href="https://pages.github.com">生命不止 | 奋斗不息</a></div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=64042317";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_sphere.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('-1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("0u7lJb1mcU1WrSpXiCBhjD2U-gzGzoHsz", "5lY33m1Uey4z1cy0aJvsv2Qm");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
