@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://shiyuefei.top/"/>
-  <updated>2020-09-01T02:26:13.398Z</updated>
+  <updated>2020-09-01T08:47:52.310Z</updated>
   <id>http://shiyuefei.top/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>CentOS安装微信</title>
+    <link href="http://shiyuefei.top/2020/09/01/CentOS%E5%AE%89%E8%A3%85%E5%BE%AE%E4%BF%A1/"/>
+    <id>http://shiyuefei.top/2020/09/01/CentOS安装微信/</id>
+    <published>2020-09-01T02:23:44.000Z</published>
+    <updated>2020-09-01T08:47:52.310Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="CentOS安装微信"><a href="#CentOS安装微信" class="headerlink" title="CentOS安装微信"></a>CentOS安装微信</h1><p>系统版本：<code>CentOS Linux release 7.7.1908 (Core)</code></p><h2 id="安装docker"><a href="#安装docker" class="headerlink" title="安装docker"></a>安装docker</h2><h3 id="配置docker的yum源"><a href="#配置docker的yum源" class="headerlink" title="配置docker的yum源"></a>配置docker的yum源</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo yum-config-manager  --add-repo https://download.docker.com/linux/centos/docker-ce.repo</span><br><span class="line"><span class="meta">$</span> sudo yum-config-manager --enable docker-ce-nightly</span><br><span class="line"><span class="meta">$</span> sudo yum-config-manager --enable docker-ce-test</span><br><span class="line"><span class="meta">$</span> sudo yum-config-manager --disable docker-ce-nightly</span><br></pre></td></tr></table></figure><h3 id="安装docker-ce"><a href="#安装docker-ce" class="headerlink" title="安装docker-ce"></a>安装docker-ce</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo yum install docker-ce</span><br></pre></td></tr></table></figure><h3 id="启动docker"><a href="#启动docker" class="headerlink" title="启动docker"></a>启动docker</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo systemctl start docker</span><br><span class="line"><span class="meta">$</span> sudo systemctl enable docker</span><br></pre></td></tr></table></figure><h2 id="安装微信"><a href="#安装微信" class="headerlink" title="安装微信"></a>安装微信</h2><h3 id="拉取docker微信镜像"><a href="#拉取docker微信镜像" class="headerlink" title="拉取docker微信镜像"></a>拉取docker微信镜像</h3><p>bestwu/wechat是基于deepin的镜像，内部包含基于deepin-wine的微信。</p><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo docker pull bestwu/wechat</span><br></pre></td></tr></table></figure><h3 id="创建微信容器"><a href="#创建微信容器" class="headerlink" title="创建微信容器"></a>创建微信容器</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo docker run -d --name wechat --device /dev/snd \</span><br><span class="line">   -v /tmp/.X11-unix:/tmp/.X11-unix \</span><br><span class="line">   -v $HOME/.WeChatFiles:/WeChatFiles \</span><br><span class="line">   -e DISPLAY=unix$DISPLAY \</span><br><span class="line">   -e XMODIFIERS=@im=ibus \</span><br><span class="line">   -e QT_IM_MODULE=ibus \</span><br><span class="line">   -e GTK_IM_MODULE=ibus \</span><br><span class="line">   -e AUDIO_GID=`getent group audio | cut -d: -f3` \</span><br><span class="line">   -e GID=`id -g` \</span><br><span class="line">   -e UID=`id -u` \</span><br><span class="line">   bestwu/wechat</span><br></pre></td></tr></table></figure><blockquote><p>上述是基于fcitx的输入法框架，如果是ibus，把上述fcitx都换成ibus即可。</p></blockquote><h3 id="启动微信容器"><a href="#启动微信容器" class="headerlink" title="启动微信容器"></a>启动微信容器</h3><p>第一次使用<code>docker run</code>创建并启动微信容器，以后每次使用<code>docker start</code>启动微信容器。</p><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo docker start wechat</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;CentOS安装微信&quot;&gt;&lt;a href=&quot;#CentOS安装微信&quot; class=&quot;headerlink&quot; title=&quot;CentOS安装微信&quot;&gt;&lt;/a&gt;CentOS安装微信&lt;/h1&gt;&lt;p&gt;系统版本：&lt;code&gt;CentOS Linux release 7.7.19
+      
+    
+    </summary>
+    
+      <category term="操作系统" scheme="http://shiyuefei.top/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"/>
+    
+    
+      <category term="微信" scheme="http://shiyuefei.top/tags/%E5%BE%AE%E4%BF%A1/"/>
+    
+      <category term="wechat" scheme="http://shiyuefei.top/tags/wechat/"/>
+    
+  </entry>
   
   <entry>
     <title>CentOS安装搜狗输入法</title>
@@ -567,32 +594,6 @@
     
     
       <category term="大数阶乘" scheme="http://shiyuefei.top/tags/%E5%A4%A7%E6%95%B0%E9%98%B6%E4%B9%98/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>gdb</title>
-    <link href="http://shiyuefei.top/2017/10/23/gdb/"/>
-    <id>http://shiyuefei.top/2017/10/23/gdb/</id>
-    <published>2017-10-22T16:00:00.000Z</published>
-    <updated>2020-08-31T08:27:12.187Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="信号处理"><a href="#信号处理" class="headerlink" title="信号处理"></a>信号处理</h1><p>gdb对信号处理有三类动作：停止、打印、传给程序。</p><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">info handle # 查看所有信号的处理方式</span><br><span class="line">handle SIGUSR2 nostop noprint pass #设置信号处理方式</span><br></pre></td></tr></table></figure><table><thead><tr><th>动作</th><th>解释</th></tr></thead><tbody><tr><td>print</td><td>收到信号打印</td></tr><tr><td>noprint</td><td>收到信号不打印</td></tr><tr><td>stop</td><td>收到信号中断</td></tr><tr><td>notop</td><td>收到信号不中断</td></tr><tr><td>pass</td><td>收到信号传递给程序</td></tr><tr><td>nopass</td><td>收到信号不传递给程序</td></tr></tbody></table><h1 id="设置源代码路径"><a href="#设置源代码路径" class="headerlink" title="设置源代码路径"></a>设置源代码路径</h1><p>在A机器上gcc编译的执行文件test，放到B机器去执行。在B机器上gdb调试test，怎么在gdb中查看源代码。</p><p>有几种方法：</p><ol><li><p>把源代码放到编译机完全相同的路径</p><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> readelf -P .debug_str <span class="built_in">test</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> mkdir &lt;code_dir&gt;</span></span><br></pre></td></tr></table></figure></li><li><p>使用gdb的substitute-path路径映射功能</p><p><code>set substitute-path &lt;FROM&gt; &lt;TO&gt;</code></p><p>FROM是编译时的代码路径。上述命令等于替换路径前缀，用TO替换FROM。</p><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> readelf -P .debug_str <span class="built_in">test</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> gdb ./<span class="built_in">test</span></span></span><br><span class="line">(gdb) set substitute-path /home/gdb/code/test /current-code</span><br><span class="line">(gdb) list</span><br></pre></td></tr></table></figure></li><li><p>使用gdb的direcotory功能，把direcotry指定的路径加入到源代码搜索路径，缺点是不能递归搜索</p><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">(gdb) show directories </span><br><span class="line">Source directories searched: $cdir:$cwd</span><br><span class="line">(gdb) directory /code</span><br><span class="line">(gdb) show directories </span><br><span class="line">Source directories searched: /home/postgres:$cdir:$cwd</span><br><span class="line">(gdb) list</span><br></pre></td></tr></table></figure></li><li><p>把二进制文件移动到源代码路径</p></li><li><p>编译时增加<code>-fdebug-prefix-map=old_path=new_path</code></p><p>在编译阶段用new_path替代old_path，这种方式比较暴力。</p></li></ol><h1 id="多进程调试"><a href="#多进程调试" class="headerlink" title="多进程调试"></a>多进程调试</h1><p>set follow-fork-mode [parent | child]</p><p>set detach-on-fork [on|off]</p><h1 id="多线程调试"><a href="#多线程调试" class="headerlink" title="多线程调试"></a>多线程调试</h1><p>调试多线程时，有时需要控制某些线程停在断点，有些线程继续执行。有时需要控制线程的运行顺序。有时需要中断某个线程，切换到其他线程。这些都可以通过gdb实现。</p><p>gdb调试线程的常用命令如下：</p><table><thead><tr><th>gdb命令</th><th>描述</th></tr></thead><tbody><tr><td>info thread</td><td>显示所有线程</td></tr><tr><td>thread ID</td><td>切换到ID指定的线程</td></tr><tr><td>break xxx.c:10 thread all</td><td>所有线程都在xxx.c文件的第10行断点，all可以换成单个线程ID</td></tr><tr><td>thread apply all COMMON</td><td>所有线程都执行COMMOND命令，也可以把all换成单个线程ID</td></tr><tr><td>set scheduler-locking off/on/step</td><td>在调试某一线程时，其他线程是否执行。off：不锁定任何线程，默认值。on：锁定其他线程，只有当前线程运行。step：在step单步调试时，只有被调试线程运行。</td></tr><tr><td>set non-stop on/off</td><td>当调试一个线程时，其他线程是否运行。默认off。</td></tr><tr><td>set pagination on/off</td><td>在使用backtrace时，在分页时是否停止。默认on。</td></tr><tr><td>set target-async on/off</td><td>同步和异步。同步，gdb在输出提示符之前等待程序报告一些线程已经终止的信息。而异步的则是直接返回。默认off。</td></tr></tbody></table><p>non-stop模式调试后台程序：</p><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ gdb</span><br><span class="line">(gdb) set non-stop on</span><br><span class="line">(gdb) set pagination off</span><br><span class="line">(gdb) set target-async on</span><br><span class="line">(gdb) attach 82373</span><br><span class="line">(gdb) info thread</span><br><span class="line">(gdb) thread apply all continue &amp;</span><br><span class="line">(gdb) thread 10</span><br><span class="line">(gdb) continue &amp;</span><br></pre></td></tr></table></figure><p>注意：在使用non-stop模式调试时，凡是执行continue操作时最好加上&amp;放入后台。否则如果continue之后当前线程没有产生断点，则回不到交互模式。</p><h1 id="打印相关"><a href="#打印相关" class="headerlink" title="打印相关"></a>打印相关</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">set print address -- Set printing of addresses</span><br><span class="line">set print array -- Set prettyprinting of arrays</span><br><span class="line">set print array-indexes -- Set printing of array indexes</span><br><span class="line">set print asm-demangle -- Set demangling of C++/ObjC names in disassembly listings</span><br><span class="line">set print demangle -- Set demangling of encoded C++/ObjC names when displaying symbols</span><br><span class="line">set print elements -- Set limit on string chars or array elements to print</span><br><span class="line">set print frame-arguments -- Set printing of non-scalar frame arguments</span><br><span class="line">set print inferior-events -- Set printing of inferior events (e.g.</span><br><span class="line">set print max-symbolic-offset -- Set the largest offset that will be printed in &lt;symbol+1234&gt; form</span><br><span class="line">set print null-stop -- Set printing of char arrays to stop at first null char</span><br><span class="line">set print object -- Set printing of object's derived type based on vtable info</span><br><span class="line">set print pascal_static-members -- Set printing of pascal static members</span><br><span class="line">set print pretty -- Set prettyprinting of structures</span><br><span class="line">set print repeats -- Set threshold for repeated print elements</span><br><span class="line">set print sevenbit-strings -- Set printing of 8-bit characters in strings as \nnn</span><br><span class="line">set print static-members -- Set printing of C++ static members</span><br><span class="line">set print symbol-filename -- Set printing of source filename and line number with &lt;symbol&gt;</span><br><span class="line">set print thread-events -- Set printing of thread events (such as thread start and exit)</span><br><span class="line">set print union -- Set printing of unions interior to structures</span><br><span class="line">set print vtbl -- Set printing of C++ virtual function tables</span><br></pre></td></tr></table></figure><h1 id="LIBRARY-PATH与LD-LIBRARY-PATH"><a href="#LIBRARY-PATH与LD-LIBRARY-PATH" class="headerlink" title="LIBRARY_PATH与LD_LIBRARY_PATH"></a>LIBRARY_PATH与LD_LIBRARY_PATH</h1><p><code>LIBRARY_PATH</code>环境变量用于在程序编译期间查找动态链接库时指定查找共享库的路径。如果不指定<code>LIBRARY_PATH</code>，可以在gcc编译时通过-L指定共享库路径。</p><p><code>LD_LIBRARY_PATH</code>环境变量用于在程序加载运行期间查找动态链接库时指定除了系统默认路径之外的其他路径。注意，<code>LD_LIBRARY_PATH</code>中指定的路径会在系统默认路径之前进行查找。</p><p>使用方法：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> LIBRARY_PATH=`<span class="built_in">pwd</span>`:<span class="variable">$LIBRARY_PATH</span></span><br><span class="line"><span class="built_in">export</span> LD_LIBRARY_PATH=`<span class="built_in">pwd</span>`:<span class="variable">$LIBRARY_PATH</span></span><br><span class="line">或</span><br><span class="line">LIBRARY_PATH=`<span class="built_in">pwd</span>`:<span class="variable">$LIBRARY_PATH</span> make</span><br><span class="line">LD_LIBRARY_PATH=`<span class="built_in">pwd</span>`:<span class="variable">$LIBRARY_PATH</span> make</span><br></pre></td></tr></table></figure></p><h1 id="C-INCLUDE-PATH、CPLUS-INCLUDE-PATH"><a href="#C-INCLUDE-PATH、CPLUS-INCLUDE-PATH" class="headerlink" title="C_INCLUDE_PATH、CPLUS_INCLUDE_PATH"></a>C_INCLUDE_PATH、CPLUS_INCLUDE_PATH</h1><p>与LIBRARY_PATH类似，gcc编译期间查找指定的头文件路径。也可以在gcc加上-I参数指定头文件路径。</p><p>使用方法：<br><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">export C_INCLUDE_PATH=`pwd`/include:$C_INCLUDE_PATH</span><br><span class="line">或</span><br><span class="line">C_INCLUDE_PATH=`pwd`/include make</span><br></pre></td></tr></table></figure></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;信号处理&quot;&gt;&lt;a href=&quot;#信号处理&quot; class=&quot;headerlink&quot; title=&quot;信号处理&quot;&gt;&lt;/a&gt;信号处理&lt;/h1&gt;&lt;p&gt;gdb对信号处理有三类动作：停止、打印、传给程序。&lt;/p&gt;
-&lt;figure class=&quot;highlight shell&quot;&gt;
-      
-    
-    </summary>
-    
-      <category term="调试" scheme="http://shiyuefei.top/categories/%E8%B0%83%E8%AF%95/"/>
-    
-    
-      <category term="gdb" scheme="http://shiyuefei.top/tags/gdb/"/>
     
   </entry>
   

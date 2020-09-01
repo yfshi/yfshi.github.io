@@ -2150,4 +2150,28 @@
         <tag>排序</tag>
       </tags>
   </entry>
+  <entry>
+    <title>CentOS安装微信</title>
+    <url>/2020/09/01/CentOS%E5%AE%89%E8%A3%85%E5%BE%AE%E4%BF%A1/</url>
+    <content><![CDATA[<h1 id="CentOS安装微信"><a href="#CentOS安装微信" class="headerlink" title="CentOS安装微信"></a>CentOS安装微信</h1><p>系统版本：<code>CentOS Linux release 7.7.1908 (Core)</code></p>
+<h2 id="安装docker"><a href="#安装docker" class="headerlink" title="安装docker"></a>安装docker</h2><h3 id="配置docker的yum源"><a href="#配置docker的yum源" class="headerlink" title="配置docker的yum源"></a>配置docker的yum源</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo yum-config-manager  --add-repo https://download.docker.com/linux/centos/docker-ce.repo</span><br><span class="line"><span class="meta">$</span> sudo yum-config-manager --enable docker-ce-nightly</span><br><span class="line"><span class="meta">$</span> sudo yum-config-manager --enable docker-ce-test</span><br><span class="line"><span class="meta">$</span> sudo yum-config-manager --disable docker-ce-nightly</span><br></pre></td></tr></table></figure>
+<h3 id="安装docker-ce"><a href="#安装docker-ce" class="headerlink" title="安装docker-ce"></a>安装docker-ce</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo yum install docker-ce</span><br></pre></td></tr></table></figure>
+<h3 id="启动docker"><a href="#启动docker" class="headerlink" title="启动docker"></a>启动docker</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo systemctl start docker</span><br><span class="line"><span class="meta">$</span> sudo systemctl enable docker</span><br></pre></td></tr></table></figure>
+<h2 id="安装微信"><a href="#安装微信" class="headerlink" title="安装微信"></a>安装微信</h2><h3 id="拉取docker微信镜像"><a href="#拉取docker微信镜像" class="headerlink" title="拉取docker微信镜像"></a>拉取docker微信镜像</h3><p>bestwu/wechat是基于deepin的镜像，内部包含基于deepin-wine的微信。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo docker pull bestwu/wechat</span><br></pre></td></tr></table></figure>
+<h3 id="创建微信容器"><a href="#创建微信容器" class="headerlink" title="创建微信容器"></a>创建微信容器</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo docker run -d --name wechat --device /dev/snd \</span><br><span class="line">		   -v /tmp/.X11-unix:/tmp/.X11-unix \</span><br><span class="line">		   -v $HOME/.WeChatFiles:/WeChatFiles \</span><br><span class="line">		   -e DISPLAY=unix$DISPLAY \</span><br><span class="line">		   -e XMODIFIERS=@im=ibus \</span><br><span class="line">		   -e QT_IM_MODULE=ibus \</span><br><span class="line">		   -e GTK_IM_MODULE=ibus \</span><br><span class="line">		   -e AUDIO_GID=`getent group audio | cut -d: -f3` \</span><br><span class="line">		   -e GID=`id -g` \</span><br><span class="line">		   -e UID=`id -u` \</span><br><span class="line">		   bestwu/wechat</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>上述是基于fcitx的输入法框架，如果是ibus，把上述fcitx都换成ibus即可。</p>
+</blockquote>
+<h3 id="启动微信容器"><a href="#启动微信容器" class="headerlink" title="启动微信容器"></a>启动微信容器</h3><p>第一次使用<code>docker run</code>创建并启动微信容器，以后每次使用<code>docker start</code>启动微信容器。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo docker start wechat</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>操作系统</category>
+      </categories>
+      <tags>
+        <tag>微信</tag>
+        <tag>wechat</tag>
+      </tags>
+  </entry>
 </search>
