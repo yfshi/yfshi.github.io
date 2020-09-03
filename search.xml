@@ -1,6 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>CentOS安装微信</title>
+    <url>/2020/09/01/CentOS%E5%AE%89%E8%A3%85%E5%BE%AE%E4%BF%A1/</url>
+    <content><![CDATA[<h1 id="CentOS安装微信"><a href="#CentOS安装微信" class="headerlink" title="CentOS安装微信"></a>CentOS安装微信</h1><p>系统版本：<code>CentOS Linux release 7.7.1908 (Core)</code></p>
+<h2 id="安装docker"><a href="#安装docker" class="headerlink" title="安装docker"></a>安装docker</h2><h3 id="配置docker的yum源"><a href="#配置docker的yum源" class="headerlink" title="配置docker的yum源"></a>配置docker的yum源</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo yum-config-manager  --add-repo https://download.docker.com/linux/centos/docker-ce.repo</span><br><span class="line"><span class="meta">$</span> sudo yum-config-manager --enable docker-ce-nightly</span><br><span class="line"><span class="meta">$</span> sudo yum-config-manager --enable docker-ce-test</span><br><span class="line"><span class="meta">$</span> sudo yum-config-manager --disable docker-ce-nightly</span><br></pre></td></tr></table></figure>
+<h3 id="安装docker-ce"><a href="#安装docker-ce" class="headerlink" title="安装docker-ce"></a>安装docker-ce</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo yum install docker-ce</span><br></pre></td></tr></table></figure>
+<h3 id="启动docker"><a href="#启动docker" class="headerlink" title="启动docker"></a>启动docker</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo systemctl start docker</span><br><span class="line"><span class="meta">$</span> sudo systemctl enable docker</span><br></pre></td></tr></table></figure>
+<h2 id="安装微信"><a href="#安装微信" class="headerlink" title="安装微信"></a>安装微信</h2><h3 id="拉取docker微信镜像"><a href="#拉取docker微信镜像" class="headerlink" title="拉取docker微信镜像"></a>拉取docker微信镜像</h3><p>bestwu/wechat是基于deepin的镜像，内部包含基于deepin-wine的微信。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo docker pull bestwu/wechat</span><br></pre></td></tr></table></figure>
+<h3 id="创建微信容器"><a href="#创建微信容器" class="headerlink" title="创建微信容器"></a>创建微信容器</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo docker run -d --name wechat --device /dev/snd \</span><br><span class="line">		   -v /tmp/.X11-unix:/tmp/.X11-unix \</span><br><span class="line">		   -v $HOME/.WeChatFiles:/WeChatFiles \</span><br><span class="line">		   -e DISPLAY=unix$DISPLAY \</span><br><span class="line">		   -e XMODIFIERS=@im=ibus \</span><br><span class="line">		   -e QT_IM_MODULE=ibus \</span><br><span class="line">		   -e GTK_IM_MODULE=ibus \</span><br><span class="line">		   -e AUDIO_GID=`getent group audio | cut -d: -f3` \</span><br><span class="line">		   -e GID=`id -g` \</span><br><span class="line">		   -e UID=`id -u` \</span><br><span class="line">		   bestwu/wechat</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>上述是基于fcitx的输入法框架，如果是ibus，把上述fcitx都换成ibus即可。</p>
+</blockquote>
+<h3 id="启动微信容器"><a href="#启动微信容器" class="headerlink" title="启动微信容器"></a>启动微信容器</h3><p>第一次使用<code>docker run</code>创建并启动微信容器，以后每次使用<code>docker start</code>启动微信容器。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo docker start wechat</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>操作系统</category>
+      </categories>
+      <tags>
+        <tag>微信</tag>
+        <tag>wechat</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CentOS编译安装wine</title>
+    <url>/2020/09/03/CentOS%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85wine/</url>
+    <content><![CDATA[<h2 id="CentOS编译安装wine"><a href="#CentOS编译安装wine" class="headerlink" title="CentOS编译安装wine"></a>CentOS编译安装wine</h2><h2 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> yum install glibc-devel.i686 dbus-devel.i686 freetype-devel.i686 pulseaudio-libs-devel.i686 libX11-devel.i686 mesa-libGLU-devel.i686 libICE-devel.i686 libXext-devel.i686 libXcursor-devel.i686 libXi-devel.i686 libXxf86vm-devel.i686 libXrender-devel.i686 libXinerama-devel.i686 libXcomposite-devel.i686 libXrandr-devel.i686 mesa-libGL-devel.i686 mesa-libOSMesa-devel.i686 libxml2-devel.i686 libxslt-devel.i686 zlib-devel.i686 gnutls-devel.i686 ncurses-devel.i686 sane-backends-devel.i686 libv4l-devel.i686 libgphoto2-devel.i686 libexif-devel.i686 lcms2-devel.i686 gettext-devel.i686 isdn4k-utils-devel.i686 cups-devel.i686 fontconfig-devel.i686 gsm-devel.i686 libjpeg-turbo-devel.i686 pkgconfig.i686 libtiff-devel.i686 unixODBC.i686 openldap-devel.i686 alsa-lib-devel.i686 audiofile-devel.i686 freeglut-devel.i686 giflib-devel.i686 gstreamer-devel.i686 gstreamer-plugins-base-devel.i686 libXmu-devel.i686 libXxf86dga-devel.i686 libieee1284-devel.i686 libpng-devel.i686 librsvg2-devel.i686 libstdc++-devel.i686 libusb-devel.i686 unixODBC-devel.i686 qt-devel.i686 libXext.i686 xulrunner.i686 ia32-libs.i686</span><br></pre></td></tr></table></figure>
+<p>##　编译安装wine</p>
+<blockquote>
+<p>wine版本下载最新的稳定版，目前是wine 5.0.2版本。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> wget http://mirrors.ibiblio.org/wine/source/5.0/wine-5.0.2.tar.xz</span><br><span class="line"><span class="meta">$</span> tar xf wine-5.0.2.tar.xz</span><br><span class="line"><span class="meta">$</span> cd wine-5.0.2</span><br><span class="line"><span class="meta">$</span> ./configure --prefix=/usr/local # 如果编译64位增加--enable-wine64</span><br><span class="line"><span class="meta">$</span> make -j8</span><br><span class="line"><span class="meta">$</span> sudo make install</span><br></pre></td></tr></table></figure>
+<h2 id="初始化wine"><a href="#初始化wine" class="headerlink" title="初始化wine"></a>初始化wine</h2><blockquote>
+<p><code>wine-mono</code>和<code>wine-geoko</code>可以初始化时安装，也可以不安装，下载后通过<code>wine control</code>命令安装exe或msi。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> wineboot</span><br><span class="line"><span class="meta">$</span> cp -f /usr/local/share/wine/fonts/* .wine/drive_c/windows/Fonts/</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>操作系统</category>
+      </categories>
+      <tags>
+        <tag>wine</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>CentOS安装搜狗输入法</title>
     <url>/2020/08/31/CentOS%E5%AE%89%E8%A3%85%E6%90%9C%E7%8B%97%E8%BE%93%E5%85%A5%E6%B3%95/</url>
     <content><![CDATA[<p>系统版本：<code>CentOS Linux release 7.7.1908 (Core)</code></p>
@@ -34,6 +79,56 @@
         <tag>sogou</tag>
         <tag>搜狗</tag>
         <tag>输入法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CentOS第三方库</title>
+    <url>/2018/07/11/CentOS%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/</url>
+    <content><![CDATA[<p><code>Software Collections</code></p>
+<p><code>EPEL</code> <code>Remi</code> <code>CentOS</code></p>
+<p>在Red Hat企业Linux（RHEL）上，一般都是提供的老掉牙的软件。CentOS作为RHEL的复制品有着同样的问题。</p>
+<p>如果应用依赖新版软件，怎么办呢？使用第三方仓库，推荐Software Collections、epel、Remi Collet。</p>
+<ul>
+<li><p>Software Collections</p>
+<p>单独安装在/opt中，新旧软件分离，需要启动。</p>
+</li>
+<li><p>epel</p>
+<p>新旧软件不分离，容易造成混乱。无需启动，直接生效。</p>
+</li>
+<li><p>Remi Collet</p>
+<p>同epel。</p>
+</li>
+</ul>
+<h1 id="Software-Collections"><a href="#Software-Collections" class="headerlink" title="Software Collections"></a>Software Collections</h1><p><a href="https://www.softwarecollections.org/en/" target="_blank" rel="noopener">Software Collections</a>是 Red Hat 唯一支持的新软件包源，为 CentOS 设立了专门的仓库，安装和管理都和其它第三方仓库一样。</p>
+<p>在 CentOS 6/7上安装Software Collections命令如下：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo yum install centos-release-scl</span></span><br></pre></td></tr></table></figure>
+<p><code>centos-release-scl-rh</code> 可能作为依赖包被同时安装。</p>
+<p>然后就可以像平常一样搜索、安装软件包了：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> yum search php7</span></span><br><span class="line"> [...]</span><br><span class="line"> rh-php70.x86_64 : Package that installs PHP 7.0</span><br><span class="line"> [...]</span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo yum install rh-php70</span></span><br></pre></td></tr></table></figure>
+<p>启用：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> scl <span class="built_in">enable</span> rh-php70 bash</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> php -v</span></span><br><span class="line">PHP 7.0.10</span><br></pre></td></tr></table></figure>
+<p>这些 SCL 软件包在重启后不会激活。SCL 的设计初衷就是在不影响原有配置的前提下，让新旧软件能一起运行。不过你可以通过 <code>~/.bashrc</code> 加载 SCL 提供的 <code>enable</code> 脚本来实现自动启用。 SCL 的所有软件包都安装在 <code>/opt</code> 下， 以我们的 PHP 7 为例，在 <code>~/.bashrc</code> 里加入一行：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">source /opt/rh/rh-php70/enable</span><br></pre></td></tr></table></figure>
+<h1 id="EPEL"><a href="#EPEL" class="headerlink" title="EPEL"></a>EPEL</h1><p>Fedora 社区为 Feora 及所有 RHEL 系的发行版维护着 <a href="https://fedoraproject.org/wiki/EPEL" target="_blank" rel="noopener">EPEL：Extra Packages for Enterprise Linux</a> 。 里面包含一些最新软件包以及一些未被发行版收纳的软件包。</p>
+<p>CentOS6/7安装命令如下：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">yum install -y epel-release</span><br><span class="line">yum --disablerepo=epel -y update ca-certificates</span><br></pre></td></tr></table></figure>
+<p>安装 EPEL 里的软件就不用麻烦 <code>enable</code> 脚本了，直接像平常一样用。你还可以用 <code>--disablerepo</code> 和 <code>--enablerepo</code> 选项指定从 EPEL 里安装软件包：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo yum --disablerepo <span class="string">"*"</span> --enablerepo epel install [package]</span></span><br></pre></td></tr></table></figure>
+<h1 id="Remi-Collet"><a href="#Remi-Collet" class="headerlink" title="Remi Collet"></a>Remi Collet</h1><p>Remi Collet 在 <a href="http://rpms.remirepo.net/" target="_blank" rel="noopener">Remi 的 RPM 仓库</a> 里维护着大量更新的和额外的软件包。需要先安装 EPEL ，因为 Remi 仓库依赖它。</p>
+<p>CentOS wiki 上有较完整的仓库列表：<a href="https://wiki.centos.org/AdditionalResources/Repositories" target="_blank" rel="noopener">更多的第三方仓库</a> ，用哪些，不用哪些，里面都有建议。</p>
+<h1 id="指定仓库"><a href="#指定仓库" class="headerlink" title="指定仓库"></a>指定仓库</h1><p>列出可用仓库：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> yum repolist</span></span><br><span class="line">[...]</span><br><span class="line">repo id                  repo name</span><br><span class="line">base/7/x86_64            CentOS-7 - Base</span><br><span class="line">centos-sclo-rh/x86_64    CentOS-7 - SCLo rh</span><br><span class="line">centos-sclo-sclo/x86_64  CentOS-7 - SCLo sclo</span><br><span class="line">extras/7/x86_64          CentOS-7 - Extras</span><br><span class="line">updates/7/x86_64         CentOS-7 - Updates</span><br></pre></td></tr></table></figure>
+<p>列出指定仓库中的 软件包：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> yum --disablerepo <span class="string">"*"</span> --enablerepo centos-sclo-rh list available</span></span><br></pre></td></tr></table></figure>
+<p><code>--disablerepo</code> 与 <code>--enablerepo</code> 简单说下。 实际上在这个命令里你并没有禁用或启用什么东西，而只是将你的搜索范围限制在某一个仓库内。</p>
+<p>从指定仓库安装：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo yum --disablerepo <span class="string">"*"</span> --enablerepo epel install [package]</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>操作系统</category>
+      </categories>
+      <tags>
+        <tag>yum</tag>
       </tags>
   </entry>
   <entry>
@@ -122,56 +217,6 @@
       <tags>
         <tag>PostgreSQL</tag>
         <tag>Greenplum</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>CentOS第三方库</title>
-    <url>/2018/07/11/CentOS%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/</url>
-    <content><![CDATA[<p><code>Software Collections</code></p>
-<p><code>EPEL</code> <code>Remi</code> <code>CentOS</code></p>
-<p>在Red Hat企业Linux（RHEL）上，一般都是提供的老掉牙的软件。CentOS作为RHEL的复制品有着同样的问题。</p>
-<p>如果应用依赖新版软件，怎么办呢？使用第三方仓库，推荐Software Collections、epel、Remi Collet。</p>
-<ul>
-<li><p>Software Collections</p>
-<p>单独安装在/opt中，新旧软件分离，需要启动。</p>
-</li>
-<li><p>epel</p>
-<p>新旧软件不分离，容易造成混乱。无需启动，直接生效。</p>
-</li>
-<li><p>Remi Collet</p>
-<p>同epel。</p>
-</li>
-</ul>
-<h1 id="Software-Collections"><a href="#Software-Collections" class="headerlink" title="Software Collections"></a>Software Collections</h1><p><a href="https://www.softwarecollections.org/en/" target="_blank" rel="noopener">Software Collections</a>是 Red Hat 唯一支持的新软件包源，为 CentOS 设立了专门的仓库，安装和管理都和其它第三方仓库一样。</p>
-<p>在 CentOS 6/7上安装Software Collections命令如下：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo yum install centos-release-scl</span></span><br></pre></td></tr></table></figure>
-<p><code>centos-release-scl-rh</code> 可能作为依赖包被同时安装。</p>
-<p>然后就可以像平常一样搜索、安装软件包了：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> yum search php7</span></span><br><span class="line"> [...]</span><br><span class="line"> rh-php70.x86_64 : Package that installs PHP 7.0</span><br><span class="line"> [...]</span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo yum install rh-php70</span></span><br></pre></td></tr></table></figure>
-<p>启用：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> scl <span class="built_in">enable</span> rh-php70 bash</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> php -v</span></span><br><span class="line">PHP 7.0.10</span><br></pre></td></tr></table></figure>
-<p>这些 SCL 软件包在重启后不会激活。SCL 的设计初衷就是在不影响原有配置的前提下，让新旧软件能一起运行。不过你可以通过 <code>~/.bashrc</code> 加载 SCL 提供的 <code>enable</code> 脚本来实现自动启用。 SCL 的所有软件包都安装在 <code>/opt</code> 下， 以我们的 PHP 7 为例，在 <code>~/.bashrc</code> 里加入一行：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">source /opt/rh/rh-php70/enable</span><br></pre></td></tr></table></figure>
-<h1 id="EPEL"><a href="#EPEL" class="headerlink" title="EPEL"></a>EPEL</h1><p>Fedora 社区为 Feora 及所有 RHEL 系的发行版维护着 <a href="https://fedoraproject.org/wiki/EPEL" target="_blank" rel="noopener">EPEL：Extra Packages for Enterprise Linux</a> 。 里面包含一些最新软件包以及一些未被发行版收纳的软件包。</p>
-<p>CentOS6/7安装命令如下：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">yum install -y epel-release</span><br><span class="line">yum --disablerepo=epel -y update ca-certificates</span><br></pre></td></tr></table></figure>
-<p>安装 EPEL 里的软件就不用麻烦 <code>enable</code> 脚本了，直接像平常一样用。你还可以用 <code>--disablerepo</code> 和 <code>--enablerepo</code> 选项指定从 EPEL 里安装软件包：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo yum --disablerepo <span class="string">"*"</span> --enablerepo epel install [package]</span></span><br></pre></td></tr></table></figure>
-<h1 id="Remi-Collet"><a href="#Remi-Collet" class="headerlink" title="Remi Collet"></a>Remi Collet</h1><p>Remi Collet 在 <a href="http://rpms.remirepo.net/" target="_blank" rel="noopener">Remi 的 RPM 仓库</a> 里维护着大量更新的和额外的软件包。需要先安装 EPEL ，因为 Remi 仓库依赖它。</p>
-<p>CentOS wiki 上有较完整的仓库列表：<a href="https://wiki.centos.org/AdditionalResources/Repositories" target="_blank" rel="noopener">更多的第三方仓库</a> ，用哪些，不用哪些，里面都有建议。</p>
-<h1 id="指定仓库"><a href="#指定仓库" class="headerlink" title="指定仓库"></a>指定仓库</h1><p>列出可用仓库：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> yum repolist</span></span><br><span class="line">[...]</span><br><span class="line">repo id                  repo name</span><br><span class="line">base/7/x86_64            CentOS-7 - Base</span><br><span class="line">centos-sclo-rh/x86_64    CentOS-7 - SCLo rh</span><br><span class="line">centos-sclo-sclo/x86_64  CentOS-7 - SCLo sclo</span><br><span class="line">extras/7/x86_64          CentOS-7 - Extras</span><br><span class="line">updates/7/x86_64         CentOS-7 - Updates</span><br></pre></td></tr></table></figure>
-<p>列出指定仓库中的 软件包：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> yum --disablerepo <span class="string">"*"</span> --enablerepo centos-sclo-rh list available</span></span><br></pre></td></tr></table></figure>
-<p><code>--disablerepo</code> 与 <code>--enablerepo</code> 简单说下。 实际上在这个命令里你并没有禁用或启用什么东西，而只是将你的搜索范围限制在某一个仓库内。</p>
-<p>从指定仓库安装：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo yum --disablerepo <span class="string">"*"</span> --enablerepo epel install [package]</span></span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>操作系统</category>
-      </categories>
-      <tags>
-        <tag>yum</tag>
       </tags>
   </entry>
   <entry>
@@ -759,6 +804,86 @@
       </tags>
   </entry>
   <entry>
+    <title>kvm虚拟机</title>
+    <url>/2018/02/09/kvm%E8%99%9A%E6%8B%9F%E6%9C%BA/</url>
+    <content><![CDATA[<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo apt-get install kvm qemu-kvm libvirt-bin bridge-utils</span><br></pre></td></tr></table></figure>
+<ul>
+<li>kvm 内核模块，实现cpu虚拟化和内存管理</li>
+<li>libvirt-bin 管理虚拟机</li>
+<li>qemu-kvm 是虚拟机</li>
+<li>bridge-utils 管理网桥</li>
+</ul>
+<p>如果只是使用命令行方式，上面的软件包已经足够。</p>
+<p>下面是图形界面工具：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo apt-get install virt-manager python-spice-client-gtk</span><br></pre></td></tr></table></figure>
+<ul>
+<li>virt-manager 图形界面的虚拟机管理程序，需要用到python-spice-client-gtk</li>
+<li>python-spice-client-gtk</li>
+</ul>
+<h1 id="配置网桥"><a href="#配置网桥" class="headerlink" title="配置网桥"></a>配置网桥</h1><ol>
+<li>手动配置</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">brctl addbr br0</span><br><span class="line">brctl addif br0 eth0</span><br><span class="line">ip addr add 10.10.10.1/24 dev br0</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li><p>自动配置</p>
+<p><strong>ubuntu</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">vi /etc/network/interfaces</span><br><span class="line">auto br0</span><br><span class="line">iface br0 inet static</span><br><span class="line">	address 10.10.10.1</span><br><span class="line">	netmask 255.255.255.0</span><br><span class="line">	bridge_ports eth0</span><br><span class="line">	bridge_stp off</span><br><span class="line">	bridge_fd 0</span><br><span class="line">	bridge_maxwait 0</span><br></pre></td></tr></table></figure>
+<p><strong>centos</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">vi /etc/sysconfig/network-script/ifcfg-br0</span><br><span class="line">DEVICE=br0</span><br><span class="line">TYPE=Bridge</span><br><span class="line">BOOTPROTO=static</span><br><span class="line">IPADDR=10.10.10.2</span><br><span class="line">NETMASK=255.255.255.0</span><br><span class="line">ONBOOT=yes</span><br><span class="line">NM_CONTROLLED=no</span><br><span class="line">DELAY=0</span><br><span class="line"></span><br><span class="line">vi /etc/sysconfig/network-script/ifcfg-eth0</span><br><span class="line">DEVICE=eth0</span><br><span class="line">HWADDR=00:15:xx:xx:xx:xx</span><br><span class="line">TYPE=Ethernet</span><br><span class="line">ONBOOT=yes</span><br><span class="line">BOOTPROTO=none</span><br><span class="line">BRIDGE=br0</span><br><span class="line">NM_CONTROLLED=no</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="使用命令行创建虚拟机"><a href="#使用命令行创建虚拟机" class="headerlink" title="使用命令行创建虚拟机"></a>使用命令行创建虚拟机</h1><ol>
+<li><p>建立磁盘镜像</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">qemu-img create -f qcow2 centos7.0.img 20G</span><br></pre></td></tr></table></figure>
+<p>使用 qcow2 格式的磁盘镜像的好处就是它在创建之初并不会给它分配全部大小磁盘容量，而是随着虚拟机中文件的增加而逐渐增大。因此，它对空间的使用更加有效。</p>
+</li>
+<li><p>建立<code>xml</code>配置文件</p>
+<p><code>linux</code>默认有<code>virtio</code>驱动，磁盘总线、网卡等可以设置为<code>virtio</code>。</p>
+<p><code>windows</code>要使用<code>virtio</code>，需要安装<code>virtio</code>驱动。或者<code>windows</code>的<code>disk</code>的总线可以选择和宿主机一致比如是<code>sata</code>，网卡可以设置为<code>rt8139</code>，<code>&lt;hyperv&gt;...&lt;/hyperv&gt;</code>域是针对<code>windows</code>的优化。实际上使用时发现在机械硬盘是使用<code>windows</code>，<code>io</code>效率很低，无论是否使用<code>virtio</code>驱动，可能有什么地方需要优化没搞懂，后来把<code>windows</code>的存储放到<code>ssd</code>上了。</p>
+<p><strong>centos7.0.xml</strong></p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">domain</span> <span class="attr">type</span>=<span class="string">'kvm'</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">name</span>&gt;</span>centos7.0<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">memory</span> <span class="attr">unit</span>=<span class="string">'KiB'</span>&gt;</span>1048576<span class="tag">&lt;/<span class="name">memory</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">currentMemory</span> <span class="attr">unit</span>=<span class="string">'KiB'</span>&gt;</span>1048576<span class="tag">&lt;/<span class="name">currentMemory</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">vcpu</span> <span class="attr">placement</span>=<span class="string">'static'</span>&gt;</span>2<span class="tag">&lt;/<span class="name">vcpu</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">os</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">type</span> <span class="attr">arch</span>=<span class="string">'x86_64'</span>&gt;</span>hvm<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">boot</span> <span class="attr">dev</span>=<span class="string">'cdrom'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">boot</span> <span class="attr">dev</span>=<span class="string">'hd'</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">os</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">features</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">acpi</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">apic</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">vmport</span> <span class="attr">state</span>=<span class="string">'off'</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">features</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">cpu</span> <span class="attr">mode</span>=<span class="string">'host-model'</span> <span class="attr">check</span>=<span class="string">'partial'</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">model</span> <span class="attr">fallback</span>=<span class="string">'allow'</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">cpu</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">clock</span> <span class="attr">offset</span>=<span class="string">'utc'</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">timer</span> <span class="attr">name</span>=<span class="string">'rtc'</span> <span class="attr">tickpolicy</span>=<span class="string">'catchup'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">timer</span> <span class="attr">name</span>=<span class="string">'pit'</span> <span class="attr">tickpolicy</span>=<span class="string">'delay'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">timer</span> <span class="attr">name</span>=<span class="string">'hpet'</span> <span class="attr">present</span>=<span class="string">'no'</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">clock</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">on_poweroff</span>&gt;</span>destroy<span class="tag">&lt;/<span class="name">on_poweroff</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">on_reboot</span>&gt;</span>restart<span class="tag">&lt;/<span class="name">on_reboot</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">on_crash</span>&gt;</span>restart<span class="tag">&lt;/<span class="name">on_crash</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">pm</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">suspend-to-mem</span> <span class="attr">enabled</span>=<span class="string">'no'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">suspend-to-disk</span> <span class="attr">enabled</span>=<span class="string">'no'</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">pm</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">devices</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">emulator</span>&gt;</span>/usr/bin/kvm<span class="tag">&lt;/<span class="name">emulator</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">disk</span> <span class="attr">type</span>=<span class="string">'file'</span> <span class="attr">device</span>=<span class="string">'disk'</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">driver</span> <span class="attr">name</span>=<span class="string">'qemu'</span> <span class="attr">type</span>=<span class="string">'qcow2'</span> <span class="attr">cache</span>=<span class="string">'writeback'</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">source</span> <span class="attr">file</span>=<span class="string">'/vmhosts/kvm/centos7.0.qcow2'</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">target</span> <span class="attr">dev</span>=<span class="string">'vda'</span> <span class="attr">bus</span>=<span class="string">'virtio'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">disk</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">disk</span> <span class="attr">type</span>=<span class="string">'file'</span> <span class="attr">device</span>=<span class="string">'cdrom'</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">driver</span> <span class="attr">name</span>=<span class="string">'qemu'</span> <span class="attr">type</span>=<span class="string">'raw'</span> <span class="attr">cache</span>=<span class="string">'none'</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">source</span> <span class="attr">file</span>=<span class="string">'/iso/centos7.0.iso'</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">target</span> <span class="attr">dev</span>=<span class="string">'hda'</span> <span class="attr">bus</span>=<span class="string">'ide'</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">readonly</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">disk</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">interface</span> <span class="attr">type</span>=<span class="string">'bridge'</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">source</span> <span class="attr">bridge</span>=<span class="string">'br0'</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">model</span> <span class="attr">type</span>=<span class="string">'virtio'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">interface</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">'tablet'</span> <span class="attr">bus</span>=<span class="string">'usb'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">'mouse'</span> <span class="attr">bus</span>=<span class="string">'ps2'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">'keyboard'</span> <span class="attr">bus</span>=<span class="string">'ps2'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">graphics</span> <span class="attr">type</span>=<span class="string">'vnc'</span> <span class="attr">port</span>=<span class="string">'-1'</span> <span class="attr">autoport</span>=<span class="string">'yes'</span> <span class="attr">listen</span>=<span class="string">'0.0.0.0'</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">listen</span> <span class="attr">type</span>=<span class="string">'address'</span> <span class="attr">address</span>=<span class="string">'0.0.0.0'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">graphics</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">devices</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">domain</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p><strong>win7</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&lt;domain type='kvm'&gt;</span><br><span class="line">  &lt;name&gt;win7&lt;/name&gt;</span><br><span class="line">  &lt;memory unit='KiB'&gt;2097152&lt;/memory&gt;</span><br><span class="line">  &lt;currentMemory unit='KiB'&gt;2097152&lt;/currentMemory&gt;</span><br><span class="line">  &lt;vcpu placement='static'&gt;2&lt;/vcpu&gt;</span><br><span class="line">  &lt;os&gt;</span><br><span class="line">    &lt;type arch='x86_64'&gt;hvm&lt;/type&gt;</span><br><span class="line">    &lt;boot dev='cdrom'/&gt;</span><br><span class="line">    &lt;boot dev='hd'/&gt;</span><br><span class="line">  &lt;/os&gt;</span><br><span class="line">  &lt;features&gt;</span><br><span class="line">    &lt;acpi/&gt;</span><br><span class="line">    &lt;apic/&gt;</span><br><span class="line">    &lt;hyperv&gt;</span><br><span class="line">      &lt;relaxed state='on'/&gt;</span><br><span class="line">      &lt;vapic state='on'/&gt;</span><br><span class="line">      &lt;spinlocks state='on' retries='4096'/&gt;</span><br><span class="line">      &lt;vpindex state='on'/&gt;</span><br><span class="line">      &lt;runtime state='on'/&gt;</span><br><span class="line">      &lt;synic state='on'/&gt;</span><br><span class="line">      &lt;reset state='on'/&gt;</span><br><span class="line">    &lt;/hyperv&gt;</span><br><span class="line">    &lt;vmport state='off'/&gt;</span><br><span class="line">  &lt;/features&gt;</span><br><span class="line">  &lt;cpu mode='host-model' check='partial'&gt;</span><br><span class="line">    &lt;model fallback='allow'/&gt;</span><br><span class="line">  &lt;/cpu&gt;</span><br><span class="line">  &lt;clock offset='localtime'&gt;</span><br><span class="line">    &lt;timer name='rtc' tickpolicy='catchup'/&gt;</span><br><span class="line">    &lt;timer name='pit' tickpolicy='delay'/&gt;</span><br><span class="line">    &lt;timer name='hpet' present='no'/&gt;</span><br><span class="line">    &lt;timer name='hypervclock' present='yes'/&gt;</span><br><span class="line">  &lt;/clock&gt;</span><br><span class="line">  &lt;on_poweroff&gt;destroy&lt;/on_poweroff&gt;</span><br><span class="line">  &lt;on_reboot&gt;restart&lt;/on_reboot&gt;</span><br><span class="line">  &lt;on_crash&gt;restart&lt;/on_crash&gt;</span><br><span class="line">  &lt;pm&gt;</span><br><span class="line">    &lt;suspend-to-mem enabled='no'/&gt;</span><br><span class="line">    &lt;suspend-to-disk enabled='no'/&gt;</span><br><span class="line">  &lt;/pm&gt;</span><br><span class="line">  &lt;devices&gt;</span><br><span class="line">    &lt;emulator&gt;/usr/bin/kvm&lt;/emulator&gt;</span><br><span class="line">    &lt;disk type='file' device='disk'&gt;</span><br><span class="line">      &lt;driver name='qemu' type='qcow2' cache='writeback'/&gt;</span><br><span class="line">      &lt;source file='/vmhosts/kvm/centos7.0.qcow2'/&gt;</span><br><span class="line">      &lt;target dev='sda' bus='sata'/&gt;</span><br><span class="line">    &lt;/disk&gt;</span><br><span class="line">    &lt;disk type='file' device='cdrom'&gt;</span><br><span class="line">      &lt;driver name='qemu' type='raw' cache='none'/&gt;</span><br><span class="line">      &lt;source file='/iso/win7.iso'/&gt;</span><br><span class="line">      &lt;target dev='hda' bus='ide'/&gt;</span><br><span class="line">      &lt;readonly/&gt;</span><br><span class="line">    &lt;/disk&gt;</span><br><span class="line">    &lt;interface type='bridge'&gt;</span><br><span class="line">      &lt;source bridge='br0'/&gt;</span><br><span class="line">      &lt;model type='rt8139'/&gt;</span><br><span class="line">    &lt;/interface&gt;</span><br><span class="line">    &lt;input type='tablet' bus='usb'/&gt;</span><br><span class="line">    &lt;input type='mouse' bus='ps2'/&gt;</span><br><span class="line">    &lt;input type='keyboard' bus='ps2'/&gt;</span><br><span class="line">    &lt;graphics type='vnc' port='-1' autoport='yes' listen='0.0.0.0'&gt;</span><br><span class="line">      &lt;listen type='address' address='0.0.0.0'/&gt;</span><br><span class="line">    &lt;/graphics&gt;</span><br><span class="line">  &lt;/devices&gt;</span><br><span class="line">&lt;/domain&gt;</span><br></pre></td></tr></table></figure>
+<p>​</p>
+</li>
+<li><p>定义虚拟机</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">virsh define centos7.0.xml</span><br><span class="line">virsh list --all</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动虚拟机</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">virsh start centos7.0</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装系统</p>
+<p>通过vnc客户端连接</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">vncviwer localhost:5900</span><br></pre></td></tr></table></figure>
+<p>安装好系统，装完必要的环境之后可以把存储(centos7.0.qcow2)备份。之后再需要系统时直接拷贝过来使用即可。</p>
+</li>
+<li><p>常用命令</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">virsh list #显示本地活动虚拟机</span><br><span class="line">virsh list –-all #显示本地所有的虚拟机（活动的+不活动的）</span><br><span class="line">virsh define ubuntu.xml #通过配置文件定义一个虚拟机（这个虚拟机还不是活动的）</span><br><span class="line">virsh start ubuntu #启动名字为ubuntu的非活动虚拟机</span><br><span class="line">virsh create ubuntu.xml # 创建虚拟机（创建后，虚拟机立即执行，成为活动主机）</span><br><span class="line">virsh suspend ubuntu # 暂停虚拟机</span><br><span class="line">virsh resume ubuntu # 启动暂停的虚拟机</span><br><span class="line">virsh shutdown ubuntu # 正常关闭虚拟机</span><br><span class="line">virsh destroy ubuntu # 强制关闭虚拟机</span><br><span class="line">virsh dominfo ubuntu #显示虚拟机的基本信息</span><br><span class="line">virsh domname 2 # 显示id号为2的虚拟机名</span><br><span class="line">virsh domid ubuntu # 显示虚拟机id号</span><br><span class="line">virsh domuuid ubuntu # 显示虚拟机的uuid</span><br><span class="line">virsh domstate ubuntu # 显示虚拟机的当前状态</span><br><span class="line">virsh dumpxml ubuntu # 显示虚拟机的当前配置文件（可能和定义虚拟机时的配置不同，因为当虚拟机启动时，需要给虚拟机分配id号、uuid、vnc端口号等等）</span><br><span class="line">virsh setmem ubuntu 512000 #给不活动虚拟机设置内存大小</span><br><span class="line">virsh setvcpus ubuntu 4 # 给不活动虚拟机设置cpu个数</span><br><span class="line">virsh edit ubuntu # 编辑配置文件（一般是在刚定义完虚拟机之后）</span><br><span class="line"></span><br><span class="line">libvirt还提供了一个shell:virsh，直接执行名virsh即可获得一个特殊的shell:virsh，在这个virsh里面可以执行上面的命令与本地libvirt交互，还可以通过命令connect命令连接远程libvirt，与之交互，例如：connect xen+ssh://root@10.0.0.11。另外可以只执行一条远程libvirt命令：virsh –c xen+ssh://root@10.0.0.11 list –all</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="快照管理"><a href="#快照管理" class="headerlink" title="快照管理"></a>快照管理</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> virsh --<span class="built_in">help</span> | grep snapshot</span></span><br><span class="line">snapshot-create                Create a snapshot from XML</span><br><span class="line">snapshot-create-as             Create a snapshot from a set of args</span><br><span class="line">snapshot-current               Get or set the current snapshot</span><br><span class="line">snapshot-delete                Delete a domain snapshot</span><br><span class="line">snapshot-dumpxml               Dump XML for a domain snapshot</span><br><span class="line">snapshot-edit                  edit XML for a snapshot</span><br><span class="line">snapshot-info                  snapshot information</span><br><span class="line">snapshot-list                  List snapshots for a domain</span><br><span class="line">snapshot-parent                Get the name of the parent of a snapshot</span><br><span class="line">snapshot-revert                Revert a domain to a snapshot</span><br></pre></td></tr></table></figure>
+<p>举例：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> virsh list</span></span><br><span class="line"> Id    Name                           State</span><br><span class="line">----------------------------------------------------</span><br><span class="line"> 1     win7                           running</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> virsh snapshot-create-as win7 snapshot-haozip_360_npp_wps</span></span><br><span class="line">Domain snapshot snapshot-haozip_360_npp_wps created</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> qemu-img info win7.qcow2</span></span><br><span class="line">image: win7.qcow2</span><br><span class="line">file format: qcow2</span><br><span class="line">virtual size: 100G (107374182400 bytes)</span><br><span class="line">disk size: 14G</span><br><span class="line">cluster_size: 65536</span><br><span class="line">Snapshot list:</span><br><span class="line">ID        TAG                 VM SIZE                DATE       VM CLOCK</span><br><span class="line">1         snapshot-haozip_360_npp_wps   1.8G 2018-03-07 10:14:03   01:15:31.438</span><br><span class="line">Format specific information:</span><br><span class="line">    compat: 1.1</span><br><span class="line">    lazy refcounts: false</span><br><span class="line">    refcount bits: 16</span><br><span class="line">    corrupt: false</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> virsh snapshot-list win7</span></span><br><span class="line"> Name                 Creation Time             State</span><br><span class="line">------------------------------------------------------------</span><br><span class="line"> snapshot-haozip_360_npp_wps 2018-03-07 10:14:03 +0800 running</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> virsh snapshot-info win7 --snapshotname snapshot-haozip_360_npp_wps</span></span><br><span class="line">Name:           snapshot-haozip_360_npp_wps</span><br><span class="line">Domain:         win7</span><br><span class="line">Current:        yes</span><br><span class="line">State:          running</span><br><span class="line">Location:       internal</span><br><span class="line">Parent:         -</span><br><span class="line">Children:       0</span><br><span class="line">Descendants:    0</span><br><span class="line">Metadata:       yes</span><br></pre></td></tr></table></figure>
+<h1 id="虚拟磁盘扩容"><a href="#虚拟磁盘扩容" class="headerlink" title="虚拟磁盘扩容"></a>虚拟磁盘扩容</h1><p>磁盘扩容或添加之后要到虚拟机内部做分区、格式化、自动挂在等操作。</p>
+<ol>
+<li><p>磁盘扩容</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> qemu-img resize win7.qcow +10G</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>磁盘添加</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> qemu-img create -f qcow2 win7_1 10G</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> virsh shutdown win7</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> virsh edit win7</span></span><br><span class="line">&lt;disk&gt;&lt;/disk&gt;在原有的disk下面添加一个disk配置：</span><br><span class="line">-- 修改file路径</span><br><span class="line">-- target中的dev修改为vdb</span><br><span class="line">-- 删除address</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="图形界面"><a href="#图形界面" class="headerlink" title="图形界面"></a>图形界面</h1><p>通过执行名virt-manager，启动libvirt的图形界面，在图形界面下可以一步一步的创建虚拟机，管理虚拟机，还可以直接控制虚拟机的桌面。​</p>
+]]></content>
+      <categories>
+        <category>常用工具</category>
+      </categories>
+      <tags>
+        <tag>kvm</tag>
+        <tag>虚拟机</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>linux终端快捷键</title>
     <url>/2018/12/27/linux%E7%BB%88%E7%AB%AF%E5%BF%AB%E6%8D%B7%E9%94%AE/</url>
     <content><![CDATA[<blockquote>
@@ -1021,86 +1146,6 @@
       <categories>
         <category>Shell</category>
       </categories>
-  </entry>
-  <entry>
-    <title>kvm虚拟机</title>
-    <url>/2018/02/09/kvm%E8%99%9A%E6%8B%9F%E6%9C%BA/</url>
-    <content><![CDATA[<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo apt-get install kvm qemu-kvm libvirt-bin bridge-utils</span><br></pre></td></tr></table></figure>
-<ul>
-<li>kvm 内核模块，实现cpu虚拟化和内存管理</li>
-<li>libvirt-bin 管理虚拟机</li>
-<li>qemu-kvm 是虚拟机</li>
-<li>bridge-utils 管理网桥</li>
-</ul>
-<p>如果只是使用命令行方式，上面的软件包已经足够。</p>
-<p>下面是图形界面工具：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo apt-get install virt-manager python-spice-client-gtk</span><br></pre></td></tr></table></figure>
-<ul>
-<li>virt-manager 图形界面的虚拟机管理程序，需要用到python-spice-client-gtk</li>
-<li>python-spice-client-gtk</li>
-</ul>
-<h1 id="配置网桥"><a href="#配置网桥" class="headerlink" title="配置网桥"></a>配置网桥</h1><ol>
-<li>手动配置</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">brctl addbr br0</span><br><span class="line">brctl addif br0 eth0</span><br><span class="line">ip addr add 10.10.10.1/24 dev br0</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li><p>自动配置</p>
-<p><strong>ubuntu</strong></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">vi /etc/network/interfaces</span><br><span class="line">auto br0</span><br><span class="line">iface br0 inet static</span><br><span class="line">	address 10.10.10.1</span><br><span class="line">	netmask 255.255.255.0</span><br><span class="line">	bridge_ports eth0</span><br><span class="line">	bridge_stp off</span><br><span class="line">	bridge_fd 0</span><br><span class="line">	bridge_maxwait 0</span><br></pre></td></tr></table></figure>
-<p><strong>centos</strong></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">vi /etc/sysconfig/network-script/ifcfg-br0</span><br><span class="line">DEVICE=br0</span><br><span class="line">TYPE=Bridge</span><br><span class="line">BOOTPROTO=static</span><br><span class="line">IPADDR=10.10.10.2</span><br><span class="line">NETMASK=255.255.255.0</span><br><span class="line">ONBOOT=yes</span><br><span class="line">NM_CONTROLLED=no</span><br><span class="line">DELAY=0</span><br><span class="line"></span><br><span class="line">vi /etc/sysconfig/network-script/ifcfg-eth0</span><br><span class="line">DEVICE=eth0</span><br><span class="line">HWADDR=00:15:xx:xx:xx:xx</span><br><span class="line">TYPE=Ethernet</span><br><span class="line">ONBOOT=yes</span><br><span class="line">BOOTPROTO=none</span><br><span class="line">BRIDGE=br0</span><br><span class="line">NM_CONTROLLED=no</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h1 id="使用命令行创建虚拟机"><a href="#使用命令行创建虚拟机" class="headerlink" title="使用命令行创建虚拟机"></a>使用命令行创建虚拟机</h1><ol>
-<li><p>建立磁盘镜像</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">qemu-img create -f qcow2 centos7.0.img 20G</span><br></pre></td></tr></table></figure>
-<p>使用 qcow2 格式的磁盘镜像的好处就是它在创建之初并不会给它分配全部大小磁盘容量，而是随着虚拟机中文件的增加而逐渐增大。因此，它对空间的使用更加有效。</p>
-</li>
-<li><p>建立<code>xml</code>配置文件</p>
-<p><code>linux</code>默认有<code>virtio</code>驱动，磁盘总线、网卡等可以设置为<code>virtio</code>。</p>
-<p><code>windows</code>要使用<code>virtio</code>，需要安装<code>virtio</code>驱动。或者<code>windows</code>的<code>disk</code>的总线可以选择和宿主机一致比如是<code>sata</code>，网卡可以设置为<code>rt8139</code>，<code>&lt;hyperv&gt;...&lt;/hyperv&gt;</code>域是针对<code>windows</code>的优化。实际上使用时发现在机械硬盘是使用<code>windows</code>，<code>io</code>效率很低，无论是否使用<code>virtio</code>驱动，可能有什么地方需要优化没搞懂，后来把<code>windows</code>的存储放到<code>ssd</code>上了。</p>
-<p><strong>centos7.0.xml</strong></p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">domain</span> <span class="attr">type</span>=<span class="string">'kvm'</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">name</span>&gt;</span>centos7.0<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">memory</span> <span class="attr">unit</span>=<span class="string">'KiB'</span>&gt;</span>1048576<span class="tag">&lt;/<span class="name">memory</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">currentMemory</span> <span class="attr">unit</span>=<span class="string">'KiB'</span>&gt;</span>1048576<span class="tag">&lt;/<span class="name">currentMemory</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">vcpu</span> <span class="attr">placement</span>=<span class="string">'static'</span>&gt;</span>2<span class="tag">&lt;/<span class="name">vcpu</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">os</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">type</span> <span class="attr">arch</span>=<span class="string">'x86_64'</span>&gt;</span>hvm<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">boot</span> <span class="attr">dev</span>=<span class="string">'cdrom'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">boot</span> <span class="attr">dev</span>=<span class="string">'hd'</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">os</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">features</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">acpi</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">apic</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">vmport</span> <span class="attr">state</span>=<span class="string">'off'</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">features</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">cpu</span> <span class="attr">mode</span>=<span class="string">'host-model'</span> <span class="attr">check</span>=<span class="string">'partial'</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">model</span> <span class="attr">fallback</span>=<span class="string">'allow'</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">cpu</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">clock</span> <span class="attr">offset</span>=<span class="string">'utc'</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">timer</span> <span class="attr">name</span>=<span class="string">'rtc'</span> <span class="attr">tickpolicy</span>=<span class="string">'catchup'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">timer</span> <span class="attr">name</span>=<span class="string">'pit'</span> <span class="attr">tickpolicy</span>=<span class="string">'delay'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">timer</span> <span class="attr">name</span>=<span class="string">'hpet'</span> <span class="attr">present</span>=<span class="string">'no'</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">clock</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">on_poweroff</span>&gt;</span>destroy<span class="tag">&lt;/<span class="name">on_poweroff</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">on_reboot</span>&gt;</span>restart<span class="tag">&lt;/<span class="name">on_reboot</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">on_crash</span>&gt;</span>restart<span class="tag">&lt;/<span class="name">on_crash</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">pm</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">suspend-to-mem</span> <span class="attr">enabled</span>=<span class="string">'no'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">suspend-to-disk</span> <span class="attr">enabled</span>=<span class="string">'no'</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">pm</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">devices</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">emulator</span>&gt;</span>/usr/bin/kvm<span class="tag">&lt;/<span class="name">emulator</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">disk</span> <span class="attr">type</span>=<span class="string">'file'</span> <span class="attr">device</span>=<span class="string">'disk'</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">driver</span> <span class="attr">name</span>=<span class="string">'qemu'</span> <span class="attr">type</span>=<span class="string">'qcow2'</span> <span class="attr">cache</span>=<span class="string">'writeback'</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">source</span> <span class="attr">file</span>=<span class="string">'/vmhosts/kvm/centos7.0.qcow2'</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">target</span> <span class="attr">dev</span>=<span class="string">'vda'</span> <span class="attr">bus</span>=<span class="string">'virtio'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">disk</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">disk</span> <span class="attr">type</span>=<span class="string">'file'</span> <span class="attr">device</span>=<span class="string">'cdrom'</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">driver</span> <span class="attr">name</span>=<span class="string">'qemu'</span> <span class="attr">type</span>=<span class="string">'raw'</span> <span class="attr">cache</span>=<span class="string">'none'</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">source</span> <span class="attr">file</span>=<span class="string">'/iso/centos7.0.iso'</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">target</span> <span class="attr">dev</span>=<span class="string">'hda'</span> <span class="attr">bus</span>=<span class="string">'ide'</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">readonly</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">disk</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">interface</span> <span class="attr">type</span>=<span class="string">'bridge'</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">source</span> <span class="attr">bridge</span>=<span class="string">'br0'</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">model</span> <span class="attr">type</span>=<span class="string">'virtio'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">interface</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">'tablet'</span> <span class="attr">bus</span>=<span class="string">'usb'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">'mouse'</span> <span class="attr">bus</span>=<span class="string">'ps2'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">'keyboard'</span> <span class="attr">bus</span>=<span class="string">'ps2'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">graphics</span> <span class="attr">type</span>=<span class="string">'vnc'</span> <span class="attr">port</span>=<span class="string">'-1'</span> <span class="attr">autoport</span>=<span class="string">'yes'</span> <span class="attr">listen</span>=<span class="string">'0.0.0.0'</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">listen</span> <span class="attr">type</span>=<span class="string">'address'</span> <span class="attr">address</span>=<span class="string">'0.0.0.0'</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">graphics</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">devices</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">domain</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p><strong>win7</strong></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&lt;domain type='kvm'&gt;</span><br><span class="line">  &lt;name&gt;win7&lt;/name&gt;</span><br><span class="line">  &lt;memory unit='KiB'&gt;2097152&lt;/memory&gt;</span><br><span class="line">  &lt;currentMemory unit='KiB'&gt;2097152&lt;/currentMemory&gt;</span><br><span class="line">  &lt;vcpu placement='static'&gt;2&lt;/vcpu&gt;</span><br><span class="line">  &lt;os&gt;</span><br><span class="line">    &lt;type arch='x86_64'&gt;hvm&lt;/type&gt;</span><br><span class="line">    &lt;boot dev='cdrom'/&gt;</span><br><span class="line">    &lt;boot dev='hd'/&gt;</span><br><span class="line">  &lt;/os&gt;</span><br><span class="line">  &lt;features&gt;</span><br><span class="line">    &lt;acpi/&gt;</span><br><span class="line">    &lt;apic/&gt;</span><br><span class="line">    &lt;hyperv&gt;</span><br><span class="line">      &lt;relaxed state='on'/&gt;</span><br><span class="line">      &lt;vapic state='on'/&gt;</span><br><span class="line">      &lt;spinlocks state='on' retries='4096'/&gt;</span><br><span class="line">      &lt;vpindex state='on'/&gt;</span><br><span class="line">      &lt;runtime state='on'/&gt;</span><br><span class="line">      &lt;synic state='on'/&gt;</span><br><span class="line">      &lt;reset state='on'/&gt;</span><br><span class="line">    &lt;/hyperv&gt;</span><br><span class="line">    &lt;vmport state='off'/&gt;</span><br><span class="line">  &lt;/features&gt;</span><br><span class="line">  &lt;cpu mode='host-model' check='partial'&gt;</span><br><span class="line">    &lt;model fallback='allow'/&gt;</span><br><span class="line">  &lt;/cpu&gt;</span><br><span class="line">  &lt;clock offset='localtime'&gt;</span><br><span class="line">    &lt;timer name='rtc' tickpolicy='catchup'/&gt;</span><br><span class="line">    &lt;timer name='pit' tickpolicy='delay'/&gt;</span><br><span class="line">    &lt;timer name='hpet' present='no'/&gt;</span><br><span class="line">    &lt;timer name='hypervclock' present='yes'/&gt;</span><br><span class="line">  &lt;/clock&gt;</span><br><span class="line">  &lt;on_poweroff&gt;destroy&lt;/on_poweroff&gt;</span><br><span class="line">  &lt;on_reboot&gt;restart&lt;/on_reboot&gt;</span><br><span class="line">  &lt;on_crash&gt;restart&lt;/on_crash&gt;</span><br><span class="line">  &lt;pm&gt;</span><br><span class="line">    &lt;suspend-to-mem enabled='no'/&gt;</span><br><span class="line">    &lt;suspend-to-disk enabled='no'/&gt;</span><br><span class="line">  &lt;/pm&gt;</span><br><span class="line">  &lt;devices&gt;</span><br><span class="line">    &lt;emulator&gt;/usr/bin/kvm&lt;/emulator&gt;</span><br><span class="line">    &lt;disk type='file' device='disk'&gt;</span><br><span class="line">      &lt;driver name='qemu' type='qcow2' cache='writeback'/&gt;</span><br><span class="line">      &lt;source file='/vmhosts/kvm/centos7.0.qcow2'/&gt;</span><br><span class="line">      &lt;target dev='sda' bus='sata'/&gt;</span><br><span class="line">    &lt;/disk&gt;</span><br><span class="line">    &lt;disk type='file' device='cdrom'&gt;</span><br><span class="line">      &lt;driver name='qemu' type='raw' cache='none'/&gt;</span><br><span class="line">      &lt;source file='/iso/win7.iso'/&gt;</span><br><span class="line">      &lt;target dev='hda' bus='ide'/&gt;</span><br><span class="line">      &lt;readonly/&gt;</span><br><span class="line">    &lt;/disk&gt;</span><br><span class="line">    &lt;interface type='bridge'&gt;</span><br><span class="line">      &lt;source bridge='br0'/&gt;</span><br><span class="line">      &lt;model type='rt8139'/&gt;</span><br><span class="line">    &lt;/interface&gt;</span><br><span class="line">    &lt;input type='tablet' bus='usb'/&gt;</span><br><span class="line">    &lt;input type='mouse' bus='ps2'/&gt;</span><br><span class="line">    &lt;input type='keyboard' bus='ps2'/&gt;</span><br><span class="line">    &lt;graphics type='vnc' port='-1' autoport='yes' listen='0.0.0.0'&gt;</span><br><span class="line">      &lt;listen type='address' address='0.0.0.0'/&gt;</span><br><span class="line">    &lt;/graphics&gt;</span><br><span class="line">  &lt;/devices&gt;</span><br><span class="line">&lt;/domain&gt;</span><br></pre></td></tr></table></figure>
-<p>​</p>
-</li>
-<li><p>定义虚拟机</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">virsh define centos7.0.xml</span><br><span class="line">virsh list --all</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>启动虚拟机</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">virsh start centos7.0</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>安装系统</p>
-<p>通过vnc客户端连接</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">vncviwer localhost:5900</span><br></pre></td></tr></table></figure>
-<p>安装好系统，装完必要的环境之后可以把存储(centos7.0.qcow2)备份。之后再需要系统时直接拷贝过来使用即可。</p>
-</li>
-<li><p>常用命令</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">virsh list #显示本地活动虚拟机</span><br><span class="line">virsh list –-all #显示本地所有的虚拟机（活动的+不活动的）</span><br><span class="line">virsh define ubuntu.xml #通过配置文件定义一个虚拟机（这个虚拟机还不是活动的）</span><br><span class="line">virsh start ubuntu #启动名字为ubuntu的非活动虚拟机</span><br><span class="line">virsh create ubuntu.xml # 创建虚拟机（创建后，虚拟机立即执行，成为活动主机）</span><br><span class="line">virsh suspend ubuntu # 暂停虚拟机</span><br><span class="line">virsh resume ubuntu # 启动暂停的虚拟机</span><br><span class="line">virsh shutdown ubuntu # 正常关闭虚拟机</span><br><span class="line">virsh destroy ubuntu # 强制关闭虚拟机</span><br><span class="line">virsh dominfo ubuntu #显示虚拟机的基本信息</span><br><span class="line">virsh domname 2 # 显示id号为2的虚拟机名</span><br><span class="line">virsh domid ubuntu # 显示虚拟机id号</span><br><span class="line">virsh domuuid ubuntu # 显示虚拟机的uuid</span><br><span class="line">virsh domstate ubuntu # 显示虚拟机的当前状态</span><br><span class="line">virsh dumpxml ubuntu # 显示虚拟机的当前配置文件（可能和定义虚拟机时的配置不同，因为当虚拟机启动时，需要给虚拟机分配id号、uuid、vnc端口号等等）</span><br><span class="line">virsh setmem ubuntu 512000 #给不活动虚拟机设置内存大小</span><br><span class="line">virsh setvcpus ubuntu 4 # 给不活动虚拟机设置cpu个数</span><br><span class="line">virsh edit ubuntu # 编辑配置文件（一般是在刚定义完虚拟机之后）</span><br><span class="line"></span><br><span class="line">libvirt还提供了一个shell:virsh，直接执行名virsh即可获得一个特殊的shell:virsh，在这个virsh里面可以执行上面的命令与本地libvirt交互，还可以通过命令connect命令连接远程libvirt，与之交互，例如：connect xen+ssh://root@10.0.0.11。另外可以只执行一条远程libvirt命令：virsh –c xen+ssh://root@10.0.0.11 list –all</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h1 id="快照管理"><a href="#快照管理" class="headerlink" title="快照管理"></a>快照管理</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> virsh --<span class="built_in">help</span> | grep snapshot</span></span><br><span class="line">snapshot-create                Create a snapshot from XML</span><br><span class="line">snapshot-create-as             Create a snapshot from a set of args</span><br><span class="line">snapshot-current               Get or set the current snapshot</span><br><span class="line">snapshot-delete                Delete a domain snapshot</span><br><span class="line">snapshot-dumpxml               Dump XML for a domain snapshot</span><br><span class="line">snapshot-edit                  edit XML for a snapshot</span><br><span class="line">snapshot-info                  snapshot information</span><br><span class="line">snapshot-list                  List snapshots for a domain</span><br><span class="line">snapshot-parent                Get the name of the parent of a snapshot</span><br><span class="line">snapshot-revert                Revert a domain to a snapshot</span><br></pre></td></tr></table></figure>
-<p>举例：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> virsh list</span></span><br><span class="line"> Id    Name                           State</span><br><span class="line">----------------------------------------------------</span><br><span class="line"> 1     win7                           running</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> virsh snapshot-create-as win7 snapshot-haozip_360_npp_wps</span></span><br><span class="line">Domain snapshot snapshot-haozip_360_npp_wps created</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> qemu-img info win7.qcow2</span></span><br><span class="line">image: win7.qcow2</span><br><span class="line">file format: qcow2</span><br><span class="line">virtual size: 100G (107374182400 bytes)</span><br><span class="line">disk size: 14G</span><br><span class="line">cluster_size: 65536</span><br><span class="line">Snapshot list:</span><br><span class="line">ID        TAG                 VM SIZE                DATE       VM CLOCK</span><br><span class="line">1         snapshot-haozip_360_npp_wps   1.8G 2018-03-07 10:14:03   01:15:31.438</span><br><span class="line">Format specific information:</span><br><span class="line">    compat: 1.1</span><br><span class="line">    lazy refcounts: false</span><br><span class="line">    refcount bits: 16</span><br><span class="line">    corrupt: false</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> virsh snapshot-list win7</span></span><br><span class="line"> Name                 Creation Time             State</span><br><span class="line">------------------------------------------------------------</span><br><span class="line"> snapshot-haozip_360_npp_wps 2018-03-07 10:14:03 +0800 running</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> virsh snapshot-info win7 --snapshotname snapshot-haozip_360_npp_wps</span></span><br><span class="line">Name:           snapshot-haozip_360_npp_wps</span><br><span class="line">Domain:         win7</span><br><span class="line">Current:        yes</span><br><span class="line">State:          running</span><br><span class="line">Location:       internal</span><br><span class="line">Parent:         -</span><br><span class="line">Children:       0</span><br><span class="line">Descendants:    0</span><br><span class="line">Metadata:       yes</span><br></pre></td></tr></table></figure>
-<h1 id="虚拟磁盘扩容"><a href="#虚拟磁盘扩容" class="headerlink" title="虚拟磁盘扩容"></a>虚拟磁盘扩容</h1><p>磁盘扩容或添加之后要到虚拟机内部做分区、格式化、自动挂在等操作。</p>
-<ol>
-<li><p>磁盘扩容</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> qemu-img resize win7.qcow +10G</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>磁盘添加</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> qemu-img create -f qcow2 win7_1 10G</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> virsh shutdown win7</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> virsh edit win7</span></span><br><span class="line">&lt;disk&gt;&lt;/disk&gt;在原有的disk下面添加一个disk配置：</span><br><span class="line">-- 修改file路径</span><br><span class="line">-- target中的dev修改为vdb</span><br><span class="line">-- 删除address</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h1 id="图形界面"><a href="#图形界面" class="headerlink" title="图形界面"></a>图形界面</h1><p>通过执行名virt-manager，启动libvirt的图形界面，在图形界面下可以一步一步的创建虚拟机，管理虚拟机，还可以直接控制虚拟机的桌面。​</p>
-]]></content>
-      <categories>
-        <category>常用工具</category>
-      </categories>
-      <tags>
-        <tag>kvm</tag>
-        <tag>虚拟机</tag>
-      </tags>
   </entry>
   <entry>
     <title>pgbouncer--greenplum测试</title>
@@ -2042,25 +2087,6 @@
       </tags>
   </entry>
   <entry>
-    <title>希尔排序</title>
-    <url>/2017/10/22/%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F/</url>
-    <content><![CDATA[<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>希尔排序，也称递减增量排序算法，是插入排序的一种高速而稳定的改进版本。</p>
-<p>希尔排序是基于插入排序的以下两点性质而提出改进方法的：</p>
-<ol>
-<li>插入排序在对几乎已经排好序的数据操作时， 效率高， 即可以达到线性排序的效率</li>
-<li>插入排序一般来说是低效的， 因为插入排序每次只能将数据移动一位</li>
-</ol>
-<h1 id="排序效果"><a href="#排序效果" class="headerlink" title="排序效果"></a>排序效果</h1><p><img src="/img/希尔排序.gif" alt></p>
-<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><figure class="highlight c"><table><tr><td class="code"><pre><span class="line">...</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>算法</category>
-      </categories>
-      <tags>
-        <tag>排序</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>插入排序</title>
     <url>/2017/10/22/%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F/</url>
     <content><![CDATA[<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>插入排序（Insertion Sort）的工作原理是通过构建有序序列，对于未排序数据，在已排序序列中从后向前扫描，找到相应位置并插入。插入排序在实现上，通常采用in-place排序（即只需用到O(1)的额外空间的排序），因而在从后向前扫描过程中，需要反复把已排序元素逐步向后挪位，为最新元素提供插入空间。</p>
@@ -2151,27 +2177,22 @@
       </tags>
   </entry>
   <entry>
-    <title>CentOS安装微信</title>
-    <url>/2020/09/01/CentOS%E5%AE%89%E8%A3%85%E5%BE%AE%E4%BF%A1/</url>
-    <content><![CDATA[<h1 id="CentOS安装微信"><a href="#CentOS安装微信" class="headerlink" title="CentOS安装微信"></a>CentOS安装微信</h1><p>系统版本：<code>CentOS Linux release 7.7.1908 (Core)</code></p>
-<h2 id="安装docker"><a href="#安装docker" class="headerlink" title="安装docker"></a>安装docker</h2><h3 id="配置docker的yum源"><a href="#配置docker的yum源" class="headerlink" title="配置docker的yum源"></a>配置docker的yum源</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo yum-config-manager  --add-repo https://download.docker.com/linux/centos/docker-ce.repo</span><br><span class="line"><span class="meta">$</span> sudo yum-config-manager --enable docker-ce-nightly</span><br><span class="line"><span class="meta">$</span> sudo yum-config-manager --enable docker-ce-test</span><br><span class="line"><span class="meta">$</span> sudo yum-config-manager --disable docker-ce-nightly</span><br></pre></td></tr></table></figure>
-<h3 id="安装docker-ce"><a href="#安装docker-ce" class="headerlink" title="安装docker-ce"></a>安装docker-ce</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo yum install docker-ce</span><br></pre></td></tr></table></figure>
-<h3 id="启动docker"><a href="#启动docker" class="headerlink" title="启动docker"></a>启动docker</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo systemctl start docker</span><br><span class="line"><span class="meta">$</span> sudo systemctl enable docker</span><br></pre></td></tr></table></figure>
-<h2 id="安装微信"><a href="#安装微信" class="headerlink" title="安装微信"></a>安装微信</h2><h3 id="拉取docker微信镜像"><a href="#拉取docker微信镜像" class="headerlink" title="拉取docker微信镜像"></a>拉取docker微信镜像</h3><p>bestwu/wechat是基于deepin的镜像，内部包含基于deepin-wine的微信。</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo docker pull bestwu/wechat</span><br></pre></td></tr></table></figure>
-<h3 id="创建微信容器"><a href="#创建微信容器" class="headerlink" title="创建微信容器"></a>创建微信容器</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo docker run -d --name wechat --device /dev/snd \</span><br><span class="line">		   -v /tmp/.X11-unix:/tmp/.X11-unix \</span><br><span class="line">		   -v $HOME/.WeChatFiles:/WeChatFiles \</span><br><span class="line">		   -e DISPLAY=unix$DISPLAY \</span><br><span class="line">		   -e XMODIFIERS=@im=ibus \</span><br><span class="line">		   -e QT_IM_MODULE=ibus \</span><br><span class="line">		   -e GTK_IM_MODULE=ibus \</span><br><span class="line">		   -e AUDIO_GID=`getent group audio | cut -d: -f3` \</span><br><span class="line">		   -e GID=`id -g` \</span><br><span class="line">		   -e UID=`id -u` \</span><br><span class="line">		   bestwu/wechat</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>上述是基于fcitx的输入法框架，如果是ibus，把上述fcitx都换成ibus即可。</p>
-</blockquote>
-<h3 id="启动微信容器"><a href="#启动微信容器" class="headerlink" title="启动微信容器"></a>启动微信容器</h3><p>第一次使用<code>docker run</code>创建并启动微信容器，以后每次使用<code>docker start</code>启动微信容器。</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span> sudo docker start wechat</span><br></pre></td></tr></table></figure>
+    <title>希尔排序</title>
+    <url>/2017/10/22/%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F/</url>
+    <content><![CDATA[<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>希尔排序，也称递减增量排序算法，是插入排序的一种高速而稳定的改进版本。</p>
+<p>希尔排序是基于插入排序的以下两点性质而提出改进方法的：</p>
+<ol>
+<li>插入排序在对几乎已经排好序的数据操作时， 效率高， 即可以达到线性排序的效率</li>
+<li>插入排序一般来说是低效的， 因为插入排序每次只能将数据移动一位</li>
+</ol>
+<h1 id="排序效果"><a href="#排序效果" class="headerlink" title="排序效果"></a>排序效果</h1><p><img src="/img/希尔排序.gif" alt></p>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><figure class="highlight c"><table><tr><td class="code"><pre><span class="line">...</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>操作系统</category>
+        <category>算法</category>
       </categories>
       <tags>
-        <tag>微信</tag>
-        <tag>wechat</tag>
+        <tag>排序</tag>
       </tags>
   </entry>
 </search>
