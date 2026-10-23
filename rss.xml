@@ -1,0 +1,5088 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>FYSBlog</title><description>Code is art</description><link>https://yfshi.github.io/</link><language>zh_CN</language><item><title>CentOS编译安装wine</title><link>https://yfshi.github.io/posts/centos%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85wine/</link><guid isPermaLink="true">https://yfshi.github.io/posts/centos%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85wine/</guid><pubDate>Thu, 03 Sep 2020 17:38:58 GMT</pubDate><content:encoded>&lt;h2&gt;CentOS编译安装wine&lt;/h2&gt;
+&lt;h2&gt;安装依赖&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;$ yum install glibc-devel.i686 dbus-devel.i686 freetype-devel.i686 pulseaudio-libs-devel.i686 libX11-devel.i686 mesa-libGLU-devel.i686 libICE-devel.i686 libXext-devel.i686 libXcursor-devel.i686 libXi-devel.i686 libXxf86vm-devel.i686 libXrender-devel.i686 libXinerama-devel.i686 libXcomposite-devel.i686 libXrandr-devel.i686 mesa-libGL-devel.i686 mesa-libOSMesa-devel.i686 libxml2-devel.i686 libxslt-devel.i686 zlib-devel.i686 gnutls-devel.i686 ncurses-devel.i686 sane-backends-devel.i686 libv4l-devel.i686 libgphoto2-devel.i686 libexif-devel.i686 lcms2-devel.i686 gettext-devel.i686 isdn4k-utils-devel.i686 cups-devel.i686 fontconfig-devel.i686 gsm-devel.i686 libjpeg-turbo-devel.i686 pkgconfig.i686 libtiff-devel.i686 unixODBC.i686 openldap-devel.i686 alsa-lib-devel.i686 audiofile-devel.i686 freeglut-devel.i686 giflib-devel.i686 gstreamer-devel.i686 gstreamer-plugins-base-devel.i686 libXmu-devel.i686 libXxf86dga-devel.i686 libieee1284-devel.i686 libpng-devel.i686 librsvg2-devel.i686 libstdc++-devel.i686 libusb-devel.i686 unixODBC-devel.i686 qt-devel.i686 libXext.i686 xulrunner.i686 ia32-libs.i686
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;##　编译安装wine&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;wine版本下载最新的稳定版，目前是wine 5.0.2版本。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ wget http://mirrors.ibiblio.org/wine/source/5.0/wine-5.0.2.tar.xz
+$ tar xf wine-5.0.2.tar.xz
+$ cd wine-5.0.2
+$ ./configure --prefix=/usr/local # 如果编译64位增加--enable-wine64
+$ make -j8
+$ sudo make install
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;初始化wine&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;code&gt;wine-mono&lt;/code&gt;和&lt;code&gt;wine-geoko&lt;/code&gt;可以初始化时安装，也可以不安装，下载后通过&lt;code&gt;wine control&lt;/code&gt;命令安装exe或msi。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ wineboot
+$ cp -f /usr/local/share/wine/fonts/* .wine/drive_c/windows/Fonts/
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>CentOS安装微信</title><link>https://yfshi.github.io/posts/centos%E5%AE%89%E8%A3%85%E5%BE%AE%E4%BF%A1/</link><guid isPermaLink="true">https://yfshi.github.io/posts/centos%E5%AE%89%E8%A3%85%E5%BE%AE%E4%BF%A1/</guid><pubDate>Tue, 01 Sep 2020 10:23:44 GMT</pubDate><content:encoded>&lt;h1&gt;CentOS安装微信&lt;/h1&gt;
+&lt;p&gt;系统版本：&lt;code&gt;CentOS Linux release 7.7.1908 (Core)&lt;/code&gt;&lt;/p&gt;
+&lt;h2&gt;安装docker&lt;/h2&gt;
+&lt;h3&gt;配置docker的yum源&lt;/h3&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo yum-config-manager  --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+$ sudo yum-config-manager --enable docker-ce-nightly
+$ sudo yum-config-manager --enable docker-ce-test
+$ sudo yum-config-manager --disable docker-ce-nightly
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;安装docker-ce&lt;/h3&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo yum install docker-ce
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;启动docker&lt;/h3&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl start docker
+$ sudo systemctl enable docker
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;安装微信&lt;/h2&gt;
+&lt;h3&gt;拉取docker微信镜像&lt;/h3&gt;
+&lt;p&gt;bestwu/wechat是基于deepin的镜像，内部包含基于deepin-wine的微信。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo docker pull bestwu/wechat
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;创建微信容器&lt;/h3&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo docker run -d --name wechat --device /dev/snd \
+		   -v /tmp/.X11-unix:/tmp/.X11-unix \
+		   -v $HOME/.WeChatFiles:/WeChatFiles \
+		   -e DISPLAY=unix$DISPLAY \
+		   -e XMODIFIERS=@im=ibus \
+		   -e QT_IM_MODULE=ibus \
+		   -e GTK_IM_MODULE=ibus \
+		   -e AUDIO_GID=`getent group audio | cut -d: -f3` \
+		   -e GID=`id -g` \
+		   -e UID=`id -u` \
+		   bestwu/wechat
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;上述是基于fcitx的输入法框架，如果是ibus，把上述fcitx都换成ibus即可。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;启动微信容器&lt;/h3&gt;
+&lt;p&gt;第一次使用&lt;code&gt;docker run&lt;/code&gt;创建并启动微信容器，以后每次使用&lt;code&gt;docker start&lt;/code&gt;启动微信容器。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo docker start wechat
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>CentOS安装搜狗输入法</title><link>https://yfshi.github.io/posts/centos%E5%AE%89%E8%A3%85%E6%90%9C%E7%8B%97%E8%BE%93%E5%85%A5%E6%B3%95/</link><guid isPermaLink="true">https://yfshi.github.io/posts/centos%E5%AE%89%E8%A3%85%E6%90%9C%E7%8B%97%E8%BE%93%E5%85%A5%E6%B3%95/</guid><pubDate>Mon, 31 Aug 2020 16:29:14 GMT</pubDate><content:encoded>&lt;p&gt;系统版本：&lt;code&gt;CentOS Linux release 7.7.1908 (Core)&lt;/code&gt;&lt;/p&gt;
+&lt;h2&gt;安装fcitx输入法框架&lt;/h2&gt;
+&lt;p&gt;安装fcitx输入法框架，注意不要删除ibus框架，gnome-shell依赖ibus框架，执行命令：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo yum install libQtWebKit* fcitx fcitx-libs fcitx-qt4 fcitx-qt5 fcitx-configtool fcitx-table fcitx-table-chinese qt5-qtbase
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;新建&lt;code&gt;/etc/profile.d/fcitx.sh&lt;/code&gt;，内容如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+export QT4_IM_MODULE=fcitx
+export XMODIFIERS=&quot;@im=fcitx&quot;```
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;设置&lt;code&gt;fctix&lt;/code&gt;开机自启动，在&lt;code&gt;gnome-tweaks&lt;/code&gt;中设置;&lt;/p&gt;
+&lt;p&gt;设置当前用户默认不启动&lt;code&gt;ibus-daemon&lt;/code&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo setfacl -m u:yfshi:rw /usr/bin/ibus-daemon
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;为了在&lt;code&gt;gnome-terminal&lt;/code&gt;中也能使用&lt;code&gt;fcitx&lt;/code&gt;，设置如下，这是gnome3的新特性导致的：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ gsettings set org.gnome.settings-daemon.plugins.xsettings overrides &quot;{&apos;Gtk/IMModule&apos;:&amp;lt;&apos;fcitx&apos;&amp;gt;}&quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;设置a&lt;code&gt;lternatives&lt;/code&gt;为&lt;code&gt;fcitx&lt;/code&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ alternatives --install /etc/X11/xinit/xinputrc xinputrc /etc/X11/xinit/xinput.d/fcitx.conf 100
+$ alternatives --config xinputrc
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;安装搜狗输入法&lt;/h2&gt;
+&lt;p&gt;下载搜狗输入法for linux，只有deb包：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo wget http://cdn2.ime.sogou.com/dl/index/1524572264/sogoupinyin_2.2.0.0108_amd64.deb?st=EPtVkvlW9rLVsn-jtfOGbA&amp;amp;e=1568569239&amp;amp;fn=sogoupinyin_2.2.0.0108_amd64.deb
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;安装&lt;code&gt;alien&lt;/code&gt;工具，把deb转成rpm包：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo yum install alien
+$ sudo alien -r --scripts sogoupinyin_2.2.0.0108_amd64.deb
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;安装搜狗拼音输入法：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo cp /usr/lib/x86_64-linux-gnu/fcitx/* /usr/lib64/fcitx
+$ chmod -R 755 /usr/lib64/fcitx/
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;配置搜狗输入法&lt;/h2&gt;
+&lt;p&gt;重启&lt;code&gt;reboot&lt;/code&gt;；&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;fcitx&lt;/code&gt;添加搜狗输入法：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ fcitx-configtool
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;注意，在fcitx-configtool的高级设置中关闭搜狗输入法的云输入，否则cpu可能会100%.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;设置搜狗输入法。&lt;/p&gt;
+</content:encoded></item><item><title>动态库和静态库</title><link>https://yfshi.github.io/posts/%E5%8A%A8%E6%80%81%E5%BA%93%E5%92%8C%E9%9D%99%E6%80%81%E5%BA%93/</link><guid isPermaLink="true">https://yfshi.github.io/posts/%E5%8A%A8%E6%80%81%E5%BA%93%E5%92%8C%E9%9D%99%E6%80%81%E5%BA%93/</guid><pubDate>Thu, 06 Jun 2019 06:49:17 GMT</pubDate><content:encoded>&lt;h1&gt;概述&lt;/h1&gt;
+&lt;p&gt;linux下有两种库：动态库和静态库。&lt;/p&gt;
+&lt;p&gt;静态库在编译过程中已经被载入，因此编译出来的可执行程序都比较大。程序运行时不再需要静态库，即程序编译完之后静态库就没用了。&lt;/p&gt;
+&lt;p&gt;动态库（共享库）在程序运行时载入内存，在编译过程中仅简单的引用，因此可执行文件体积比较小。程序运行需要加载动态库，即程序和动态库必须同时存在。&lt;/p&gt;
+&lt;h1&gt;静态库&lt;/h1&gt;
+&lt;p&gt;静态库是.o文件的集合，使用时可以把.a文件当成多个.o的集合使用。&lt;/p&gt;
+&lt;p&gt;如果.a依赖于动态库，生成.a时不会把.so动态库集合进来，那么使用者使用.a时需要同时链接其依赖的.so库。在产生.a时要避免依赖过多的动态库。&lt;/p&gt;
+&lt;p&gt;静态库更新之后使用静态库的程序必须重新编译。&lt;/p&gt;
+&lt;h1&gt;动态库&lt;/h1&gt;
+&lt;p&gt;在编译的时候动态库并没有被编译进目标代码，你的程序执行到相关函数时才去调用动态库，所以程序运行时必须提供相应的库。&lt;/p&gt;
+&lt;p&gt;动态库更新之后不需要重新编译目标程序。&lt;/p&gt;
+</content:encoded></item><item><title>docker搭建greenplum开发环境</title><link>https://yfshi.github.io/posts/%E5%9F%BA%E4%BA%8Edocker%E6%90%AD%E5%BB%BAgreenplum%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/</link><guid isPermaLink="true">https://yfshi.github.io/posts/%E5%9F%BA%E4%BA%8Edocker%E6%90%AD%E5%BB%BAgreenplum%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/</guid><pubDate>Wed, 15 May 2019 10:00:40 GMT</pubDate><content:encoded>&lt;h1&gt;docker&lt;/h1&gt;
+&lt;h1&gt;安装docker&lt;/h1&gt;
+&lt;p&gt;略&lt;/p&gt;
+&lt;h1&gt;给普通用户权限&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;# 把普通用户加入docker组，如果docker用户组不存在，新建
+sudo gppasswd -a yfshi docker
+# 重启docker服务
+sudo systemctl restart docker
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;配置greenplum环境&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;# 创建自定义网络，以便后续设置静态ip
+$ docker network create --subnet 10.0.0.0/24 syf_net
+
+# 拉取centos7最小安装镜像
+$ docker pull centos
+
+#  创建并后台启动容器，名称为dev，使用自定义的网络syf_net，指定静态ip（比如属于syf_net所指定的子网，如果使用非自定义网络，不可设置静态ip，自动分配）
+$ docker run -dit --privileged --net syf_net --ip 10.0.0.1 -dit --name dev centos /usr/sbin/init
+
+# 在容器中打开一个交互终端
+$ docker exec -it dev /bin/bash
+
+# 安装常用工具和开发包
+$ yum install -y net-tools which openssh-clients openssh-server less zip unzip iproute bzip2 cmake gcc gcc-c++ gdb git libtool lrzsz make man net-tools sysstat vim wget sudo
+$ yum install -y apr-devel apr-util-devel bison bzip2-devel c-ares-devel flex java-1.8.0-openjdk java-1.8.0-openjdk-devel json-c-devel krb5-devel libcurl-devel libevent-devel libkadm5 libxml2-devel libxslt-devel libyaml-devel openldap-devel openssl-devel pam-devel perl perl-devel perl-ExtUtils-Embed readline-devel unixODBC-devel zlib-devel
+
+# 设置系统参数
+$ cat &amp;gt;&amp;gt; /etc/sysctl.conf &amp;lt;&amp;lt;-EOF
+kernel.shmmax = 500000000
+kernel.shmmni = 4096
+kernel.shmall = 4000000000
+kernel.sem = 500 1024000 200 4096
+kernel.sysrq = 1
+kernel.core_uses_pid = 1
+kernel.msgmnb = 65536
+kernel.msgmax = 65536
+kernel.msgmni = 2048
+net.ipv4.tcp_syncookies = 1
+net.ipv4.ip_forward = 0
+net.ipv4.conf.default.accept_source_route = 0
+net.ipv4.tcp_tw_recycle = 1
+net.ipv4.tcp_max_syn_backlog = 4096
+net.ipv4.conf.all.arp_filter = 1
+net.ipv4.ip_local_port_range = 1025 65535
+net.core.netdev_max_backlog = 10000
+net.core.rmem_max = 2097152
+net.core.wmem_max = 2097152
+vm.overcommit_memory = 2
+EOF
+$ cat &amp;gt;&amp;gt; /etc/security/limits.conf &amp;lt;&amp;lt;-EOF
+* soft nofile 65536
+* hard nofile 65536
+* soft nproc 131072
+* hard nproc 131072
+EOF
+$ cat &amp;gt;&amp;gt; /etc/ld.so.conf &amp;lt;&amp;lt;-EOF
+/usr/local/lib
+EOF
+
+# 设置ssh自启动
+systemctl enable sshd
+systemctl start sshd
+
+# 添加用户
+passwd root
+useradd -m gpadmin
+passwd gpadmin
+
+# 退出当前终端
+exit
+
+# 把该容器制作为镜像
+docker commit -a yfshi -m &quot;develop environment for greenplum&quot; dev centos-gpdb
+
+#  基于新镜像启动容器
+docker run -dit --privileged --net syf_net --ip 10.0.0.2 -dit --name dev1 centos-gpdb /usr/sbin/init
+
+# 打开终端，可以以ssh方式或docker方式
+docker exec -it dev1 /bin/bash
+# 或
+ssh gpadmin@10.0.0.2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;备份镜像&lt;/h1&gt;
+&lt;p&gt;为了防止镜像丢失，可以把镜像导出到文件。之后可以通过该文件导入镜像。&lt;/p&gt;
+&lt;p&gt;有两种方式，一种是通过save/load镜像方式，一种是通过export/import容器方式。区别是export/import不保留历史记录（docker history IMAGE）。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# 把centos-gpdb镜像导出到文件centos-gpdb.tar
+docker save -o centos-gpdb.tar centos-gpdb
+
+# 导入centos-gpdb.tar
+docker load -i centos-gpdb.tar
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;附：docker建立ubuntu桌面版，通过vnc连接&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# 启动容器
+$ docker run -d --name=ubuntu -p 5901:5901 -p 6901:6901 --hostname ubuntu --user $(id -u) --net sys_net --ip 10.0.0.200 -e VNC_PW=yfshi -e VNC_RESOLUTION=1280x800  consol/ubuntu-xfce-vnc
+
+# 使用浏览器访问: x.x.x.x:6901
+# 使用vnc客户端访问：x.x.x.x:5901
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>linux终端快捷键</title><link>https://yfshi.github.io/posts/linux%E7%BB%88%E7%AB%AF%E5%BF%AB%E6%8D%B7%E9%94%AE/</link><guid isPermaLink="true">https://yfshi.github.io/posts/linux%E7%BB%88%E7%AB%AF%E5%BF%AB%E6%8D%B7%E9%94%AE/</guid><pubDate>Thu, 27 Dec 2018 17:28:48 GMT</pubDate><content:encoded>&lt;blockquote&gt;
+&lt;p&gt;linux中的许多操作在终端（Terminal）中十分的快捷。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;光标操作&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;快捷键&lt;/th&gt;
+&lt;th&gt;功能&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+A(ahead)&lt;/td&gt;
+&lt;td&gt;移动到行首&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+E(end)&lt;/td&gt;
+&lt;td&gt;移动到行尾&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+Left&lt;/td&gt;
+&lt;td&gt;移动到上一个单词的词首&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+Right&lt;/td&gt;
+&lt;td&gt;移动到下一个单词的词尾&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+F(forwards)&lt;/td&gt;
+&lt;td&gt;向后移动一个字符&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+B(backwards)&lt;/td&gt;
+&lt;td&gt;向前移动一个字符&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Esc+F&lt;/td&gt;
+&lt;td&gt;移动到当前单词的词尾&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Esc+B&lt;/td&gt;
+&lt;td&gt;移动到当前单词的词首&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ul&gt;
+&lt;li&gt;文本处理操作&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;快捷键&lt;/th&gt;
+&lt;th&gt;功能&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+U&lt;/td&gt;
+&lt;td&gt;剪切光标到行首的内容&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+K&lt;/td&gt;
+&lt;td&gt;剪切光标到行尾的内容&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+W&lt;/td&gt;
+&lt;td&gt;剪切光标到词首的内容&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Alt+D&lt;/td&gt;
+&lt;td&gt;剪切光标到词尾的内容&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+H&lt;/td&gt;
+&lt;td&gt;删除光标前的字符，相当于Backspace&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+D&lt;/td&gt;
+&lt;td&gt;删除光标后的字符，相当于Delete&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+Y&lt;/td&gt;
+&lt;td&gt;粘贴删除或剪切的字符&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+7&lt;/td&gt;
+&lt;td&gt;恢复刚才的内容&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ul&gt;
+&lt;li&gt;历史命令操作&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;快捷键&lt;/th&gt;
+&lt;th&gt;功能&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+P(previous)&lt;/td&gt;
+&lt;td&gt;显示上一条命令&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+N(next)&lt;/td&gt;
+&lt;td&gt;显示下一条命令&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;!Num&lt;/td&gt;
+&lt;td&gt;执行命令历史表的第Num条命令&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;!!&lt;/td&gt;
+&lt;td&gt;执行上一条命令&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;!$&lt;/td&gt;
+&lt;td&gt;上一条命令的最后一个参数&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+R(retrive)&lt;/td&gt;
+&lt;td&gt;向上搜索历史命令&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ul&gt;
+&lt;li&gt;窗口操作&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;快捷键&lt;/th&gt;
+&lt;th&gt;功能&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Shift+Ctrl+N&lt;/td&gt;
+&lt;td&gt;新建窗口&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Shift+Ctrl+Q&lt;/td&gt;
+&lt;td&gt;关闭终端&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;F11&lt;/td&gt;
+&lt;td&gt;全屏&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+Plus&lt;/td&gt;
+&lt;td&gt;放大&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+Minus&lt;/td&gt;
+&lt;td&gt;缩小&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+0&lt;/td&gt;
+&lt;td&gt;原始大小&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Shirt+Up&lt;/td&gt;
+&lt;td&gt;向上滚屏&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Shift+Down&lt;/td&gt;
+&lt;td&gt;向下滚屏&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Shift+PageUp&lt;/td&gt;
+&lt;td&gt;向上翻页&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Shift+PageDown&lt;/td&gt;
+&lt;td&gt;向下翻页&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ul&gt;
+&lt;li&gt;任务处理操作&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;快捷键&lt;/th&gt;
+&lt;th&gt;功能&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+C&lt;/td&gt;
+&lt;td&gt;删除整行/终止&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+L&lt;/td&gt;
+&lt;td&gt;刷新屏幕&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+S&lt;/td&gt;
+&lt;td&gt;挂起当前shell&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+Q&lt;/td&gt;
+&lt;td&gt;重新启用挂起的shell&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ul&gt;
+&lt;li&gt;标签页处理操作&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;快捷键&lt;/th&gt;
+&lt;th&gt;功能&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Shift+Ctrl+T&lt;/td&gt;
+&lt;td&gt;新建标签页&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Shift+Ctrl+W&lt;/td&gt;
+&lt;td&gt;关闭标签页&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+PageUp&lt;/td&gt;
+&lt;td&gt;前一标签页&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Ctrl+PageDown&lt;/td&gt;
+&lt;td&gt;后一标签页&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Shift+Ctrl+PageUp&lt;/td&gt;
+&lt;td&gt;标签页左移&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Shift+Ctrl+PageDown&lt;/td&gt;
+&lt;td&gt;标签页右移&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Alt+1,2,3...&lt;/td&gt;
+&lt;td&gt;切换到标签页1,2,3...&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ul&gt;
+&lt;li&gt;其他操作&lt;/li&gt;
+&lt;/ul&gt;
+</content:encoded></item><item><title>常用的c语言函数</title><link>https://yfshi.github.io/posts/%E5%B8%B8%E7%94%A8%E7%9A%84c%E8%AF%AD%E8%A8%80%E5%87%BD%E6%95%B0/</link><guid isPermaLink="true">https://yfshi.github.io/posts/%E5%B8%B8%E7%94%A8%E7%9A%84c%E8%AF%AD%E8%A8%80%E5%87%BD%E6%95%B0/</guid><pubDate>Thu, 06 Dec 2018 14:45:14 GMT</pubDate><content:encoded>&lt;h1&gt;日志相关&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;// 把标准错误和标准输出重定位到文件
+bool setLogFile(const char *logFile)
+{
+    if ((Logfilefd = open(Logfile, O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1) 
+    {   
+        fprintf(stderr, &quot;Open logfile %s failed.\n&quot;, Logfile);
+        return false;
+    }   
+
+    close(1);
+    close(2);
+    dup2(Logfilefd, 1); 
+    dup2(Logfilefd, 2); 
+    close(Logfilefd);
+
+    return true;
+}
+
+#define LOG(fmt, ...) \
+    do { \
+        fprintf(stdout, &quot;%s [LOG]:--&quot;fmt&quot;--%s:%d\n&quot;, \
+                GetCurrentTime(), ##__VA_ARGS__, __FILE__, __LINE__); \
+    } while (0)
+
+#define ELOG(fmt, ...) \
+    do { \
+        fprintf(stderr, &quot;%s [ERROR]:--&quot;fmt&quot;--%s:%d\n&quot;, \
+                GetCurrentTime(), ##__VA_ARGS__, __FILE__, __LINE__); \
+    } while (0)
+
+#define DLOG(fmt, ...) \
+    do { \
+        if (EnableDebug) \
+            fprintf(stdout, &quot;%s [DEBUG]:--&quot;fmt&quot;--%s:%d\n&quot;, \
+                    GetCurrentTime(), ##__VA_ARGS__, __FILE__, __LINE__); \
+    } while (0)
+
+# 二进制转十六机制
+
+```c
+// 把二进制转换成十六进制并以字符串形式写到文件
+#define Bin2HexFp(fp,src,n) \
+    do { \
+        int _bi; \
+        for (_bi=0; _bi&amp;lt;n; _bi++) fprintf(fp, &quot;%02X&quot;, (src)[_bi]); \
+        fprintf(fp, &quot;\n&quot;); \
+    } while (0)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;阻塞&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;bool SetNonblock(int socket)
+{
+    int flag = 0;
+    if ((flag = fcntl(socket, F_GETFL, 0)) &amp;lt; 0)
+        return false;
+    if (fcntl(socket, F_SETFL, flag | O_NONBLOCK) &amp;lt; 0)
+        return false;
+    return true;
+}
+
+ssize_t BlockRead(int fd, void *buf, size_t n)
+{
+    size_t nleft;
+    ssize_t nread;
+    unsigned char *pb;
+
+    pb = buf;
+    nleft = n;
+
+    while (nleft &amp;gt; 0)
+    {
+        if ((nread = read(fd, pb, nleft)) &amp;lt; 0)
+        {
+            if (errno == EINTR)
+                continue;
+            return -1;
+        }
+        else if (nread == 0) /* Peer close the connection */
+            return 0;
+
+        nleft -= nread;
+        pb += nread;
+    }
+    return n - nleft;
+}
+
+ssize_t BlockWrite(int fd, void *buf, size_t n)
+{
+    size_t nleft;
+    ssize_t nwritten;
+    unsigned char *pb;
+
+    pb = buf;
+    nleft = n;
+
+    while (nleft &amp;gt; 0)
+    {
+        if ((nwritten = write(fd, pb, nleft)) &amp;lt; 0)
+        {
+            if (errno == EINTR)
+                nwritten = 0;
+            else
+                return -1;
+        }
+        else if (nwritten == 0)
+            return 0;
+
+        nleft -= nwritten;
+        pb += nwritten;
+    }
+    return n - nleft;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;程序运行&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;const char *GetProgname(const char *argv0)
+{
+    char *p;
+
+    p = strrchr(argv0, &apos;/&apos;);
+    if (p == NULL)
+        return argv0;
+    else
+        return p+1;
+}
+
+char *MakeAbsolutePath(const char *path)
+{
+    char *new;
+
+    if (path == NULL)
+        return NULL;
+
+    if (path[0] == &apos;/&apos;)
+    {
+        new = strdup(path);
+        if (new == NULL)
+            return NULL;
+    }
+    else
+    {
+        char *buf;
+        size_t bufLen;
+
+        bufLen = 1024;
+        for (;;)
+        {
+            buf = malloc(bufLen);
+            if (buf == NULL)
+                return NULL;
+
+            if (getcwd(buf, bufLen))
+                break;
+            else if (errno == ERANGE)
+            {
+                free(buf);
+                bufLen *= 2;
+                continue;
+            }
+            else
+          	{
+                free(buf);
+                return NULL;
+            }   
+        }   
+        
+        new = malloc(strlen(buf) + strlen(path) + 2);
+        if (new == NULL)
+        {
+            free(buf);
+            return NULL;
+        }   
+        sprintf(new, &quot;%s/%s&quot;, buf, path);
+        free(buf);
+    }   
+    
+    return new;
+}
+
+bool IsAlreadyRunning(const char *path)
+{
+    int          fd;
+    char         buf[16];
+    struct flock fl;
+
+    if ((fd = open(path, O_RDWR | O_CREAT, 0644)) == -1)
+        return true;
+
+    fl.l_type = F_WRLCK;
+    fl.l_whence = SEEK_SET;
+    fl.l_start = 0;
+    fl.l_len = 0;
+    fl.l_pid = getpid();
+    if (fcntl(fd, F_SETLK, &amp;amp;fl) == -1)
+    {
+        close(fd);
+        return true;
+    }
+
+    ftruncate(fd, 0);
+    snprintf(buf, 16, &quot;%ld&quot;, (long)getpid());
+    write(fd, buf, strlen(buf)+1);
+
+    return false;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;随机数&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;void GenerateString(unsigned char *dest, int len)
+{
+    int i;
+    char allChar[] = &quot;0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;;
+    int cLen = strlen(allChar);
+
+    srand(time(NULL));
+
+    for (i=0; i&amp;lt;len-1; i++)
+    {
+        *dest = allChar[rand() % cLen];
+        dest++;
+    }
+    *dest = &apos;\0&apos;;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;时间相关&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;char *GetCurrentTime(void)
+{
+    static char _CurrentTime[27];
+    struct timeval tv;
+    struct tm *tp;
+
+    snprintf(_CurrentTime, 27, &quot;unknown time&quot;);
+
+    if (gettimeofday(&amp;amp;tv, NULL) == -1)
+        return _CurrentTime;
+
+    if ((tp = localtime(&amp;amp;tv.tv_sec)) == NULL)
+        return _CurrentTime;
+
+    snprintf(_CurrentTime, 27, &quot;%04d-%02d-%02d %02d:%02d:%02d.%06ld&quot;,
+            tp-&amp;gt;tm_year+1900, tp-&amp;gt;tm_mon+1, tp-&amp;gt;tm_mday,
+            tp-&amp;gt;tm_hour, tp-&amp;gt;tm_min, tp-&amp;gt;tm_sec, tv.tv_usec);
+
+    return _CurrentTime;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;数字判断&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;bool IsDigitals(const char *s)
+{
+    const char *p = s;
+
+    if (s == NULL || *s == &apos;\0&apos;)
+        return false;
+
+    if (*p == &apos;-&apos;)
+        p++;
+
+    for (; *p!=&apos;\0&apos;; p++)
+    {
+        if (*p &amp;lt; &apos;0&apos; || *p &amp;gt; &apos;9&apos;)
+            return false;
+    }
+
+    return true;
+}
+
+bool IsNonnegativeInteger(char *data)
+{
+    char *p;
+
+    if (data == NULL || data[0] == &apos;\0&apos;)
+        return false;
+
+    p = data;
+    for (p=data; *p!=&apos;\0&apos;; p++)
+    {
+        if (*p&amp;lt;&apos;0&apos; || *p&amp;gt;&apos;9&apos;)
+            return false;
+    }
+
+    return true;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;mac地址&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;// 根据socket获取mac地址
+bool GetLocalMac(int fd, char delimiter, char *mac, size_t macLen)
+{
+    struct ifaddrs *ifaddr = NULL;
+    struct ifaddrs *ifp = NULL;
+    struct ifreq    ifr;
+    struct sockaddr_in *inp;
+    char *ifname;
+    struct sockaddr_in in;
+    socklen_t inLen;
+
+    inLen = sizeof(in);
+    memset(&amp;amp;in, 0, inLen);
+    if (getsockname(fd, (struct sockaddr*)&amp;amp;in, &amp;amp;inLen) != 0)
+        return false;
+
+    if (getifaddrs(&amp;amp;ifaddr) != 0)
+        return false;
+
+    for (ifp=ifaddr; ifp!=NULL; ifp=ifp-&amp;gt;ifa_next)
+    {   
+        inp = (struct sockaddr_in*)ifp-&amp;gt;ifa_addr;
+        if (inp != NULL &amp;amp;&amp;amp;
+                inp-&amp;gt;sin_family == in.sin_family &amp;amp;&amp;amp;
+                inp-&amp;gt;sin_addr.s_addr == in.sin_addr.s_addr)
+            break;
+    }
+    if (ifp == NULL)
+    {   
+        freeifaddrs(ifaddr);
+        return false;
+    }
+    ifname = ifp-&amp;gt;ifa_name;
+  	strncpy(ifr.ifr_name, ifname, IFNAMSIZ);
+    if (ioctl(fd, SIOCGIFHWADDR, &amp;amp;ifr) == -1)
+    {
+        freeifaddrs(ifaddr);
+        return false;
+    }
+
+    freeifaddrs(ifaddr);
+
+    snprintf(mac, macLen, &quot;%02X%c%02X%c%02X%c%02X%c%02X%c%02X&quot;,
+            (unsigned char)ifr.ifr_hwaddr.sa_data[0], delimiter,
+            (unsigned char)ifr.ifr_hwaddr.sa_data[1], delimiter,
+            (unsigned char)ifr.ifr_hwaddr.sa_data[2], delimiter,
+            (unsigned char)ifr.ifr_hwaddr.sa_data[3], delimiter,
+            (unsigned char)ifr.ifr_hwaddr.sa_data[4], delimiter,
+            (unsigned char)ifr.ifr_hwaddr.sa_data[5]);
+
+    return true;
+}
+
+// 根据socket获取对端mac地址
+bool GetPeerMac(int fd, struct sockaddr *from,
+        socklen_t fromLen, char delimiter, char *mac, size_t macLen)
+{
+    struct ifaddrs *ifaddr = NULL;
+    struct ifaddrs *ifp = NULL;
+    struct sockaddr_in *inp;
+    char *ifname;
+    struct sockaddr_in in;
+    socklen_t inLen;
+    struct arpreq arp;
+
+    inLen = sizeof(in);
+    memset(&amp;amp;in, 0, inLen);
+    if (getsockname(fd, (struct sockaddr*)&amp;amp;in, &amp;amp;inLen) != 0)
+        return false;
+
+    if (getifaddrs(&amp;amp;ifaddr) != 0)
+        return false;
+
+    for (ifp=ifaddr; ifp!=NULL; ifp=ifp-&amp;gt;ifa_next)
+    {
+        inp = (struct sockaddr_in*)ifp-&amp;gt;ifa_addr;
+        if (inp != NULL &amp;amp;&amp;amp;
+                inp-&amp;gt;sin_family == in.sin_family &amp;amp;&amp;amp;
+                inp-&amp;gt;sin_addr.s_addr == in.sin_addr.s_addr)
+            break;
+    }
+    if (ifp == NULL)
+    {
+        freeifaddrs(ifaddr);
+        return false;
+    }
+    ifname = ifp-&amp;gt;ifa_name;
+
+    memset(&amp;amp;arp, 0, sizeof(arp));
+    memcpy(&amp;amp;arp.arp_pa, from, fromLen);
+  	strncpy(arp.arp_dev, ifname, 16);
+    if (ioctl(fd, SIOCGARP, &amp;amp;arp) == -1)
+    {
+        freeifaddrs(ifaddr);
+        return false;
+    }
+
+    freeifaddrs(ifaddr);
+
+    snprintf(mac, macLen, &quot;%02X%c%02X%c%02X%c%02X%c%02X%c%02X&quot;,
+            arp.arp_ha.sa_data[0], delimiter,
+            arp.arp_ha.sa_data[1], delimiter,
+            arp.arp_ha.sa_data[2], delimiter,
+            arp.arp_ha.sa_data[3], delimiter,
+            arp.arp_ha.sa_data[4], delimiter,
+            arp.arp_ha.sa_data[5]);
+
+    return true;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;参数处理&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;fcntl.h&amp;gt;
+#include &amp;lt;getopt.h&amp;gt;
+#include &amp;lt;signal.h&amp;gt;
+#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+#include &amp;lt;string.h&amp;gt;
+#include &amp;lt;unistd.h&amp;gt;
+#include &amp;lt;errno.h&amp;gt;
+#include &amp;lt;time.h&amp;gt;
+
+#ifndef bool
+typedef unsigned char bool;
+#define true 1
+#define false 0
+#endif
+
+#define _(x) (x)
+
+#define ELOG(fmt, args...) \
+    do { \
+        fprintf(stderr, &quot;[ERROR]:--&quot;fmt&quot;--%s:%d\n&quot;, \
+                ##args, __FILE__, __LINE__); \
+    } while (0)
+
+static const char *Progname;
+static const char *SubProgram = NULL;
+static char       *Opts;
+static void       (*Func)(void);
+
+static int    ProductionLimit = -1;
+static int    ConnectionLimit = -1;
+static time_t Deadline = 0xFFFFFFFF;
+static char  *UpdateFile = &quot;./update.bin&quot;;
+static char  *Hid = NULL;
+static char  *Logo = &quot;&quot;;
+static char  *Protocol = &quot;CCID&quot;;
+static bool   SetNetwork = false;
+static bool   SetLogo = false;
+static bool   SetDeadline = false;
+static bool   SetUnlock = false;
+static bool   SetMotherMode = false;
+static bool   IsEmpty = false;
+static bool   EnableVerbose = false;
+static bool   EnableDebug = false;
+
+static void Usage(void);
+static void FormLogo(char *logo);
+static bool StrToTime(const char *str, time_t *t);
+static bool IsDigitals(const char *str);
+const char *GetProgname(const char *argv0);
+
+static void MCInit(void);
+static void Init(void);
+static void MakeUpdate(void);
+static void Update(void);
+static void Reset(void);
+static void List(void);
+static void SwitchProtocol(void);
+
+static struct ExecStringOpts
+{
+    char    *string;
+    char    *opts;
+    void    (*func)(void);
+} ExecStringOpts[] =
+{
+    {&quot;mcinit&quot;, &quot;H:F:P:&quot;, MCInit},
+    {&quot;init&quot;, &quot;D:H:L:M:N:P:&quot;, Init},
+    {&quot;makeupdate&quot;, &quot;D:F:H:L:N:U1&quot;, MakeUpdate},
+    {&quot;update&quot;, &quot;H:F:&quot;, Update},
+    {&quot;reset&quot;, &quot;H:&quot;, Reset},
+    {&quot;list&quot;, &quot;H:v&quot;, List},
+    {&quot;switch&quot;, &quot;H:P:&quot;, SwitchProtocol},
+    {NULL, NULL, NULL}
+};
+
+int main(int argc, char **argv)
+{
+    static struct option long_options[] = {
+        {&quot;debug&quot;, no_argument, NULL, &apos;d&apos;},    /* enable debug */
+        {&quot;empty&quot;, no_argument, NULL, &apos;1&apos;},    /* is empty dongle */
+        {&quot;local&quot;, no_argument, NULL, &apos;2&apos;},    /* is empty dongle */
+        {NULL, required_argument, NULL, &apos;D&apos;}, /* deadline */
+        {NULL, required_argument, NULL, &apos;F&apos;}, /* update file path */
+        {NULL, required_argument, NULL, &apos;H&apos;}, /* hid */
+        {NULL, required_argument, NULL, &apos;L&apos;}, /* logo */
+        {NULL, required_argument, NULL, &apos;M&apos;}, /* init a mother dongle? default child dongle */
+        {NULL, required_argument, NULL, &apos;N&apos;}, /* network client number */
+        {NULL, required_argument, NULL, &apos;P&apos;}, /* admin pin */
+        {NULL , no_argument, NULL, &apos;U&apos;},      /* unlock user pin */
+        {NULL , no_argument, NULL, &apos;v&apos;},      /* list dongle verbose information */
+        {NULL, 0, NULL, 0}
+    };
+    int c, option_index;
+    int i;
+
+    Progname = GetProgname(argv[0]);
+
+    Opts = ExecStringOpts[i].opts;
+    Func = MCInit;
+    
+    if (argc &amp;gt; 1)
+    {
+        for (i=0; ExecStringOpts[i].string!=NULL; i++)
+        {
+            if (strcasecmp(argv[1], ExecStringOpts[i].string) == 0)
+            {
+                SubProgram = ExecStringOpts[i].string;
+                Opts = ExecStringOpts[i].opts;
+                Func = ExecStringOpts[i].func;
+                argc--;
+                argv++;
+                break;
+            }
+        }
+    }
+
+    if (argc &amp;gt; 1)
+    {
+        if (strcmp(argv[1], &quot;--help&quot;) == 0 || strcmp(argv[1], &quot;-?&quot;) == 0)
+        {
+            Usage();
+            exit(0);
+        }
+        if (strcmp(argv[1], &quot;--version&quot;) == 0 || strcmp(argv[1], &quot;-V&quot;) == 0)
+        {
+            exit(0);
+        }
+    }
+    
+    while ((c = getopt_long(argc, argv, Opts, long_options, &amp;amp;option_index)) != -1)
+    {
+        switch (c)
+        {
+            case &apos;D&apos;:
+                SetDeadline = true;
+                if (!StrToTime(optarg, &amp;amp;Deadline))
+                {
+                    ELOG(&quot;Time format error&quot;);
+                    return 1;
+                }
+                break;
+            case &apos;d&apos;:
+                EnableDebug = true;
+                break;
+            case &apos;F&apos;:
+                UpdateFile = optarg;
+                break;
+            case &apos;H&apos;:
+                Hid = optarg;
+                break;
+            case &apos;L&apos;:
+                SetLogo = true;
+                Logo = optarg;
+                FormLogo(Logo);
+                break;
+            case &apos;M&apos;:
+                SetMotherMode = true;
+                if (!IsDigitals(optarg))
+                {
+                    ELOG(&quot;Option format error&quot;);
+                    return 1;
+                }
+                ProductionLimit = atoi(optarg);
+                break;
+            case &apos;N&apos;:
+            	SetNetwork = true;
+                if (!IsDigitals(optarg))
+                {
+                    ELOG(&quot;Option format error&quot;);
+                    return 1;
+                }
+                ConnectionLimit = atoi(optarg);
+                break;
+            case &apos;P&apos;:
+                Protocol = optarg;
+                break;
+            case &apos;U&apos;:
+                SetUnlock = true;
+                break;
+            case &apos;v&apos;:
+                EnableVerbose = true;
+                break;
+            case &apos;1&apos;:
+                IsEmpty = true;
+                break;
+            default:
+                if (SubProgram != NULL)
+                    fprintf(stderr, &quot;Try \&quot;%s %s --help\&quot; for more information.\n&quot;,
+                            Progname, SubProgram);
+                else
+                    fprintf(stderr, &quot;Try \&quot;%s --help\&quot; for more information.\n&quot;,
+                            Progname);
+                return 1;
+        }
+    }
+    
+    if (optind &amp;lt; argc)
+    {
+        fprintf(stderr, &quot;Invalid argument: \&quot;%s\&quot;.\n&quot;, argv[optind]);
+        return 1;
+    }
+
+    Func();
+    
+    return 0;
+}
+
+static void Usage(void)
+{
+    printf(_(&quot;%s is a super dongle tool.\n\n&quot;), Progname);
+    printf(_(&quot;Usage:\n&quot;));
+    if (SubProgram == NULL || *SubProgram == &apos;\0&apos;)
+    {
+        printf(_(&quot;  %s [mcinit] [OPTION]\n&quot;), Progname);
+        printf(_(&quot;  %s init [OPTION]\n&quot;), Progname);
+        printf(_(&quot;  %s mamkeupdate [OPTION]\n&quot;), Progname);
+        printf(_(&quot;  %s update [OPTION]\n&quot;), Progname);
+        printf(_(&quot;  %s reset [OPTION]\n&quot;), Progname);
+        printf(_(&quot;  %s list [OPTION]\n&quot;), Progname);
+        printf(_(&quot;  %s switch [OPTION]\n&quot;), Progname);
+    }
+    else
+        printf(_(&quot;  %s %s [OPTION]\n&quot;), Progname, SubProgram);
+    printf(_(&quot;\nOptions:\n&quot;));
+    if (strchr(Opts, &apos;D&apos;) != NULL)
+    {
+        printf(_(&quot;  -D DEADLINE          set expiration time\n&quot;));
+        printf(_(&quot;                       \&quot;unlimited\&quot;\n&quot;));
+        printf(_(&quot;                       \&quot;yyyy-mm-dd hh:mm:ss\&quot; (1977-06-23 23:00:00 ~ 2038-01-19 11:14:07)\n&quot;));
+        printf(_(&quot;                       \&quot;hours\&quot; (1 ~ 65535)\n&quot;));
+    }
+    if (strchr(Opts, &apos;F&apos;) != NULL)
+        printf(_(&quot;  -F FILE              update file path (default %s)\n&quot;), UpdateFile);
+    if (strchr(Opts, &apos;H&apos;) != NULL)
+        printf(_(&quot;  -H HID               dongle hid\n&quot;));
+    if (strchr(Opts, &apos;L&apos;) != NULL)
+    {
+        printf(_(&quot;  -L LOGO              logo separated by \&quot;;\&quot;\n&quot;));
+        printf(_(&quot;                       \&quot;CustomerName: xxx;ProjectCode: 0x123;ProjectName: yyy\&quot;\n&quot;));
+    }
+    if (strchr(Opts, &apos;M&apos;) != NULL)
+        printf(_(&quot;  -M NUM               initialize a mother dongle\n&quot;));
+    if (strchr(Opts, &apos;N&apos;) != NULL)
+    	printf(_(&quot;  -N NUM               set to network mode, and set connection limit&quot;
+                    &quot;(default local mode)\n&quot;));
+    if (strchr(Opts, &apos;P&apos;) != NULL)
+        printf(_(&quot;  -P PROTOCOL          communication protocol, default CCID\n&quot;));
+    if (strchr(Opts, &apos;U&apos;) != NULL)
+        printf(_(&quot;  -U                   unlock user pin\n&quot;));
+    if (strchr(Opts, &apos;v&apos;) != NULL)
+        printf(_(&quot;  -v                   view details\n&quot;));
+    if (strchr(Opts, &apos;1&apos;) != NULL)
+        printf(_(&quot;  --empty              empty dongle\n&quot;), UpdateFile);
+    printf(_(&quot;  -?,--help            show help\n&quot;));
+}
+static void FormLogo(char *logo)
+{}
+static bool StrToTime(const char *str, time_t *t)
+{
+    struct tm tm; 
+
+    if (strcasecmp(str, &quot;unlimited&quot;) == 0) /* unlimited */
+    {   
+        *t = 0xFFFFFFFF;
+        return true;
+    }   
+
+    if (sscanf(str, &quot;%d-%d-%d %d:%d:%d&quot;,
+                &amp;amp;tm.tm_year, &amp;amp;tm.tm_mon, &amp;amp;tm.tm_mday,
+                &amp;amp;tm.tm_hour, &amp;amp;tm.tm_min, &amp;amp;tm.tm_sec) == 6) /* xxxx-xx-xx xx:xx:xx */
+    {   
+        if (tm.tm_year &amp;lt; 1977 || tm.tm_year &amp;gt; 2038 ||
+                tm.tm_mon &amp;lt; 1 || tm.tm_mon &amp;gt; 12 ||
+                tm.tm_mday &amp;lt; 1 || tm.tm_mday &amp;gt; 31 ||
+                tm.tm_hour &amp;gt; 24 || tm.tm_min &amp;gt; 60 || tm.tm_sec &amp;gt; 60) 
+            return false;
+
+        if (tm.tm_year == 1977 &amp;amp;&amp;amp;
+                (tm.tm_mon &amp;lt; 6 ||
+                 (tm.tm_mon == 6 &amp;amp;&amp;amp;
+                  (tm.tm_mday &amp;lt; 23 ||
+                   (tm.tm_mday == 23 &amp;amp;&amp;amp;
+                    (tm.tm_hour &amp;lt; 23))))))
+                return false;
+
+        if (tm.tm_year == 2038 &amp;amp;&amp;amp;
+                (tm.tm_mon &amp;gt; 1 ||
+                 (tm.tm_mon == 1 &amp;amp;&amp;amp;
+                  (tm.tm_mday &amp;gt; 19 ||
+                   (tm.tm_mday == 19 &amp;amp;&amp;amp;
+                    (tm.tm_hour &amp;gt; 11 ||
+                     (tm.tm_hour == 11 &amp;amp;&amp;amp;
+                      (tm.tm_min &amp;gt; 14 ||
+                       (tm.tm_min == 14 &amp;amp;&amp;amp;
+                        (tm.tm_sec &amp;gt; 7))))))))))
+                return false;
+
+        tm.tm_year -= 1900;
+        tm.tm_mon--;
+        tm.tm_isdst = -1;
+        if ((*t = mktime(&amp;amp;tm)) == -1)
+            return false;
+        return true;
+    }
+
+    /* xxx hours */
+    if (!IsDigitals(str))
+        return false;
+
+    *t = atoi(str);
+    if (*t &amp;lt; 1 || *t &amp;gt; 0xFFFF)
+        return false;
+
+    return true;
+}
+static bool IsDigitals(const char *str)
+{
+  	return true;
+}
+const char *GetProgname(const char *argv0)
+{
+    char *p;
+
+    p = strrchr(argv0, &apos;/&apos;);
+    if (p == NULL)
+        return argv0;
+    else
+        return p+1;
+}
+static void MCInit(void)
+{}
+static void Init(void)
+{}
+static void MakeUpdate(void)
+{}
+static void Update(void)
+{}
+static void Reset(void)
+{}
+static void List(void)
+{}
+static void SwitchProtocol(void)
+{}
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>Makefile</title><link>https://yfshi.github.io/posts/makefile/</link><guid isPermaLink="true">https://yfshi.github.io/posts/makefile/</guid><pubDate>Tue, 30 Oct 2018 10:01:54 GMT</pubDate><content:encoded>&lt;p&gt;下面是一个基础的Makefile文件&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# 一些基本命令和参数
+CC = gcc
+AR = ar
+AROPT = crs
+CFLAGS += -g3 -O0
+CFLAGS += -std=gnu99 -Wall
+CFLAGS += -I./include -fPIC
+CFLAGS += -fpic
+
+# 编译命令，编译.o、.a、.so的命令分别如下：
+COMPILER = $(CC) $(CFLGAS)
+LINK.static = $(AR) $(AROPT)
+LINK.shared = $(COMPILER) -shared #-Wl,-soname,xxx
+
+# 编译过程需要链接的库，-Wl,--as-needed告诉连接器按需链接，比如crypto有的目标没有引用，则不连接
+LDFLAGS += -L./lib -Wl,--as-needed
+LIBS += -ltest -lcrypto -ld -lz -lc
+
+# 公用接口文件
+OBJS :=  common.o
+
+# 要生成的目标文件
+PROGS := dgcheck dgservice libdongle.so libdongle.a test
+
+all: $(PROGS)
+
+dgcheck: dgcheck.o libdongle.o $(OBJS)
+	$(COMPILER) $^ $(LDFLAGS) $(LIBS) -o $@
+
+dgservice: dgservice.o dongle.o $(OBJS)
+	$(COMPILER) $^ $(LDFLAGS) $(LIBS) -o $@
+
+libdongle.so: libdongle.o $(OBJS)
+	$(LINK.shared) $^ $(LDFLAGS) $(LIBS) -o $@
+
+libdongle.a: libdongle.o $(OBJS)
+	$(LINK.static) $@ $^ 
+
+test: test.o libdongle.o $(OBJS)
+	$(COMPILER) $^ $(LDFLAGS) $(LIBS) -o $@
+
+clean:
+rm -f *.o $(PROGS)
+
+install: $(PROGS)
+	mkdir -p deploy
+	cp -f $^ deploy
+
+uninstall:
+	rm -rf deploy
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>查看linux信息</title><link>https://yfshi.github.io/posts/%E6%9F%A5%E7%9C%8Blinux%E4%BF%A1%E6%81%AF/</link><guid isPermaLink="true">https://yfshi.github.io/posts/%E6%9F%A5%E7%9C%8Blinux%E4%BF%A1%E6%81%AF/</guid><pubDate>Sat, 15 Sep 2018 11:42:13 GMT</pubDate><content:encoded>&lt;h1&gt;系统信息&lt;/h1&gt;
+&lt;h2&gt;内核和架构&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;$ # uname --help
+  -a, --all                print all information, in the following order,
+                             except omit -p and -i if unknown:
+  -s, --kernel-name        print the kernel name
+  -n, --nodename           print the network node hostname
+  -r, --kernel-release     print the kernel release
+  -v, --kernel-version     print the kernel version
+  -m, --machine            print the machine hardware name
+  -p, --processor          print the processor type or &quot;unknown&quot;
+  -i, --hardware-platform  print the hardware platform or &quot;unknown&quot;
+  -o, --operating-system   print the operating system
+      --help     display this help and exit
+      --version  output version information and exit
+
+# 所有信息
+$ uname -a
+Linux h113 2.6.32-696.10.1.el6.x86_64 #1 SMP Tue Aug 22 18:51:35 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+
+# 以“|”分割的所有信息
+$ echo &quot;`uname -s` | `uname -n` | `uname -r` | `uname -v` | `uname -m` | `uname -p` | `uname -i` | `uname -o`&quot;
+Linux | h113 | 2.6.32-696.10.1.el6.x86_64 | #1 SMP Tue Aug 22 18:51:35 UTC 2017 | x86_64 | x86_64 | x86_64 | GNU/Linux
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;操作系统&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;$ cat /etc/issue
+CentOS release 6.4 (Final)
+Kernel \r on an \m
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;语言和字符集&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;$ echo $LANG 
+en_US.UTF-8
+
+$ locale
+LANG=en_US.UTF-8
+LC_CTYPE=&quot;en_US.UTF-8&quot;
+LC_NUMERIC=&quot;en_US.UTF-8&quot;
+LC_TIME=&quot;en_US.UTF-8&quot;
+LC_COLLATE=&quot;en_US.UTF-8&quot;
+LC_MONETARY=&quot;en_US.UTF-8&quot;
+LC_MESSAGES=&quot;en_US.UTF-8&quot;
+LC_PAPER=&quot;en_US.UTF-8&quot;
+LC_NAME=&quot;en_US.UTF-8&quot;
+LC_ADDRESS=&quot;en_US.UTF-8&quot;
+LC_TELEPHONE=&quot;en_US.UTF-8&quot;
+LC_MEASUREMENT=&quot;en_US.UTF-8&quot;
+LC_IDENTIFICATION=&quot;en_US.UTF-8&quot;
+LC_ALL=
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;进程&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;# 显示系统所有进程
+$ ps -ef
+
+# 以树形显示所有进程
+$ ps -ef f
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;其他&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;$ uptime          #查看服务器开机时长，用户数，平均负载
+$ lsmod           #查看所有加载的模块
+$ env             #查系统环境变量
+$ crontab -l      #查看计划任务
+$ top             #查看系统任务
+$ iostat          #查看系统io
+$ vmstate
+$ netstat         #查看网络、路由、端口占用等
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;硬件信息&lt;/h1&gt;
+&lt;h2&gt;cpu&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;$ cat /proc/cpu
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 85
+model name	: Intel(R) Xeon(R) Gold 6140 CPU @ 2.30GHz
+stepping	: 4
+microcode	: 0x2000026
+cpu MHz		: 999.960
+cache size	: 25344 KB
+physical id	: 0
+siblings	: 36
+core id		: 0
+cpu cores	: 18
+apicid		: 0
+initial apicid	: 0
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 22
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb 
+rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 
+ssse3 fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb cat_l3 cdp_l3 
+intel_pt tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm mpx rdt_a avx512f avx512dq rdseed adx smap cl
+flushopt clwb avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts hwp hwp_act_window
+ hwp_epp hwp_pkg_req
+bogomips	: 4600.00
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 46 bits physical, 48 bits virtual
+power management:
+
+...
+省略
+...
+
+processor	: 71             # 逻辑核编号：共72个逻辑cpu
+vendor_id	: GenuineIntel   # 制造商
+cpu family	: 6              # 产品系列
+model		: 85             # 属于其系列的哪一代
+model name	: Intel(R) Xeon(R) Gold 6140 CPU @ 2.30GHz
+stepping	: 4
+microcode	: 0x2000026
+cpu MHz		: 1131.222       # 主频
+cache size	: 25344 KB       # 二级缓存大小
+physical id	: 1              # 单个cpu标号：共2个cpu
+siblings	: 36             # 当前cpu的逻辑核数
+core id		: 27             # 当前物理核在其所处cpu中的唯一编号，不一定连续
+cpu cores	: 18             # 当前cpu的物理核数，siblings/cpu cores就是超线程数
+apicid		: 119
+initial apicid	: 119
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 22
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb cat_l3 cdp_l3 intel_pt tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm mpx rdt_a avx512f avx512dq rdseed adx smap clflushopt clwb avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts hwp hwp_act_window hwp_epp hwp_pkg_req
+bogomips	: 4605.53
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 46 bits physical, 48 bits virtual
+power management:
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;内存&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;$ cat /proc/meminfo 
+MemTotal:       196521604 kB   # 总内存
+MemFree:          644068 kB    # 空闲内存
+MemAvailable:   192606708 kB   # 可用内存
+Buffers:             152 kB
+Cached:         186042324 kB
+SwapCached:            0 kB
+Active:           643680 kB
+Inactive:       185668932 kB
+Active(anon):     203332 kB
+Inactive(anon):   329264 kB
+Active(file):     440348 kB
+Inactive(file): 185339668 kB
+Unevictable:           0 kB
+Mlocked:               0 kB
+SwapTotal:       4194300 kB    # 交换空间大小
+SwapFree:        4194300 kB    # 空闲交换空间
+Dirty:                40 kB
+Writeback:             0 kB
+AnonPages:        270064 kB
+Mapped:           330936 kB
+Shmem:            262460 kB
+Slab:            7182928 kB
+SReclaimable:    6933600 kB
+SUnreclaim:       249328 kB
+KernelStack:       20704 kB
+PageTables:        17124 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:    190889820 kB
+Committed_AS:    1997032 kB
+VmallocTotal:   34359738367 kB
+VmallocUsed:      833948 kB
+VmallocChunk:   34258257916 kB
+HardwareCorrupted:     0 kB
+AnonHugePages:     69632 kB
+HugePages_Total:       0
+HugePages_Free:        0
+HugePages_Rsvd:        0
+HugePages_Surp:        0
+Hugepagesize:       2048 kB
+DirectMap4k:      374132 kB
+DirectMap2M:     8749056 kB
+DirectMap1G:    192937984 kB
+
+# 查看所有交换空间
+$ swapon -s
+Filename				Type		Size	Used	Priority
+/dev/dm-1                               partition	16506876	240	-1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;磁盘&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;# 树状显示所有块设备，比较直观
+$ lsblk 
+NAME                      MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sda                         8:0    0   512G  0 disk 
+├─sda1                      8:1    0   500M  0 part /boot
+└─sda2                      8:2    0 511.5G  0 part 
+  ├─vg_h95-lv_root (dm-0) 253:0    0    50G  0 lvm  /
+  ├─vg_h95-lv_swap (dm-1) 253:1    0  15.8G  0 lvm  [SWAP]
+  └─vg_h95-lv_home (dm-2) 253:2    0   2.1T  0 lvm  /home
+sdb                         8:16   0   1.7T  0 disk 
+└─sdb1                      8:17   0   1.7T  0 part 
+  └─vg_h95-lv_home (dm-2) 253:2    0   2.1T  0 lvm  /home
+sr0                        11:0    1  1024M  0 rom
+
+# fdisk是分区工具，可显示磁盘详细信息，不直观
+$ fdisk -l
+
+Disk /dev/sda: 549.8 GB, 549755813888 bytes
+255 heads, 63 sectors/track, 66837 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x000cde3e
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sda1   *           1          64      512000   83  Linux
+Partition 1 does not end on cylinder boundary.
+/dev/sda2              64       66838   536357888   8e  Linux LVM
+
+WARNING: GPT (GUID Partition Table) detected on &apos;/dev/sdb&apos;! The util fdisk doesn&apos;t support GPT. Use GNU Parted.
+
+
+Disk /dev/sdb: 1842.2 GB, 1842238980096 bytes
+255 heads, 63 sectors/track, 223972 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x00000000
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sdb1               1      223973  1799061503+  ee  GPT
+
+Disk /dev/mapper/vg_h95-lv_root: 53.7 GB, 53687091200 bytes
+255 heads, 63 sectors/track, 6527 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x00000000
+
+
+Disk /dev/mapper/vg_h95-lv_swap: 16.9 GB, 16903045120 bytes
+255 heads, 63 sectors/track, 2055 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x00000000
+
+
+Disk /dev/mapper/vg_h95-lv_home: 2320.9 GB, 2320871981056 bytes
+255 heads, 63 sectors/track, 282163 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x00000000
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>iptables</title><link>https://yfshi.github.io/posts/iptables/</link><guid isPermaLink="true">https://yfshi.github.io/posts/iptables/</guid><pubDate>Fri, 14 Sep 2018 16:35:52 GMT</pubDate><content:encoded>&lt;h1&gt;netfilter/iptables&lt;/h1&gt;
+&lt;p&gt;netfilter是linux内核2.4.x引入的一个子系统，作为一个通用的、抽象的框架，提供一整套的hook（钩子、检查点）函数的管理机制，使得诸如包过滤、网络地址转换(NAT)和基于协议类型的连接跟踪成为了可能。&lt;/p&gt;
+&lt;p&gt;netfilter的架构就是在整个网络流程的若干位置放置了一些检测点（hook），而在每个检测点上登记了一些处理函数进行处理。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/iptables/netfilter-hook.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;netfilter主要采用连线跟踪（Connection Tracking）、包过滤（Packet Filtering）、地址转换（NAT）、包处理（Packet Mangling)4种关键技术。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;连线跟踪&lt;/p&gt;
+&lt;p&gt;是包过滤、地址转换的基础，它作为一个独立的模块运行。采用连线跟踪技术在协议栈低层截取数据包，将当前数据包及其状态信息与历史数据包及其状态信息进行比较，从而得到当前数据包的控制信息，根据这些信息决定对网络数据包的操作，达到保护网络的目的。&lt;/p&gt;
+&lt;p&gt;当下层网络接收到初始化连接同步（Synchronize，SYN）包，将被netfilter规则库检查。该数据包将在规则链中依次序进行比较。如果该包应被丢弃，发送一个复位（Reset，RST）包到远端主机，否则连接接收。这次连接的信息将被保存在连线跟踪信息表中，并表明该数据包所应有的状态。这个连线跟踪信息表位于内核模式下，其后的网络包就将与此连线跟踪信息表中的内容进行比较，根据信息表中的信息来决定该数据包的操作。因为数据包首先是与连线跟踪信息表进行比较，只有SYN包才与规则库进行比较，数据包与连线跟踪信息表的比较都是在内核模式下进行的，所以速度很快。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;包过滤&lt;/p&gt;
+&lt;p&gt;包过滤检查通过的每个数据包的头部，然后决定如何处置它们，可以选择丢弃，让包通过，或者更复杂的操作。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;地址转换&lt;/p&gt;
+&lt;p&gt;网络地址转换分为源NAT（Source NAT，SNAT）和目的NAT（Destination NAT,DNAT）2种不同的类型。SNAT是指修改数据包的源地址（改变连接的源IP）。SNAT会在数据包送出之前的最后一刻做好转换工作。地址伪装（Masquerading）是SNAT的一种特殊形式。DNAT 是指修改数据包的目标地址（改变连接的目的IP）。DNAT 总是在数据包进入以后立即完成转换。端口转发、负载均衡和透明代理都属于DNAT。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;包处理&lt;/p&gt;
+&lt;p&gt;利用包处理可以设置或改变数据包的服务类型（Type of Service,TOS）字段；改变包的生存期（Time to Live,TTL）字段；在包中设置标志值，利用该标志值可以进行带宽限制和分类查询。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;iptables是运行在用户空间的一个防火墙管理工具，真正的防火墙是netfilter。&lt;/p&gt;
+&lt;p&gt;netfilter组件是内核模块，iptables是用户空间工具。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/iptables/system-netfilter-iptables.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;h1&gt;四表五链&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;规则（rule）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;规则表（table）&lt;/p&gt;
+&lt;p&gt;实现特定功能的规则的集合。iptables内置了4个表，raw、mangle、nat、filter表，分表用于实现数据跟踪处理、包重构、网络地址转换和包过滤。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;规则链（chain）&lt;/p&gt;
+&lt;p&gt;一个chain就是一个检查清单（钩子、hook），每一条链中可以有多个规则。一共预定义了五个规则链。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;自定义链&lt;/p&gt;
+&lt;p&gt;用户可以自定义链。但是无法自动触发，需要由预定义链跳转过来。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&quot;/img/iptables/table-chain.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;h1&gt;网络数据流向&lt;/h1&gt;
+&lt;p&gt;&lt;img src=&quot;/img/iptables/%E7%BD%91%E7%BB%9C%E6%95%B0%E6%8D%AE%E6%B5%81%E5%90%91.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;有三条报文类型：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;进入本机的报文&lt;/p&gt;
+&lt;p&gt;网络 -&amp;gt; PREROUTING -&amp;gt; route -&amp;gt; INPUT -&amp;gt; 本机应用&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;本机发出的报文&lt;/p&gt;
+&lt;p&gt;本机应用 -&amp;gt; route -&amp;gt; OUTPUT -&amp;gt; POSTROUTING&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;转发的报文&lt;/p&gt;
+&lt;p&gt;网路A -&amp;gt; PREROUTING -&amp;gt; route -&amp;gt; FORWARD -&amp;gt; POSTROUTING -&amp;gt; 网络B&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;iptables用法&lt;/h1&gt;
+&lt;p&gt;可以根据下面两图使用iptables&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/iptables/iptables-cmd.gif&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/iptables/iptables-cmd1.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;h1&gt;例子&lt;/h1&gt;
+&lt;h2&gt;nat&lt;/h2&gt;
+&lt;p&gt;局域网通过snat网关上网；局域网的web服务器需要映射到外网；&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/iptables/snat.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/iptables/dnat.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# 首先打开路由转发功能
+$ sysctl -w net.ipv4.ip_forward=1 
+# 永久生效方法 echo &quot;net.ipv4.ip_forward=1&quot;&amp;gt;&amp;gt;/etc/sysctl.conf &amp;amp;&amp;amp; sysctl -p
+
+# snat访问外网
+$ iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+# dnat映射内网服务器
+$ iptables -t nat -p tcp --dport 80 -A PREROUTING -i eth1 -j DNAT --to-destination 192.168.1.6
+
+# 保存
+$ service iptables save
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;filter&lt;/h2&gt;
+&lt;p&gt;限制本机的web服务器在周一不允许访问； 新请求的速率不能超过100个每秒；web服务器包含了admin字符串的页面不允许访问；web 服务器仅允许响应报文离开本机；&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# 周一不允许访问
+$ iptables -A INPUT -p tcp --dport 80 -m time ! --weekdays Mon -j ACCEPT
+$ iptables -A OUTPUT -p tcp --dport 80 -m state --state ESTABLISHED -j ACCEPT
+
+# 新请求速率不能超过100个每秒
+$ iptables -A INPUT -p tcp --dport 80 -m limit --limit 100/s -j ACCEPT
+
+# web包含admin字符串的页面不允许访问，源端口：dport
+$ iptables -A INPUT -p tcp --dport 80 -m string --algo bm --string &apos;admin&apos; -j REJECT
+
+# web服务器仅允许响应报文离开主机,目标端口：sport
+$ iptables -A OUTPUT -p tcp --sport 80 -m state --state ESTABLISHED -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;在工作时间，即周一到周五的8:30-18:00，开放本机的ftp服务给192.168.1.0网络中的主机访问；数据下载请求的次数每分钟不得超过 5 个；&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ iptables -A INPUT -p tcp --dport 21 -s 192.168.1.0/24 -m time ! --weekdays 6,7 -m time --timestart 8:30 --timestop 18:00 -m connlimit --connlimit-above 5 -j ACCET
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;开放本机的ssh服务给192.168.1.1-192.168.1.100 中的主机；新请求建立的速率一分钟不得超过2个；仅允许响应报文通过其服务端口离开本机；&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ iptables -A INPUT -p tcp --dport 22 -m iprange --src-rang 192.168.1.1-192.168.1.100 -m limit --limit 2/m -j ACCEPT
+$ iptables -A OUTPUT -p tcp --sport 22 -m iprange --dst-rang 192.168.1.1-192.168.1.100 -m state --state ESTABLISHED -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;拒绝 TCP 标志位全部为 1 及全部为 0 的报文访问本机；&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ iptables -A INPUT -p tcp --tcp-flags ALL ALL -j DROP
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;允许本机 ping 别的主机；但不开放别的主机 ping 本机；&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ iptables -I INPUT -p icmp --icmp-type echo-request -j DROP 
+$ iptables -I INPUT -p icmp --icmp-type echo-reply -j ACCEPT 
+$ iptables -I INPUT -p icmp --icmp-type destination-Unreachable -j ACCEPT
+# 或者下面禁ping操作：
+$ echo 1 &amp;gt; /proc/sys/net/ipv4/icmp_echo_ignore_all
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;##　其他&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# 开通本机的22端口，允许192.168.1.0网段的服务器访问
+$ iptables -A INPUT -s 192.168.1.0/24 -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
+
+# 开通本机的80端口，只允许192.168.1.150机器访问
+$ iptables -t filter -A INPUT -s 192.168.1.150/32 -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+
+# 拒绝进入防火墙的所有ICMP协议数据包
+$ iptables -I INPUT -p icmp -j REJECT
+
+# 允许防火墙转发除ICMP协议以外的所有数据包
+$ iptables -A FORWARD -p ! icmp -j ACCEPT
+
+# 拒绝转发来自192.168.1.10主机的数据，允许转发来自192.168.0.0/24网段的数据
+$ iptables -A FORWARD -s 192.168.1.11 -j REJECT 
+$ iptables -A FORWARD -s 192.168.0.0/24 -j ACCEPT
+# 注意一定要把拒绝的放在前面不然就不起作用了！
+
+# 丢弃从外网接口（eth1）进入防火墙本机的源地址为私网地址的数据包
+$ iptables -A INPUT -i eth1 -s 192.168.0.0/16 -j DROP 
+$ iptables -A INPUT -i eth1 -s 172.16.0.0/12 -j DROP 
+$ iptables -A INPUT -i eth1 -s 10.0.0.0/8 -j DROP
+
+# 只允许管理员从202.13.0.0/16网段使用SSH远程登录防火墙主机
+$ iptables -A INPUT -s 202.13.0.0/16 -p tcp -m tcp -m state --state NEW --dport 22  -j ACCEPT 
+
+# 允许本机开放从TCP端口20-1024提供的应用服务
+$ ptables -A INPUT -p tcp -m tcp -m state --state NEW --dport 20:1024 -j ACCEPT
+
+# 允许转发来自192.168.0.0/24局域网段的DNS解析请求数据包
+$ iptables -A FORWARD -s 192.168.0.0/24 -p udp --dport 53 -j ACCEPT 
+$ iptables -A FORWARD -d 192.168.0.0/24 -p udp --sport 53 -j ACCEPT
+
+# 屏蔽环回(loopback)访问
+$ iptables -A INPUT -i lo -j DROP
+$ iptables -A OUTPUT -o lo -j DROP
+
+# 屏蔽来自外部的ping，即禁止外部机器ping本机
+$ iptables -A INPUT -p icmp --icmp-type echo-request -j DROP
+$ iptables -A OUTPUT -p icmp --icmp-type echo-reply -j DROP
+
+# 屏蔽从本机ping外部主机，禁止本机ping外部机器
+$ iptables -A OUTPUT -p icmp --icmp-type echo-request -j DROP
+$ iptables -A INPUT -p icmp --icmp-type echo-reply -j DROP
+
+# 禁止其他主机ping本机，但是允许本机ping其他主机（禁止别人ping本机，也可以使用echo 1 &amp;gt; /proc/sys/net/ipv4/icmp_echo_ignore_all）
+$ iptables -I INPUT -p icmp --icmp-type echo-request -j DROP 
+$ iptables -I INPUT -p icmp --icmp-type echo-reply -j ACCEPT 
+$ iptables -I INPUT -p icmp --icmp-type destination-Unreachable -j ACCEPT
+
+# 禁止转发来自MAC地址为00：0C：29：27：55：3F的和主机的数据包
+$ iptables -A FORWARD -m mac --mac-source 00:0c:29:27:55:3F -j DROP
+# iptables中使用“-m 模块关键字”的形式调用显示匹配。咱们这里用“-m mac –mac-source”来表示数据包的源MAC地址
+
+# 允许防火墙本机对外开放TCP端口20、21、25、110以及被动模式FTP端口1250-1280
+$ iptables -A INPUT -p tcp -m multiport --dport 20,21,25,110,1250:1280 -j ACCEPT
+$ iptables -A INPUT -p tcp -m tcp -m multiport --dports 22,80,443,1250-1280 -m state --state NEW -j ACCEPT
+# 也可以将这几个端口分开设置多行：
+$ iptables -A INPUT -p tcp -m tcp -m state --state NEW --dport 22 -j ACCEPT
+$ iptables -A INPUT -p tcp -m tcp -m state --state NEW --dport 80 -j ACCEPT
+$ iptables -A INPUT -p tcp -m tcp -m state --state NEW --dport 443 -j ACCEPT
+$ iptables -A INPUT -p tcp -m tcp -m state --state NEW --dport 1250:1280 -j ACCEPT
+
+#禁止转发源IP地址为192.168.1.20-192.168.1.99的TCP数据包
+$ iptables -A FORWARD -p tcp -m iprange --src-range 192.168.1.20-192.168.1.99 -j DROP
+
+# 禁止转发与正常TCP连接无关的非--syn请求数据包
+$ iptables -A FORWARD -m state --state NEW -p tcp ! --syn -j DROP
+# “-m state”表示数据包的连接状态，“NEW”表示与任何连接无关的
+
+# 拒绝访问防火墙的新数据包，但允许响应连接或与已有连接相关的数据包
+$ iptables -A INPUT -p tcp -m state --state NEW -j DROP 
+$ iptables -A INPUT -p tcp -m state --state ESTABLISHED,RELATED -j ACCEPT
+# “ESTABLISHED”表示已经响应请求或者已经建立连接的数据包，“RELATED”表示与已建立的连接有相关性的，比如FTP数据连接等
+
+# 防止DoS攻击
+$ iptables -A INPUT -p tcp --dport 80 -m limit --limit 25/minute --limit-burst 100 -j ACCEPT
+# -m limit: 启用limit扩展，限制速度。
+# --limit 25/minute: 允许最多每分钟25个连接
+# --limit-burst 100: 当达到100个连接后，才启用上述25/minute限制
+# --icmp-type 8 表示 Echo request——回显请求（Ping请求）。下面表示本机ping主机192.168.1.109时候的限速设置：
+$ iptables -I INPUT -d 192.168.1.109 -p icmp --icmp-type 8 -m limit --limit 3/minute --limit-burst 5 -j ACCEPT
+
+# 如果本地主机有两块网卡，一块连接内网(eth0)，一块连接外网(eth1)，那么可以使用下面的规则将eth0的数据路由到eht1：
+$ iptables -A FORWARD -i eth0 -o eth1 -j ACCEPT
+
+# 拒绝进入防火墙的所有ICMP协议数据包
+$ iptables -I INPUT -p icmp -j REJECT
+
+# 允许防火墙转发除ICMP协议以外的所有数据包
+$ iptables -A FORWARD -p ! icmp -j ACCEPT
+
+# 拒绝转发来自192.168.1.10主机的数据，允许转发来自192.168.0.0/24网段的数据
+$ iptables -A FORWARD -s 192.168.1.11 -j REJECT 
+$ iptables -A FORWARD -s 192.168.0.0/24 -j ACCEPT
+# 注意一定要把拒绝的放在前面不然就不起作用了
+
+# 丢弃从外网接口（eth1）进入防火墙本机的源地址为私网地址的数据包
+$ iptables -A INPUT -i eth1 -s 192.168.0.0/16 -j DROP 
+$ iptables -A INPUT -i eth1 -s 172.16.0.0/12 -j DROP 
+$ iptables -A INPUT -i eth1 -s 10.0.0.0/8 -j DROP
+
+# 允许转发来自192.168.0.0/24局域网段的DNS解析请求数据包
+$ iptables -A FORWARD -s 192.168.0.0/24 -p udp --dport 53 -j ACCEPT 
+$ iptables -A FORWARD -d 192.168.0.0/24 -p udp --sport 53 -j ACCEPT
+
+# 假设现在本机外网网关是58.68.250.1，那么把HTTP请求转发到内部的一台服务器192.168.1.20的8888端口上，规则如下
+$ iptables -t nat -A PREROUTING -p tcp -i eth0 -d 58.68.250.1 --dport 8888 -j DNAT --to 192.168.1.20:80
+$ iptables -A FORWARD -p tcp -i eth0 -d 192.168.0.2 --dport 80 -j ACCEPT
+$ iptables -t filter -A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+
+# 把所有10.8.0.0网段的数据包SNAT成192.168.5.3的ip然后发出去
+$ iptables -t nat -A POSTROUTING -s 10.8.0.0/255.255.255.0 -o eth0 -j SNAT --to-source 192.168.5.3
+
+# 把所有10.8.0.0网段的数据包SNAT成192.168.5.3/192.168.5.4/192.168.5.5等几个ip然后发出去
+$ iptables -t nat -A POSTROUTING -s 10.8.0.0/255.255.255.0 -o eth0 -j SNAT --to-source 192.168.5.3-192.168.5.5
+
+# 从服务器的网卡上，自动获取当前ip地址来做NAT
+$ iptables -t nat -A POSTROUTING -s 10.8.0.0/255.255.255.0 -o eth0 -j MASQUERADE
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>git</title><link>https://yfshi.github.io/posts/git/</link><guid isPermaLink="true">https://yfshi.github.io/posts/git/</guid><pubDate>Tue, 31 Jul 2018 15:22:54 GMT</pubDate><content:encoded>&lt;p&gt;官方文档：
+&lt;a href=&quot;/docs/progit_v2.1.15.pdf&quot;&gt;progit_v2.1.15.pdf&lt;/a&gt;
+来自：
+&lt;a href=&quot;https://git-scm.com/book/zh/v2&quot;&gt;https://git-scm.com/book/zh/v2&lt;/a&gt;&lt;/p&gt;
+&lt;h1&gt;完整迁移&lt;/h1&gt;
+&lt;p&gt;把本地git库localtest完整的迁移到github上的test库，保留提交记录:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# github端建立test空白库
+
+# 本地库镜像推送
+$ cd localtest
+# git push --mirror git@github.com:yfshi/test.git
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>pgbouncer--greenplum测试</title><link>https://yfshi.github.io/posts/pgbouncer-greenplum%E6%B5%8B%E8%AF%95/</link><guid isPermaLink="true">https://yfshi.github.io/posts/pgbouncer-greenplum%E6%B5%8B%E8%AF%95/</guid><pubDate>Thu, 19 Jul 2018 15:53:57 GMT</pubDate><content:encoded>&lt;h1&gt;测试环境&lt;/h1&gt;
+&lt;p&gt;系统：CentOS release 6.5 (Final)&lt;/p&gt;
+&lt;p&gt;节点：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;节点&lt;/th&gt;
+&lt;th&gt;地址&lt;/th&gt;
+&lt;th&gt;角色&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;h1&lt;/td&gt;
+&lt;td&gt;192.168.2.114&lt;/td&gt;
+&lt;td&gt;master,seg0~seg7,mirror(seg8~seg15)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;h2&lt;/td&gt;
+&lt;td&gt;192.168.2.115&lt;/td&gt;
+&lt;td&gt;standby,seg8~seg15,mirror(seg0~seg7)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;连接数：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;pgbouncer --- 100 ---&amp;gt; master&lt;/li&gt;
+&lt;li&gt;client --- 1000 ---&amp;gt; pgbouncer&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;用户：yfshi/123456&lt;/p&gt;
+&lt;h1&gt;greenplum&lt;/h1&gt;
+&lt;h2&gt;配置交互key&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;# gpssh-exkeys -h h1 -h h2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;安装&lt;/h2&gt;
+&lt;p&gt;略&lt;/p&gt;
+&lt;h2&gt;初始化&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;初始化数据目录&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ gpssh -h h1 -h h2
+=&amp;gt; mkdir -p /home/yfshi/gpdata/master
+=&amp;gt; mkdir -p /home/yfshi/gpdata/primary
+=&amp;gt; mkdir -p /home/yfshi/gpdata/mirror
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;配置gpinitsystem_config&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;ARRAY_NAME=&quot;Greenplum Data Platform&quot;
+SEG_PREFIX=gpseg
+PORT_BASE=64300
+declare -a DATA_DIRECTORY=(/home/yfshi/gpdata/primary /home/yfshi/gpdata/primary /home/yfshi/gpdata/primary /home/yfshi/gpdata/primary /home/yfshi/gpdata/primary /home/yfshi/gpdata/primary /home/yfshi/gpdata/primary /home/yfshi/gpdata/primary)
+MASTER_HOSTNAME=h1
+MASTER_DIRECTORY=/home/yfshi/gpdata/master
+MASTER_PORT=65432
+TRUSTED_SHELL=ssh
+CHECK_POINT_SEGMENTS=8
+ENCODING=UNICODE
+
+MIRROR_PORT_BASE=64400
+REPLICATION_PORT_BASE=64500
+MIRROR_REPLICATION_PORT_BASE=64600
+declare -a MIRROR_DATA_DIRECTORY=(/home/yfshi/gpdata/mirror /home/yfshi/gpdata/mirror /home/yfshi/gpdata/mirror /home/yfshi/gpdata/mirror /home/yfshi/gpdata/mirror /home/yfshi/gpdata/mirror /home/yfshi/gpdata/mirror /home/yfshi/gpdata/mirror)
+
+MACHINE_LIST_FILE=/home/yfshi/config/hostfile_gpinitsystem
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;配置hostfile_gpinitsystem&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;h1
+h2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;初始化并启动&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ gpinitsystem -c gpinitsystem_config -s h2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;pgbouncer测试1000连接数&lt;/h1&gt;
+&lt;h2&gt;配置&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;pgbouncer.ini&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[databases]
+pgbench = host=127.0.0.1 dbname=pgbench user=yfshi port=65432
+postgres = host=127.0.0.1 dbname=pgbench user=yfshi port=65432
+[pgbouncer]
+logfile = /home/yfshi/pgbouncer/var/log/pgbouncer.log   # 日志文件
+pidfile = /home/yfshi/pgbouncer/var/log/pgbouncer.pid   # pid文件
+listen_addr = 127.0.0.1          # 监听地址
+listen_port = 6543               # 监听端口
+auth_type = trust
+auth_file = /home/yfshi/pgbouncer/etc/userlist.txt      # 用户认证文件
+pool_mode = session
+server_reset_query = DISCARD ALL
+max_client_conn = 1000           # pgbouncer的客户端最大连接数
+default_pool_size = 100          # 连接池大小
+admin_users = yfshi              # 管理员，pgbouncer内部使用
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;userlist.txt&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&quot;admin&quot; &quot;111111&quot;
+&quot;yfshi&quot; &quot;111111&quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;启动&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;$ pgbouncer -d pgbouncer.ini
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;管理&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;pbouncer提供了类似连接到虚拟数据库pgbouncer,然后执行一些特殊命令的功能,这些命令就像是执行一个真正的SQL命令,让管理者能查询和管理pgbouncer的连接池信息,这个界面为pgbouncer的Console控制界面.一般使用psql命令连接到这个虚拟数据库上.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ psql -p6543 pgbouncer
+psql (9.6.3, server 1.7.2/bouncer)
+Type &quot;help&quot; for help.
+
+pgbouncer=#
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;show help&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;NOTICE:  Console usage
+DETAIL:&lt;br /&gt;
+SHOW HELP|CONFIG|DATABASES|POOLS|CLIENTS|SERVERS|VERSION
+SHOW FDS|SOCKETS|ACTIVE_SOCKETS|LISTS|MEM
+SHOW DNS_HOSTS|DNS_ZONES
+SHOW STATS|STATS_TOTALS|STATS_AVERAGES
+SET key = arg
+RELOAD
+PAUSE [&amp;lt;db&amp;gt;]
+RESUME [&amp;lt;db&amp;gt;]
+DISABLE &amp;lt;db&amp;gt;
+ENABLE &amp;lt;db&amp;gt;
+KILL &amp;lt;db&amp;gt;
+SUSPEND
+SHUTDOWN
+SHOW&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;show config&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;显示当前配置设置,一个配置一行,字段如下:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;key：配置变量名称&lt;/li&gt;
+&lt;li&gt;value：配置值&lt;/li&gt;
+&lt;li&gt;changeable：yes 或 no,显示这个变量是否可以在运行时修改如果为 no,那么这个变量只能在启动的时候修改&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;下表是执行show config;的结果。一下的key都可以在pgbouncer.ini的[pgbouncer]中配置：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;key&lt;/th&gt;
+&lt;th&gt;value&lt;/th&gt;
+&lt;th&gt;changeable&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;job_name&lt;/td&gt;
+&lt;td&gt;pgbouncer&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;conffile&lt;/td&gt;
+&lt;td&gt;pgbouncer.ini&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;logfile&lt;/td&gt;
+&lt;td&gt;/home/yfshi/pgbouncer/pgbouncer.log&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;pidfile&lt;/td&gt;
+&lt;td&gt;/home/yfshi/pgbouncer/pgbouncer.pid&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;listen_addr&lt;/td&gt;
+&lt;td&gt;192.168.2.113&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;listen_port&lt;/td&gt;
+&lt;td&gt;55556&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;listen_backlog&lt;/td&gt;
+&lt;td&gt;128&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;unix_socket_dir&lt;/td&gt;
+&lt;td&gt;/tmp&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;unix_socket_mode&lt;/td&gt;
+&lt;td&gt;511&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;unix_socket_group&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;auth_type&lt;/td&gt;
+&lt;td&gt;trust&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;auth_file&lt;/td&gt;
+&lt;td&gt;/home/yfshi/pgbouncer/userlist.txt&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;auth_hba_file&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;auth_user&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;auth_query&lt;/td&gt;
+&lt;td&gt;SELECT usename, passwd FROM pg_shadow WHERE usename=$1&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;pool_mode&lt;/td&gt;
+&lt;td&gt;session&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;max_client_conn&lt;/td&gt;
+&lt;td&gt;200&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;default_pool_size&lt;/td&gt;
+&lt;td&gt;100&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;min_pool_size&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;reserve_pool_size&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;reserve_pool_timeout&lt;/td&gt;
+&lt;td&gt;5&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;max_db_connections&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;max_user_connections&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;syslog&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;syslog_facility&lt;/td&gt;
+&lt;td&gt;daemon&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;syslog_ident&lt;/td&gt;
+&lt;td&gt;pgbouncer&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;user&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;autodb_idle_timeout&lt;/td&gt;
+&lt;td&gt;3600&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;server_reset_query&lt;/td&gt;
+&lt;td&gt;DISCARD ALL&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;server_reset_query_always&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;server_check_query&lt;/td&gt;
+&lt;td&gt;select 1&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;server_check_delay&lt;/td&gt;
+&lt;td&gt;30&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;query_timeout&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;query_wait_timeout&lt;/td&gt;
+&lt;td&gt;120&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;client_idle_timeout&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;client_login_timeout&lt;/td&gt;
+&lt;td&gt;60&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;idle_transaction_timeout&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;server_lifetime&lt;/td&gt;
+&lt;td&gt;3600&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;server_idle_timeout&lt;/td&gt;
+&lt;td&gt;600&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;server_connect_timeout&lt;/td&gt;
+&lt;td&gt;15&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;server_login_retry&lt;/td&gt;
+&lt;td&gt;15&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;server_round_robin&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;suspend_timeout&lt;/td&gt;
+&lt;td&gt;10&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ignore_startup_parameters&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;disable_pqexec&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;dns_max_ttl&lt;/td&gt;
+&lt;td&gt;15&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;dns_nxdomain_ttl&lt;/td&gt;
+&lt;td&gt;15&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;dns_zone_check_period&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;max_packet_size&lt;/td&gt;
+&lt;td&gt;2147483647&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;pkt_buf&lt;/td&gt;
+&lt;td&gt;4096&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;sbuf_loopcnt&lt;/td&gt;
+&lt;td&gt;5&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;tcp_defer_accept&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;tcp_socket_buffer&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;tcp_keepalive&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;tcp_keepcnt&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;tcp_keepidle&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;tcp_keepintvl&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;verbose&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;admin_users&lt;/td&gt;
+&lt;td&gt;yfshi&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;stats_users&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;stats_period&lt;/td&gt;
+&lt;td&gt;60&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;log_connections&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;log_disconnections&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;log_pooler_errors&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;application_name_add_host&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;client_tls_sslmode&lt;/td&gt;
+&lt;td&gt;disable&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;client_tls_ca_file&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;client_tls_cert_file&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;client_tls_key_file&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;client_tls_protocols&lt;/td&gt;
+&lt;td&gt;all&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;client_tls_ciphers&lt;/td&gt;
+&lt;td&gt;fast&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;client_tls_dheparams&lt;/td&gt;
+&lt;td&gt;auto&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;client_tls_ecdhcurve&lt;/td&gt;
+&lt;td&gt;auto&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;server_tls_sslmode&lt;/td&gt;
+&lt;td&gt;disable&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;server_tls_ca_file&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;server_tls_cert_file&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;server_tls_key_file&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;server_tls_protocols&lt;/td&gt;
+&lt;td&gt;all&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;server_tls_ciphers&lt;/td&gt;
+&lt;td&gt;HIGH:MEDIUM:+3DES:!aNULL&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;show pools&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;列出连接池&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;database：数据库名&lt;/li&gt;
+&lt;li&gt;user：用户名&lt;/li&gt;
+&lt;li&gt;cl_active：当前 active (活跃)的客户端连接的个数&lt;/li&gt;
+&lt;li&gt;cl_waiting：当前 waiting (等待)的客户端连接个数&lt;/li&gt;
+&lt;li&gt;sv_active：当前 active (活跃)的服务器连接个数&lt;/li&gt;
+&lt;li&gt;sv_idle：当前 idle (空闲) 的服务器连接个数&lt;/li&gt;
+&lt;li&gt;sv_used：当前 used (在使用)的服务器连接个数&lt;/li&gt;
+&lt;li&gt;sv_tested：当前 tested (测试过)的服务器连接个数&lt;/li&gt;
+&lt;li&gt;sv_login：当前 login (登录)到 PostgreSQL 服务器的个数&lt;/li&gt;
+&lt;li&gt;maxwait：队列中第一个(最老的那个)客户端等待的时间长度,单位是秒.如果这个数值开始上升,那么就意味着当前的连接池中的服务器处理请求的速度不够快.原因可能是服务器过载,也可能只是 pool_size 太小&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;show stats&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;database：统计是根据每个数据库分比例的&lt;/li&gt;
+&lt;li&gt;total_requests：连接池处理的SQL请求的总数&lt;/li&gt;
+&lt;li&gt;total_received：接收到的网络流量的总字节数&lt;/li&gt;
+&lt;li&gt;total_sent：发出的网络流量的总字节数&lt;/li&gt;
+&lt;li&gt;total_query_time：活跃在与数据库上面的时间开销总数,单位是微秒&lt;/li&gt;
+&lt;li&gt;avg_req：在最后一次统计过程中的每秒平均请求数&lt;/li&gt;
+&lt;li&gt;avg_recv：每秒(从客户端)接收到的平均数据量&lt;/li&gt;
+&lt;li&gt;avg_sent：每秒发送(给客户端)的平均数据量&lt;/li&gt;
+&lt;li&gt;avg_query：平均的查询时间,单位是微秒&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;show servers&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;列出数据库与pgbouncer之间连接&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;type：S,表示服务器&lt;/li&gt;
+&lt;li&gt;user：gbouncer用于连接服务器的用户名&lt;/li&gt;
+&lt;li&gt;database：服务器端的数据库名&lt;/li&gt;
+&lt;li&gt;state：pgbouncer 服务器连接的状态 active、used、idle&lt;/li&gt;
+&lt;li&gt;addr：PostgreSQL服务器的IP地址&lt;/li&gt;
+&lt;li&gt;port：PostgreSQL服务器的端口&lt;/li&gt;
+&lt;li&gt;local_addr：本地机器上的发起连接地址&lt;/li&gt;
+&lt;li&gt;local_port：本地机器上的发起连接端口&lt;/li&gt;
+&lt;li&gt;connect_time：连接建立的时间&lt;/li&gt;
+&lt;li&gt;request_time：请求发出的时间&lt;/li&gt;
+&lt;li&gt;ptr：这个连接的内部对象地址,用做唯一 ID&lt;/li&gt;
+&lt;li&gt;link：这个服务器对应的客户端地址&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;show clients&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;列出客户端及客户端连接状态&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;type：C,表示客户端&lt;/li&gt;
+&lt;li&gt;user：客户端连接的用户&lt;/li&gt;
+&lt;li&gt;database：数据库名&lt;/li&gt;
+&lt;li&gt;state：客户端连接的状态 active、used、waiting或者idle之一&lt;/li&gt;
+&lt;li&gt;addr：客户端的 IP 地址&lt;/li&gt;
+&lt;li&gt;port：客户端连接去的端口&lt;/li&gt;
+&lt;li&gt;local_addr：本地机器上连接到的对端地址&lt;/li&gt;
+&lt;li&gt;local_port：本地机器上的连接到的对端端口&lt;/li&gt;
+&lt;li&gt;connect_time：最后的客户端连接的时间戳&lt;/li&gt;
+&lt;li&gt;request_time：最后的客户端请求的时间戳&lt;/li&gt;
+&lt;li&gt;ptr：这个连接的内部对象的地址,用做唯一 ID&lt;/li&gt;
+&lt;li&gt;link：这个客户端连接对应的服务器的地址&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;show lists&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;显示连接池的计数信息&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;databases：数据库的个数&lt;/li&gt;
+&lt;li&gt;users：用户的个数&lt;/li&gt;
+&lt;li&gt;pools：连接池的个数&lt;/li&gt;
+&lt;li&gt;free_clients：空闲客户端的个数&lt;/li&gt;
+&lt;li&gt;used_clients：已用的客户端的个数&lt;/li&gt;
+&lt;li&gt;login_clients：处于已登录状态的客户端个数&lt;/li&gt;
+&lt;li&gt;free_servers：空闲服务器个数&lt;/li&gt;
+&lt;li&gt;used_servers：已用服务器个数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;show databases&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;列出pgbouncer数据库别名及相关数据库&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;name：已配置的数据库名字记录&lt;/li&gt;
+&lt;li&gt;host：pgbouncer 连接到的主机名&lt;/li&gt;
+&lt;li&gt;port：pgbouncer 连接到的端口号&lt;/li&gt;
+&lt;li&gt;database：pgbouncer 实际连接的数据库名&lt;/li&gt;
+&lt;li&gt;force_user：当用户是连接字串的一部分的时候,在 pgbouncer 和 PostgreSQL 之间的连接会强制成给出的用户,不管 client user 是什么&lt;/li&gt;
+&lt;li&gt;pool_size：最大的服务器端连接数目&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;show fds&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;显示正在使用的 fd 列表如果连接的用户的用户名是 “pgbouncer”,那么通过 unix socket 连接,并且和运行的进程有同样的 UID,实际的 fd 列表是通过这个连接传递的这个机制用于做在线重启&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;fd：文件描述符的数字值&lt;/li&gt;
+&lt;li&gt;task：pooler,client 或 server 之一&lt;/li&gt;
+&lt;li&gt;user：使用该 FD 的连接用户&lt;/li&gt;
+&lt;li&gt;database：使用该 FD 的连接的数据库&lt;/li&gt;
+&lt;li&gt;addr：使用该 FD 的连接的 IP 地址,如果使用的是 unix socket,就是 unix&lt;/li&gt;
+&lt;li&gt;port：使用该 FD 的连接的端口号&lt;/li&gt;
+&lt;li&gt;cancel：这个连接的取消键字&lt;/li&gt;
+&lt;li&gt;link：对应的服务器/客户端的 fd如果为 idle (空闲)则为 NULL&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;DISABLE &amp;lt;db&amp;gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;拒绝指定数据库上所有新客户端连接&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;ENALBLE &amp;lt;db&amp;gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;准许之前DISABLE命令之后的新客户端连接&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;PAUSE [&amp;lt;db&amp;gt;]&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;尝试从所有服务器断开连接(等待query完成),在所有query完成之前,此命令不会返回,在数据库重新启动时使用.如果给出了数据库名字则只对该数据库有用&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;KILL &amp;lt;db&amp;gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;立即删除给定数据库上所有客户端以及数据库连接&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;SUPEND&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;刷新所有socket缓存,并且停止监听,在缓存flush之前此命令不会有任何返回.使用场景:pgbouncer在线重新启动时使用&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;RESUME [&amp;lt;db&amp;gt;]&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;从之前PAUSE或者SUPEND命令恢复之前状态&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;SHUTDOWN&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;pgbouncer进程退出&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;RELOAD&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;重新加载其配置文件并更新配置&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2&gt;测试&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;只读查询&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ pgbench -p6543 -i pgbench
+$ pgbench -p6543 -n -S -c 1000 -t 1 pgbench
+transaction type: SELECT only
+scaling factor: 1
+query mode: simple
+number of clients: 1000
+number of threads: 1
+number of transactions per client: 1
+number of transactions actually processed: 1000/1000
+tps = 713.361402 (including connections establishing)
+tps = 866.376950 (excluding connections establishing)
+
+$ psql -p6543 pgbench
+$ SELECT count(*) from pg_stat_activity;
+ count 
+-------
+   100
+(1 row)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;行存插入&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ psql -p6543 -c &quot;create table table_h(id serial, n1 varchar(20), n2 varchar(20)) distributed by (id);&quot; pgbench;
+$ echo &quot;insert into table_h(n1,n2) values(&apos;n1&apos;,&apos;n2&apos;)&quot; &amp;gt; test.sql
+$ pgbench -p6543 -n -f test.sql -c 1000 -t 1 pgbench
+transaction type: Custom query
+scaling factor: 1
+query mode: simple
+number of clients: 1000
+number of threads: 1
+number of transactions per client: 1
+number of transactions actually processed: 1000/1000
+tps = 207.016064 (including connections establishing)
+tps = 217.756804 (excluding connections establishing)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;列存插入&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ psql -p6543 -c &quot;create table table_c(id serial, n1 varchar(20), n2 varchar(20)) with (appendonly=true,orientation=column,compresstype=zlib,COMPRESSLEVEL=5) distributed by (id);&quot; pgbench;
+$ echo &quot;insert into table_c(n1,n2) values(&apos;n1&apos;,&apos;n2&apos;)&quot; &amp;gt; test.sql
+$ pgbench -p6543 -n -f test.sql -c 1000 -t 1 pgbench
+transaction type: Custom query
+scaling factor: 1
+query mode: simple
+number of clients: 1000
+number of threads: 1
+number of transactions per client: 1
+number of transactions actually processed: 1000/1000
+tps = 64.295818 (including connections establishing)
+tps = 65.290265 (excluding connections establishing)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+</content:encoded></item><item><title>CentOS第三方库</title><link>https://yfshi.github.io/posts/centos%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/</link><guid isPermaLink="true">https://yfshi.github.io/posts/centos%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/</guid><pubDate>Wed, 11 Jul 2018 11:36:00 GMT</pubDate><content:encoded>&lt;p&gt;&lt;code&gt;Software Collections&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;EPEL&lt;/code&gt; &lt;code&gt;Remi&lt;/code&gt; &lt;code&gt;CentOS&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;在Red Hat企业Linux（RHEL）上，一般都是提供的老掉牙的软件。CentOS作为RHEL的复制品有着同样的问题。&lt;/p&gt;
+&lt;p&gt;如果应用依赖新版软件，怎么办呢？使用第三方仓库，推荐Software Collections、epel、Remi Collet。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Software Collections&lt;/p&gt;
+&lt;p&gt;单独安装在/opt中，新旧软件分离，需要启动。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;epel&lt;/p&gt;
+&lt;p&gt;新旧软件不分离，容易造成混乱。无需启动，直接生效。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Remi Collet&lt;/p&gt;
+&lt;p&gt;同epel。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;Software Collections&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.softwarecollections.org/en/&quot;&gt;Software Collections&lt;/a&gt;是 Red Hat 唯一支持的新软件包源，为 CentOS 设立了专门的仓库，安装和管理都和其它第三方仓库一样。&lt;/p&gt;
+&lt;p&gt;在 CentOS 6/7上安装Software Collections命令如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo yum install centos-release-scl
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;centos-release-scl-rh&lt;/code&gt; 可能作为依赖包被同时安装。&lt;/p&gt;
+&lt;p&gt;然后就可以像平常一样搜索、安装软件包了：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ yum search php7
+ [...]
+ rh-php70.x86_64 : Package that installs PHP 7.0
+ [...]
+$ sudo yum install rh-php70 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;启用：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ scl enable rh-php70 bash
+$ php -v
+PHP 7.0.10
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;这些 SCL 软件包在重启后不会激活。SCL 的设计初衷就是在不影响原有配置的前提下，让新旧软件能一起运行。不过你可以通过 &lt;code&gt;~/.bashrc&lt;/code&gt; 加载 SCL 提供的 &lt;code&gt;enable&lt;/code&gt; 脚本来实现自动启用。 SCL 的所有软件包都安装在 &lt;code&gt;/opt&lt;/code&gt; 下， 以我们的 PHP 7 为例，在 &lt;code&gt;~/.bashrc&lt;/code&gt; 里加入一行：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;source /opt/rh/rh-php70/enable
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;EPEL&lt;/h1&gt;
+&lt;p&gt;Fedora 社区为 Feora 及所有 RHEL 系的发行版维护着 &lt;a href=&quot;https://fedoraproject.org/wiki/EPEL&quot;&gt;EPEL：Extra Packages for Enterprise Linux&lt;/a&gt; 。 里面包含一些最新软件包以及一些未被发行版收纳的软件包。&lt;/p&gt;
+&lt;p&gt;CentOS6/7安装命令如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;yum install -y epel-release
+yum --disablerepo=epel -y update ca-certificates
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;安装 EPEL 里的软件就不用麻烦 &lt;code&gt;enable&lt;/code&gt; 脚本了，直接像平常一样用。你还可以用 &lt;code&gt;--disablerepo&lt;/code&gt; 和 &lt;code&gt;--enablerepo&lt;/code&gt; 选项指定从 EPEL 里安装软件包：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo yum --disablerepo &quot;*&quot; --enablerepo epel install [package]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;Remi Collet&lt;/h1&gt;
+&lt;p&gt;Remi Collet 在 &lt;a href=&quot;http://rpms.remirepo.net/&quot;&gt;Remi 的 RPM 仓库&lt;/a&gt; 里维护着大量更新的和额外的软件包。需要先安装 EPEL ，因为 Remi 仓库依赖它。&lt;/p&gt;
+&lt;p&gt;CentOS wiki 上有较完整的仓库列表：&lt;a href=&quot;https://wiki.centos.org/AdditionalResources/Repositories&quot;&gt;更多的第三方仓库&lt;/a&gt; ，用哪些，不用哪些，里面都有建议。&lt;/p&gt;
+&lt;h1&gt;指定仓库&lt;/h1&gt;
+&lt;p&gt;列出可用仓库：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ yum repolist
+[...]
+repo id                  repo name
+base/7/x86_64            CentOS-7 - Base
+centos-sclo-rh/x86_64    CentOS-7 - SCLo rh
+centos-sclo-sclo/x86_64  CentOS-7 - SCLo sclo
+extras/7/x86_64          CentOS-7 - Extras
+updates/7/x86_64         CentOS-7 - Updates
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;列出指定仓库中的 软件包：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ yum --disablerepo &quot;*&quot; --enablerepo centos-sclo-rh list available
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;--disablerepo&lt;/code&gt; 与 &lt;code&gt;--enablerepo&lt;/code&gt; 简单说下。 实际上在这个命令里你并没有禁用或启用什么东西，而只是将你的搜索范围限制在某一个仓库内。&lt;/p&gt;
+&lt;p&gt;从指定仓库安装：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo yum --disablerepo &quot;*&quot; --enablerepo epel install [package]
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>Greenplum安装</title><link>https://yfshi.github.io/posts/greenplum%E5%AE%89%E8%A3%85/</link><guid isPermaLink="true">https://yfshi.github.io/posts/greenplum%E5%AE%89%E8%A3%85/</guid><pubDate>Tue, 10 Jul 2018 19:40:00 GMT</pubDate><content:encoded>&lt;p&gt;节点分配：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;地址&lt;/th&gt;
+&lt;th&gt;主机名&lt;/th&gt;
+&lt;th&gt;segment&lt;/th&gt;
+&lt;th&gt;mirror&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;10.0.0.100&lt;/td&gt;
+&lt;td&gt;gp&lt;/td&gt;
+&lt;td&gt;master&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;10.0.0.101&lt;/td&gt;
+&lt;td&gt;gp1&lt;/td&gt;
+&lt;td&gt;pseg0、pseg1&lt;/td&gt;
+&lt;td&gt;mseg4、mseg5&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;10.0.0.102&lt;/td&gt;
+&lt;td&gt;gp2&lt;/td&gt;
+&lt;td&gt;pseg2、gpseg3&lt;/td&gt;
+&lt;td&gt;mseg0、mseg1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;10.0.0.103&lt;/td&gt;
+&lt;td&gt;gp3&lt;/td&gt;
+&lt;td&gt;pseg4、pseg5&lt;/td&gt;
+&lt;td&gt;mseg2、mseg3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;10.0.0.104&lt;/td&gt;
+&lt;td&gt;gps&lt;/td&gt;
+&lt;td&gt;standby&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h1&gt;操作系统&lt;/h1&gt;
+&lt;p&gt;本章所有操作在所有节点使用root用户执行&lt;/p&gt;
+&lt;h2&gt;开发环境&lt;/h2&gt;
+&lt;p&gt;当前系统如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ cat /etc/issue
+CentOS release 6.4 (Final)
+Kernel \r on an \m
+
+$ uname -a
+Linux vm 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 00:31:26 UTC 2013 x86_64 x86_64 x86_64 GNU/Linux
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;搭建基本环境：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# linux基本环境
+$ yum install -y bzip2 cmake gcc gcc-c++ gdb git libtool lrzsz make man net-tools sysstat unzip vim wget zip
+
+# 数据库开发环境
+$ yum install -y apr-devel apr-util-devel bison bzip2-devel c-ares-devel flex java-1.8.0-openjdk java-1.8.0-openjdk-devel json-c-devel krb5-devel libcurl-devel libevent-devel libkadm5 libxml2-devel libxslt-devel libyaml-devel openldap-devel openssl-devel pam-devel perl perl-devel perl-ExtUtils-Embed readline-devel unixODBC-devel zlib-devel
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;如果上述环境无法满足要求，参考&lt;a href=&quot;../Greenplum%E7%BC%96%E8%AF%91/&quot;&gt;Greenplun编译&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;系统设置&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;# 关闭防火墙
+$ service iptables stop
+$ chkconfig iptables off
+
+# 禁用selinux
+$ setenforce 0
+$ vi /etc/selinux/config
+SELINUX=disabled
+
+# 分别配置ip
+$ bash -c &apos;cat &amp;gt; /etc/sysctl.conf &amp;lt;&amp;lt;-EOF
+DEVICE=eth0
+TYPE=Ethernet
+ONBOOT=yes
+BOOTPROTO=static
+IPADDR=10.0.0.100
+NETMASK=255.255.255.0
+EOF&apos;
+
+# 分别设置主机名
+$ vi /etc/sysconfig/network
+NETWORKING=yes
+HOSTNAME=gp
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;系统参数配置&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;$ cat &amp;gt;&amp;gt; /etc/sysctl.conf &amp;lt;&amp;lt;-EOF
+kernel.shmmax = 500000000
+kernel.shmmni = 4096
+kernel.shmall = 4000000000
+kernel.sem = 500 1024000 200 4096
+kernel.sysrq = 1
+kernel.core_uses_pid = 1
+kernel.msgmnb = 65536
+kernel.msgmax = 65536
+kernel.msgmni = 2048
+net.ipv4.tcp_syncookies = 1
+net.ipv4.ip_forward = 0
+net.ipv4.conf.default.accept_source_route = 0
+net.ipv4.tcp_tw_recycle = 1
+net.ipv4.tcp_max_syn_backlog = 4096
+net.ipv4.conf.all.arp_filter = 1
+net.ipv4.ip_local_port_range = 1025 65535
+net.core.netdev_max_backlog = 10000
+net.core.rmem_max = 2097152
+net.core.wmem_max = 2097152
+vm.overcommit_memory = 2
+EOF
+
+$ cat &amp;gt;&amp;gt; /etc/security/limits.conf &amp;lt;&amp;lt;-EOF
+* soft nofile 65536
+* hard nofile 65536
+* soft nproc 131072
+* hard nproc 131072
+EOF
+
+$ cat &amp;gt;&amp;gt; /etc/ld.so.conf &amp;lt;&amp;lt;-EOF
+/usr/local/lib
+EOF
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;添加主机名本地映射&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;$ cat &amp;gt;&amp;gt; /etc/hosts &amp;lt;&amp;lt;-EOF
+10.0.0.100  ka
+10.0.0.101  ka1
+10.0.0.102  ka2
+10.0.0.103  ka3
+10.0.0.104  kas
+EOF
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;重启操作系统&lt;/h2&gt;
+&lt;p&gt;上述所有配置完成之后重启操作系统。&lt;/p&gt;
+&lt;p&gt;如果是在虚拟机操作，创建快照，方便以后恢复。另外，如果是虚拟机操作，只需配置一台机器，然后克隆其他的机器，修改ip和主机名即可。&lt;/p&gt;
+&lt;h1&gt;安装Greenplum&lt;/h1&gt;
+&lt;h2&gt;添加用户&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;$ useadd gpadmin
+$ passwd gpadmin
+$ vi /etc/sudoers
+gpadmin ALL=(ALL) NOPASSWD: ALL
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;以下操作都在主节点的gpadmin用户下进行&lt;/p&gt;
+&lt;h2&gt;创建节点文件&lt;/h2&gt;
+&lt;p&gt;创建两个文件：all_hosts和all_segs，all_hosts是所有节点列表，all_segs是所有segment所在的节点列表。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ cat all_hosts
+gp
+gp1
+gp2
+gp3
+gps
+$ cat all_segs
+gp1
+gp2
+gp3
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;配置主机互信&lt;/h2&gt;
+&lt;p&gt;交换密钥&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ source /home/gpadmin/gpdb/Greenplum_path.sh
+$ gpssh-exkeys -f all_hosts
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;安装&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;master节点安装Greenplum到/home/gpadmin/gpdb&lt;/p&gt;
+&lt;p&gt;略&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;把master的Greenplum同步安装到其他机器&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ source /home/gpadmin/gpdb/Greenplum_path.sh
+$ gpseginstall -f all_hosts
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;初始化Greenplum&lt;/h1&gt;
+&lt;p&gt;修改配置文件&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ cp /home/gpadmin/gpdb/docs/cli_help/gpconfigs/gpinitsystem_config .
+
+# 修改为如下配置，各个参数的意义参考注释
+$ cat gpinitsystem_config | grep -E -v &apos;^#&apos; | grep -v &apos;^$&apos;
+ARRAY_NAME=&quot;Greenplum Data Platform&quot;
+SEG_PREFIX=gpseg
+PORT_BASE=40000
+declare -a DATA_DIRECTORY=(/data/primary)
+MASTER_HOSTNAME=ka
+MASTER_DIRECTORY=/data/master
+MASTER_PORT=5432
+TRUSTED_SHELL=ssh
+CHECK_POINT_SEGMENTS=8
+ENCODING=UNICODE
+MIRROR_PORT_BASE=50000
+REPLICATION_PORT_BASE=41000
+MIRROR_REPLICATION_PORT_BASE=51000
+declare -a MIRROR_DATA_DIRECTORY=(/data/mirror)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;创建数据目录&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ gpssh -f all_hosts
+=&amp;gt; sudo mkdir /data
+=&amp;gt; sudo chown gpadmin.gpadmin /data
+=&amp;gt; mkdir /data/master
+=&amp;gt; mkdir /data/primary
+=&amp;gt; mkdir /data/mirror
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;初始化集群&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ gpinitsystem -c gpinitsystem_config -h all_segs -s kas -S
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;配置主机和备机的环境变量&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ vi .bashrc
+if [ -f /home/gpadmin/gpdb/Greenplum_path.sh ]; then
+	source /home/gpadmin/gpdb/Greenplum_path.sh
+	export MASTER_DATA_DIRECTORY=/data/master/gpseg-1
+fi
+$ source .bashrc
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;使用Greenplum&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;$ psql -hgp -dpostgres
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>Greenplum编译</title><link>https://yfshi.github.io/posts/greenplum%E7%BC%96%E8%AF%91/</link><guid isPermaLink="true">https://yfshi.github.io/posts/greenplum%E7%BC%96%E8%AF%91/</guid><pubDate>Tue, 10 Jul 2018 19:34:45 GMT</pubDate><content:encoded>&lt;blockquote&gt;
+&lt;p&gt;操作系统：centos6.4 x64最小安装&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1&gt;添加用户&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;$ useradd gpadmin
+$ passwd gpadmin
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;把gpadmin加入sudoer，之后的操作都在gpadmin用户下完成。&lt;/p&gt;
+&lt;h1&gt;搭建开发环境&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;# linux基本环境
+$ sudo yum install -y bzip2 cmake gcc gcc-c++ gdb git libtool lrzsz make man net-tools sysstat unzip vim wget zip
+
+# 数据库开发环境
+$ sudo yum install -y apr-devel apr-util-devel bison bzip2-devel c-ares-devel flex java-1.8.0-openjdk java-1.8.0-openjdk-devel json-c-devel krb5-devel libcurl-devel libevent-devel libkadm5 libxml2-devel libxslt-devel libyaml-devel openldap-devel openssl-devel pam-devel perl perl-devel perl-ExtUtils-Embed readline-devel unixODBC-devel zlib-devel
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;一般来说，上面安装的开发包足够一般的数据库编译或安装使用了。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;如果Greenplum版本较新(&amp;gt;=5X_STABLE)，CentOS 6.4官方的开发包版本可能无法满足Greenplum（比如glibc不支持C11标准，python版本较低、cmake版本较低等）,也可能会缺少一些其他的包。&lt;/p&gt;
+&lt;p&gt;可以通过源码编译或者非官方yum源安装合适的版本。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1&gt;编译开发包&lt;/h1&gt;
+&lt;h2&gt;gcc-4.8.5&lt;/h2&gt;
+&lt;p&gt;Greenplum较新的代码要用到C11/C++11标准，要求gcc版本4.7以上。由于系统自带或yum安装的gcc版本是4.4.7，需要编译更高版本的gcc。&lt;/p&gt;
+&lt;p&gt;编译gcc需要先编译gmp、mpfr、mpc，按照顺序编译安装。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# 编译gmp
+$ wget https://gmplib.org/download/gmp/gmp-6.1.0.tar.bz2
+$ tar -jxf gmp-6.1.0.tar.bz2
+$ cd gmp-6.1.0
+$ ./configure --prefix=/home/gpadmin/BuildEnv/gcc
+$ make &amp;amp;&amp;amp; make install
+
+# 编译mpfr
+$ wget https://www.mpfr.org/mpfr-3.1.4/mpfr-3.1.4.tar.bz2
+$ tar -jxf mpfr-3.1.4.tar.bz2
+$ cd mpfr-3.1.4
+$ ./configure --prefix=/home/gpadmin/BuildEnv/gcc --with-gmp=/home/gpadmin/BuildEnv/gcc
+make &amp;amp;&amp;amp; make install
+
+# 编译mpc
+$ wget https://ftp.gnu.org/gnu/mpc/mpc-1.0.3.tar.gz
+$ tar -zxf mpc-1.0.3.tar.gz
+$ cd mpc-1.0.3
+$ ./configure --prefix=/home/gpadmin/BuildEnv/gcc --with-gmp=/home/gpadmin/BuildEnv/gcc --with-mpfr=/home/gpadmin/BuildEnv/gcc
+$ make &amp;amp;&amp;amp; make install
+
+# 编译gcc
+$ wget ftp://gcc.gnu.org/pub/gcc/releases/gcc-4.8.5/gcc-4.8.5.tar.bz2
+$ tar -jxf gcc-4.8.5.tar.bz2
+$ cd gcc-4.8.5
+$ export LD_LIBRARY_PATH=/home/gpadmin/BuildEnv/gcc/lib:$LD_LIBRARY_PATH
+$ ./configure --prefix=/home/gpadmin/BuildEnv/gcc --with-gmp=/home/gpadmin/BuildEnv/gcc --with-mpfr=/home/gpadmin/BuildEnv/gcc --with-mpc=/home/gpadmin/BuildEnv/gcc --disable-multilib
+$ make &amp;amp;&amp;amp; make install
+
+# 设置环境变量
+$ vi ~/.bashrc
+export LD_LIBRARY_PATH=/home/gpadmin/BuildEnv/gcc/lib:/home/gpadmin/BuildEnv/gcc/lib64:$LD_LIBRARY_PATH
+export PATH=/home/gpadmin/BuildEnv/gcc/bin:$PATH
+$ source ~/.bashrc
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;cmake3&lt;/h2&gt;
+&lt;p&gt;gporca要求cmake版本3.1以上，系统自带或者yum安装的cmake是cmake-2.8，需要编译更高版本cmake。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ wget https://cmake.org/files/v3.10/cmake-3.10.3.tar.gz
+$ tar -zxf cmake-3.10.3.tar.gz
+$ cd cmake-3.10.3
+$ ./configure --prefix=/home/gpadmin/BuildEnv/cmake
+$ make &amp;amp;&amp;amp; make install
+
+$ vi ~/.bashrc
+export LD_LIBRARY_PATH=/home/gpadmin/BuileEnv/cmake/lib:$LD_LIBRARY_PATH
+export PATH=/home/gpadmin/BuildEnv/cmake/bin:$PATH
+$ source ~/.bashrc
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;python-2.7&lt;/h2&gt;
+&lt;p&gt;greeplum要求python 2.7以上，系统自带或yum安装的python是2.6，需要编译新版本。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# 编译python
+$ wget https://www.python.org/ftp/python/2.7.14/Python-2.7.14.tgz
+$ tar -xf Python-2.7.14.tgz
+$ cd Python-2.7.14
+$ ./configure --prefix=/home/gpadmin/BuildEnv/python --enable-optimizations -enable-shared CFLAGS=-fPIC
+$ make &amp;amp;&amp;amp; make install
+
+# 设置环境变量
+$ vi ~/.bashrc
+export LD_LIBRARY_PATH=/home/gpadmin/BuildEnv/python/lib:$LD_LIBRARY_PATH
+export PATH=/home/gpadmin/BuildEnv/python/bin:$PATH
+$ source ~/.bashrc
+
+# 安装pip
+$ python -m ensurepip
+$ pip install --upgrade pip
+
+# 安装python模块
+$ pip install psutil lockfile paramiko setuptools
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;python2.6+yum的使用：&lt;/p&gt;
+&lt;p&gt;安装python和工具：sudo yum install -y python python-setuptools python-devel python-crypto python-paramiko&lt;/p&gt;
+&lt;p&gt;安装python模块：
+sudo easy_install lockfile
+sudo easy_install psi&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2&gt;ninja&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;$ wget https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-linux.zip
+$ mkdir -p /home/gpadmin/BuildEnv/ninja/bin
+$ unzip -d /home/gpadmin/BuildEnv/ninja/bin ninja-linux.zip
+
+$ vi ~/.bashrc
+$ export PATH=/home/gpadmin/BuildEnv/ninja/bin:$PATH
+$ source ~/.bashrc
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;geos+proj+gdal&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;# geos
+$ wget http://download.osgeo.org/geos/geos-3.4.2.tar.bz2
+$ tar xjf geos-3.4.2.tar.bz2
+$ cd geos-3.4.2
+$ ./configure --prefix=/home/gpadmin/BuildEnv/geos
+$ make &amp;amp;&amp;amp; make install
+
+# proj
+$ wget http://download.osgeo.org/proj/proj-4.9.1.tar.gz
+$ tar xzf proj-4.9.1.tar.gz
+$ cd proj-4.9.1
+$ ./configure --prefix=/home/gpadmin/BuildEnv/proj
+$ make &amp;amp;&amp;amp; make install
+
+# gdal
+$ wget http://download.osgeo.org/gdal/1.11.2/gdal-1.11.2.tar.gz
+$ tar xzf gdal-1.11.2.tar.gz
+$ cd gdal-1.11.2
+$ ./configure --prefix=/home/gpadmin/BuildEnv/gdal
+$ make &amp;amp;&amp;amp; make install
+
+# 设置环境变量
+$ vi ~/.bashrc
+export LD_LIBRARY_PATH=/home/gpadmin/BuildEnv/geos/lib:/home/gpadmin/BuildEnv/proj/lib:/home/gpadmin/BuildEnv/gdal/lib:$LD_LIBRARY_PATH
+export PATH=/home/gpadmin/BuildEnv/geos/bin:/home/gpadmin/BuildEnv/proj/bin:/home/gpadmin/BuildEnv/gdal/bin:$PATH
+$ source ~/.bashrc
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;libevent&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;$ wget https://github.com/downloads/libevent/libevent/libevent-2.0.20-stable.tar.gz
+$ tar xf libevent-2.0.20-stable.tar.gz
+$ cd libevent-2.0.20-stable
+$ ./configure --prefix=/home/gpadmin/BuildEnv/libevent
+$ make &amp;amp;&amp;amp; make install
+
+$ vi ~/.bashrc
+export LD_LIBRARY_PATH=/home/gpadmin/BuildEnv/libevent/lib:$LD_LIBRARY_PATH
+export PATH=/home/gpadmin/BuildEnv/libevent/bin:$PATH
+$ source ~/.bashrc
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;Apache Maven&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;$ wget http://mirrors.hust.edu.cn/apache/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz
+$ tar -zxf apache-maven-3.5.4-bin.tar.gz -C /home/gpadmin/BuildEnv/
+$ mv /home/gpadmin/BuildEnv/apache-maven-3.5.4 /home/gpadmin/BuildEnv/apache-maven
+
+$ vi ~/.bashrc
+export PATH=/home/gpadmin/BuildEnv/apache-maven/bin:$PATH
+$ souce ~/.bashrc
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;编译gporca&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;# gp-xerces
+$ git clone git://github.com/Greenplum-db/gp-xerces.git
+$ cd gp-xerces/
+$ mkdir build
+$ cd build
+$ ../configure --prefix=/home/gpadmin/gporca
+$ make &amp;amp;&amp;amp; make install
+
+# gporca
+$ git clone git://github.com/Greenplum-db/gporca.git
+$ cd gporca
+$ cmake -GNinja -D CMAKE_INSTALL_PREFIX=/home/gpadmin/gporca -D XERCES_LIBRARY=/home/gpadmin/gporca/lib/libxerces-c.so -D XERCES_INCLUDE_DIR=/home/gpadmin/gporca/include -H. -Bbuild
+$ ninja install -C build
+
+$ vi ~/.bashrc
+export LD_LIBRARY_PATH=/home/gpadmin/gporca/lib:$LD_LIBRARY_PATH
+export PATH=/home/gpadmin/gporca/bin:$PATH
+$ source ~/.bashrc
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;编译gpdb&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;$ git clone git://github.com/Greenplum-db/gpdb.git
+$ cd gpdb
+$ export LIBRARY_PATH=/home/gpadmin/gporca/lib:$LIBRARY_PATH
+$ export C_INCLUDE_PATH=/home/gpadmin/gporca/include:$C_INCLUDE_PATH
+$ export CPLUS_INCLUDE_PATH=/home/gpadmin/gporca/include:$CPLUS_INCLUDE_PATH
+$ ./configure --with-perl --with-python --with-libxml --with-gssapi --prefix=/home/gpadmin/gpdb
+$ make &amp;amp;&amp;amp; make install
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;编译postgis&lt;/h1&gt;
+&lt;blockquote&gt;
+&lt;p&gt;PostGIS 2.1.5 for GreenPlum 5.x+&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ git clone git://github.com/Greenplum-db/geospatial.git
+$ source /home/gpadmin/gpdb/greenplum_path.sh
+$ cd geospatial/postgis/build/postgis-2.1.5/
+$ ./configure --prefix=$GPHOME --with-pgconfig=$GPHOME/bin/pg_config --with-raster --without-topology --with-projdir=/home/gpadmin/BuildEnv/proj
+$ make USE_PGXS=1 clean all install
+
+# 安装postgis
+$ psql -d postgres -f ${GPHOME}/share/postgresql/contrib/postgis-2.1/postgis.sql
+$ psql -d postgres -f ${GPHOME}/share/postgresql/contrib/postgis-2.1/postgis_comments.sql
+$ psql -d postgres -f ${GPHOME}/share/postgresql/contrib/postgis-2.1/rtpostgis.sql
+$ psql -d postgres -f ${GPHOME}/share/postgresql/contrib/postgis-2.1/raster_comments.sql
+$ psql -d postgres -f ${GPHOME}/share/postgresql/contrib/postgis-2.1/spatial_ref_sys.sql
+
+$ vi $GPHOME/greenplum_path.sh
+export GDAL_DATA=$GPHOME/share/gdal
+export POSTGIS_ENABLE_OUTDB_RASTERS=0
+export POSTGIS_GDAL_ENABLED_DRIVERS=DISABLE_ALL
+
+$ gpstop –r	//重启数据库
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;编译pgbouncer&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;$ git clone -b pgbouncer_1_8_1 git://github.com/Greenplum-db/pgbouncer.git
+$ cd pgbouncer
+$ git submodule init
+$ git submodule update
+$ ./autogen.sh
+$ ./configure --prefix=/home/gpadmin/pgbouncer
+$ make &amp;amp;&amp;amp; make install
+
+$ vi ~/.bashrc
+export PATH=/home/gpadmin/pgbouncer/bin:$PATH
+$ source ~/.bashrc
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;编译jdbc&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;$ wget https://jdbc.postgresql.org/download/postgresql-jdbc-42.2.2.src.tar.gz --no-check-certificate
+$ tar -zxf postgresql-jdbc-42.2.2.src.tar.gz
+$ cd postgresql-jdbc-42.2-2.src/pgjdbc/
+$ mvn package –DskipTests
+$ cp target/postgresql-42.2.2.jar /home/gpadmin/gpdb/lib
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;编译odbc&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;$ wget https://ftp.postgresql.org/pub/odbc/versions/src/psqlodbc-09.03.0400.tar.gz --no-check-certificate
+$ tar -xf psqlodbc-09.03.0400.tar.gz
+$ cd psqlodbc-09.03.0400
+$ ./configure --prefix=/home/gpadmin/psqlodbc
+$ make &amp;amp;&amp;amp; make install
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;测试：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/odbcinst.ini
+[PostgreSQL]
+Description   = ODBC for PostgreSQL
+Driver       = /home/gpadmin/psqlodbc/lib/psqlodbcw.so 
+Setup       = /usr/lib/libodbcpsqlS.so
+Driver64     = /home/gpadmin/psqlodbc/lib/psqlodbcw.so 
+Setup64     = /usr/lib64/libodbcpsqlS.so
+FileUsage	    = 1
+
+$ vi ~/.odbc.ini
+[gp]
+Description = Test to gp
+Driver = PostgreSQL
+Database = postgres
+Servername = 127.0.0.1
+UserName = gpadmin
+Password = 111111
+Port = 5432
+ReadOnly = 0
+
+$ source /home/gpadmin/gpdb/greenplum_path.sh
+$ isql gp
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;附：CentOS 7.0编译gpdb&lt;/h1&gt;
+&lt;blockquote&gt;
+&lt;p&gt;CentOS 7.0最小化安装&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;系统设置：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# 关闭防火墙
+systemctl stop firewalld
+systemctl disable firewalld
+
+# 关闭selinux
+setenforce 0
+vi /etc/selinux/config
+SELINUX=disabled
+
+# 配置ip，网络等
+
+# 安装基本环境
+yum install -y bzip2 git lrzsz sysstat unzip vim wget zip
+
+# 添加用户
+$ useadd gpadmin
+$ passwd gpadmin
+$ su - gpadmin
+
+# 下载代码
+$ mkdir /home/gpadmin/code
+$ cd /home/gpadmin/code
+$ git clone https://github.com/greenplum-db/gpdb.git
+
+# 安装开发环境
+$ sudo ln -sf /bin/cmake3 /usr/local/bin/cmake
+$ cd /home/gpadmin/code/gpdb
+$ ./README.CentOS.bash
+
+# 系统配置
+$ sudo bash -c &apos;cat &amp;gt;&amp;gt; /etc/sysctl.conf &amp;lt;&amp;lt;-EOF
+kernel.shmmax = 500000000
+kernel.shmmni = 4096
+kernel.shmall = 4000000000
+kernel.sem = 500 1024000 200 4096
+kernel.sysrq = 1
+kernel.core_uses_pid = 1
+kernel.msgmnb = 65536
+kernel.msgmax = 65536
+kernel.msgmni = 2048
+net.ipv4.tcp_syncookies = 1
+net.ipv4.ip_forward = 0
+net.ipv4.conf.default.accept_source_route = 0
+net.ipv4.tcp_tw_recycle = 1
+net.ipv4.tcp_max_syn_backlog = 4096
+net.ipv4.conf.all.arp_filter = 1
+net.ipv4.ip_local_port_range = 1025 65535
+net.core.netdev_max_backlog = 10000
+net.core.rmem_max = 2097152
+net.core.wmem_max = 2097152
+vm.overcommit_memory = 2
+
+EOF&apos;
+
+$ sudo bash -c &apos;cat &amp;gt;&amp;gt; /etc/security/limits.conf &amp;lt;&amp;lt;-EOF
+* soft nofile 65536
+* hard nofile 65536
+* soft nproc 131072
+* hard nproc 131072
+
+EOF&apos;
+
+$ sudo bash -c &apos;cat &amp;gt;&amp;gt; /etc/ld.so.conf &amp;lt;&amp;lt;-EOF
+/usr/local/lib
+
+EOF&apos;
+
+# 编译gporca
+$ cd /home/gpadmin/code/gpdb/depends
+$ ./configure --prefix=/home/gpadmin/gpdb
+$ make &amp;amp;&amp;amp; make install
+
+# 编译gpdb
+$ LD_LIBRARY_PATH=/home/gpadmin/gpdb/lib ./configure \
+--with-libraries=/home/gpadmin/gpdb/lib \
+--with-includes=/home/gpadmin/gpdb/include \
+--with-perl --with-python --with-libxml --with-gssapi --prefix=/home/gpadmin/gpdb
+$ LD_LIBRARY_PATH=/home/gpadmin/gpdb/lib make install
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>PostgreSQL查询和计划树绘图工具</title><link>https://yfshi.github.io/posts/postgresql%E6%9F%A5%E8%AF%A2%E5%92%8C%E8%AE%A1%E5%88%92%E6%A0%91%E7%BB%98%E5%9B%BE%E5%B7%A5%E5%85%B7/</link><guid isPermaLink="true">https://yfshi.github.io/posts/postgresql%E6%9F%A5%E8%AF%A2%E5%92%8C%E8%AE%A1%E5%88%92%E6%A0%91%E7%BB%98%E5%9B%BE%E5%B7%A5%E5%85%B7/</guid><pubDate>Sat, 09 Jun 2018 17:06:25 GMT</pubDate><content:encoded>&lt;p&gt;使用Graphviz的dot工具绘制QueryStmt和PlanStmt。&lt;/p&gt;
+&lt;p&gt;工具地址：&lt;a href=&quot;/download/dotpgstmt.sh&quot;&gt;dotpgstmt&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;使用方法：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;获取查询树或计划树&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;postgres=# set client_min_messages to log;
+SET
+postgres=# set debug_print_parse to on;
+SET
+postgres=# select * from t;
+LOG:  parse tree:
+DETAIL:     {QUERY 
+   :commandType 1 
+   :querySource 0 
+   :canSetTag true 
+   :utilityStmt &amp;lt;&amp;gt; 
+   :resultRelation 0 
+   :hasAggs false 
+   :hasWindowFuncs false 
+   :hasTargetSRFs false 
+   :hasSubLinks false 
+   :hasDistinctOn false 
+   :hasRecursive false 
+   :hasModifyingCTE false 
+   :hasForUpdate false 
+   :hasRowSecurity false 
+   :cteList &amp;lt;&amp;gt; 
+   :rtable (
+      {RTE 
+      :alias &amp;lt;&amp;gt; 
+      :eref 
+         {ALIAS 
+         :aliasname t 
+         :colnames (&quot;id&quot;)
+         }
+      :rtekind 0 
+      :relid 16498 
+      :relkind r 
+      :tablesample &amp;lt;&amp;gt; 
+      :lateral false 
+      :inh true 
+      :inFromCl true 
+      :requiredPerms 2 
+      :checkAsUser 0 
+      :selectedCols (b 9)
+      :insertedCols (b)
+      :updatedCols (b)
+      :securityQuals &amp;lt;&amp;gt;
+      }
+   )
+   :jointree 
+      {FROMEXPR 
+      :fromlist (
+         {RANGETBLREF 
+         :rtindex 1
+         }
+      )
+      :quals &amp;lt;&amp;gt;
+      }
+   :targetList (
+      {TARGETENTRY 
+      :expr 
+         {VAR 
+         :varno 1 
+         :varattno 1 
+         :vartype 23 
+         :vartypmod -1 
+         :varcollid 0 
+         :varlevelsup 0 
+         :varnoold 1 
+         :varoattno 1 
+         :location 7
+         }
+      :resno 1 
+      :resname id 
+      :ressortgroupref 0 
+      :resorigtbl 16498 
+      :resorigcol 1 
+      :resjunk false
+      }
+   )
+   :override 0 
+   :onConflict &amp;lt;&amp;gt; 
+   :returningList &amp;lt;&amp;gt; 
+   :groupClause &amp;lt;&amp;gt; 
+   :groupingSets &amp;lt;&amp;gt; 
+   :havingQual &amp;lt;&amp;gt; 
+   :windowClause &amp;lt;&amp;gt; 
+   :distinctClause &amp;lt;&amp;gt; 
+   :sortClause &amp;lt;&amp;gt; 
+   :limitOffset &amp;lt;&amp;gt; 
+   :limitCount &amp;lt;&amp;gt; 
+   :rowMarks &amp;lt;&amp;gt; 
+   :setOperations &amp;lt;&amp;gt; 
+   :constraintDeps &amp;lt;&amp;gt; 
+   :stmt_location 0 
+   :stmt_len 15
+   }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;把&lt;code&gt;DETAIL:&lt;/code&gt;之后的内容写入文件parse&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;绘图&lt;/p&gt;
+&lt;p&gt;./dotpgstmt.sh parse&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/parse.png&quot; alt=&quot;parse&quot; /&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</content:encoded></item><item><title>win10通过hyper-v安装虚拟机</title><link>https://yfshi.github.io/posts/win10%E9%80%9A%E8%BF%87hyper-v%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA/</link><guid isPermaLink="true">https://yfshi.github.io/posts/win10%E9%80%9A%E8%BF%87hyper-v%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA/</guid><pubDate>Fri, 20 Apr 2018 13:11:55 GMT</pubDate><content:encoded>&lt;h1&gt;安装Hyper-v组件&lt;/h1&gt;
+&lt;p&gt;控制面板 -&amp;gt; 程序和功能 -&amp;gt; 启用或关闭Windows功能 -&amp;gt; 选中Hyper-V -&amp;gt; 确定&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/HV-Windows%E5%8A%9F%E8%83%BD.PNG&quot; alt=&quot;Windows功能&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;开始菜单 -&amp;gt; Windows管理工具 -&amp;gt; Hyper-v管理器&lt;/p&gt;
+&lt;h1&gt;配置Hyper-V网络&lt;/h1&gt;
+&lt;p&gt;打开虚拟交换机管理器创建虚拟交换机。一般使用内部或外部。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/HV-%E8%99%9A%E6%8B%9F%E4%BA%A4%E6%8D%A2%E6%9C%BA%E7%AE%A1%E7%90%86%E5%99%A8.jpg&quot; alt=&quot;虚拟交换机管理器&quot; /&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;外部&lt;/p&gt;
+&lt;p&gt;网桥方式，相当于物理网卡。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;内部&lt;/p&gt;
+&lt;p&gt;nat方式，可以连接主机，可以通过主机上网。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;专用&lt;/p&gt;
+&lt;p&gt;虚拟机使用，不能和主机通信。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;安装虚拟机&lt;/h1&gt;
+&lt;h2&gt;新建虚拟机向导&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&quot;/img/HV-%E5%90%91%E5%AF%BC-%E5%90%8D%E7%A7%B0%E5%92%8C%E4%BD%8D%E7%BD%AE.jpg&quot; alt=&quot;向导-名称和位置&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/HV-%E5%90%91%E5%AF%BC-%E6%8C%87%E5%AE%9A%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%B8%BA1%E4%BB%A3.jpg&quot; alt=&quot;向导-指定虚拟机为1代&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/HV-%E5%90%91%E5%AF%BC-%E8%AE%BE%E7%BD%AE%E7%A1%AC%E7%9B%98.jpg&quot; alt=&quot;向导-设置硬盘&quot; /&gt;&lt;/p&gt;
+&lt;h2&gt;虚拟机设置&lt;/h2&gt;
+&lt;p&gt;关闭自动检查点，没什么用处&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/HV-%E5%85%B3%E9%97%AD%E8%87%AA%E5%8A%A8%E6%A3%80%E6%9F%A5%E7%82%B9.jpg&quot; alt=&quot;关闭自动检查点&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;添加磁盘驱动器&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/HV-%E8%AE%BE%E7%BD%AE%E7%A1%AC%E7%9B%98.jpg&quot; alt=&quot;设置硬盘&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;新建或使用已经存在的磁盘（可以通过拷贝其他虚拟机的磁盘到新建的虚拟机方式克隆）&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/HV-%E6%96%B0%E5%BB%BA%E6%88%96%E9%99%84%E5%8A%A0ing%E7%9B%98.jpg&quot; alt=&quot;新建或附加ing盘&quot; /&gt;&lt;/p&gt;
+&lt;h2&gt;安装系统&lt;/h2&gt;
+&lt;p&gt;右键连接，启动系统安装&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/HV-%E8%BF%9E%E6%8E%A5.jpg&quot; alt=&quot;连接&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;安装系统并初始化配置，之后创建检查点&lt;/p&gt;
+</content:encoded></item><item><title>kvm虚拟机</title><link>https://yfshi.github.io/posts/kvm%E8%99%9A%E6%8B%9F%E6%9C%BA/</link><guid isPermaLink="true">https://yfshi.github.io/posts/kvm%E8%99%9A%E6%8B%9F%E6%9C%BA/</guid><pubDate>Fri, 09 Feb 2018 00:22:51 GMT</pubDate><content:encoded>&lt;h1&gt;安装&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;sudo apt-get install kvm qemu-kvm libvirt-bin bridge-utils
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;kvm 内核模块，实现cpu虚拟化和内存管理&lt;/li&gt;
+&lt;li&gt;libvirt-bin 管理虚拟机&lt;/li&gt;
+&lt;li&gt;qemu-kvm 是虚拟机&lt;/li&gt;
+&lt;li&gt;bridge-utils 管理网桥&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;如果只是使用命令行方式，上面的软件包已经足够。&lt;/p&gt;
+&lt;p&gt;下面是图形界面工具：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;sudo apt-get install virt-manager python-spice-client-gtk
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;virt-manager 图形界面的虚拟机管理程序，需要用到python-spice-client-gtk&lt;/li&gt;
+&lt;li&gt;python-spice-client-gtk&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;配置网桥&lt;/h1&gt;
+&lt;ol&gt;
+&lt;li&gt;手动配置&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;brctl addbr br0
+brctl addif br0 eth0
+ip addr add 10.10.10.1/24 dev br0
+...
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;自动配置&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ubuntu&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;vi /etc/network/interfaces
+auto br0
+iface br0 inet static
+	address 10.10.10.1
+	netmask 255.255.255.0
+	bridge_ports eth0
+	bridge_stp off
+	bridge_fd 0
+	bridge_maxwait 0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;centos&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;vi /etc/sysconfig/network-script/ifcfg-br0
+DEVICE=br0
+TYPE=Bridge
+BOOTPROTO=static
+IPADDR=10.10.10.2
+NETMASK=255.255.255.0
+ONBOOT=yes
+NM_CONTROLLED=no
+DELAY=0
+
+vi /etc/sysconfig/network-script/ifcfg-eth0
+DEVICE=eth0
+HWADDR=00:15:xx:xx:xx:xx
+TYPE=Ethernet
+ONBOOT=yes
+BOOTPROTO=none
+BRIDGE=br0
+NM_CONTROLLED=no
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1&gt;使用命令行创建虚拟机&lt;/h1&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;建立磁盘镜像&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;qemu-img create -f qcow2 centos7.0.img 20G
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;使用 qcow2 格式的磁盘镜像的好处就是它在创建之初并不会给它分配全部大小磁盘容量，而是随着虚拟机中文件的增加而逐渐增大。因此，它对空间的使用更加有效。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;建立&lt;code&gt;xml&lt;/code&gt;配置文件&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;linux&lt;/code&gt;默认有&lt;code&gt;virtio&lt;/code&gt;驱动，磁盘总线、网卡等可以设置为&lt;code&gt;virtio&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;windows&lt;/code&gt;要使用&lt;code&gt;virtio&lt;/code&gt;，需要安装&lt;code&gt;virtio&lt;/code&gt;驱动。或者&lt;code&gt;windows&lt;/code&gt;的&lt;code&gt;disk&lt;/code&gt;的总线可以选择和宿主机一致比如是&lt;code&gt;sata&lt;/code&gt;，网卡可以设置为&lt;code&gt;rt8139&lt;/code&gt;，&lt;code&gt;&amp;lt;hyperv&amp;gt;...&amp;lt;/hyperv&amp;gt;&lt;/code&gt;域是针对&lt;code&gt;windows&lt;/code&gt;的优化。实际上使用时发现在机械硬盘是使用&lt;code&gt;windows&lt;/code&gt;，&lt;code&gt;io&lt;/code&gt;效率很低，无论是否使用&lt;code&gt;virtio&lt;/code&gt;驱动，可能有什么地方需要优化没搞懂，后来把&lt;code&gt;windows&lt;/code&gt;的存储放到&lt;code&gt;ssd&lt;/code&gt;上了。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;centos7.0.xml&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;domain type=&apos;kvm&apos;&amp;gt;
+  &amp;lt;name&amp;gt;centos7.0&amp;lt;/name&amp;gt;
+  &amp;lt;memory unit=&apos;KiB&apos;&amp;gt;1048576&amp;lt;/memory&amp;gt;
+  &amp;lt;currentMemory unit=&apos;KiB&apos;&amp;gt;1048576&amp;lt;/currentMemory&amp;gt;
+  &amp;lt;vcpu placement=&apos;static&apos;&amp;gt;2&amp;lt;/vcpu&amp;gt;
+  &amp;lt;os&amp;gt;
+    &amp;lt;type arch=&apos;x86_64&apos;&amp;gt;hvm&amp;lt;/type&amp;gt;
+    &amp;lt;boot dev=&apos;cdrom&apos;/&amp;gt;
+    &amp;lt;boot dev=&apos;hd&apos;/&amp;gt;
+  &amp;lt;/os&amp;gt;
+  &amp;lt;features&amp;gt;
+    &amp;lt;acpi/&amp;gt;
+    &amp;lt;apic/&amp;gt;
+    &amp;lt;vmport state=&apos;off&apos;/&amp;gt;
+  &amp;lt;/features&amp;gt;
+  &amp;lt;cpu mode=&apos;host-model&apos; check=&apos;partial&apos;&amp;gt;
+    &amp;lt;model fallback=&apos;allow&apos;/&amp;gt;
+  &amp;lt;/cpu&amp;gt;
+  &amp;lt;clock offset=&apos;utc&apos;&amp;gt;
+    &amp;lt;timer name=&apos;rtc&apos; tickpolicy=&apos;catchup&apos;/&amp;gt;
+    &amp;lt;timer name=&apos;pit&apos; tickpolicy=&apos;delay&apos;/&amp;gt;
+    &amp;lt;timer name=&apos;hpet&apos; present=&apos;no&apos;/&amp;gt;
+  &amp;lt;/clock&amp;gt;
+  &amp;lt;on_poweroff&amp;gt;destroy&amp;lt;/on_poweroff&amp;gt;
+  &amp;lt;on_reboot&amp;gt;restart&amp;lt;/on_reboot&amp;gt;
+  &amp;lt;on_crash&amp;gt;restart&amp;lt;/on_crash&amp;gt;
+  &amp;lt;pm&amp;gt;
+    &amp;lt;suspend-to-mem enabled=&apos;no&apos;/&amp;gt;
+    &amp;lt;suspend-to-disk enabled=&apos;no&apos;/&amp;gt;
+  &amp;lt;/pm&amp;gt;
+  &amp;lt;devices&amp;gt;
+    &amp;lt;emulator&amp;gt;/usr/bin/kvm&amp;lt;/emulator&amp;gt;
+    &amp;lt;disk type=&apos;file&apos; device=&apos;disk&apos;&amp;gt;
+      &amp;lt;driver name=&apos;qemu&apos; type=&apos;qcow2&apos; cache=&apos;writeback&apos;/&amp;gt;
+      &amp;lt;source file=&apos;/vmhosts/kvm/centos7.0.qcow2&apos;/&amp;gt;
+      &amp;lt;target dev=&apos;vda&apos; bus=&apos;virtio&apos;/&amp;gt;
+    &amp;lt;/disk&amp;gt;
+    &amp;lt;disk type=&apos;file&apos; device=&apos;cdrom&apos;&amp;gt;
+      &amp;lt;driver name=&apos;qemu&apos; type=&apos;raw&apos; cache=&apos;none&apos;/&amp;gt;
+      &amp;lt;source file=&apos;/iso/centos7.0.iso&apos;/&amp;gt;
+      &amp;lt;target dev=&apos;hda&apos; bus=&apos;ide&apos;/&amp;gt;
+      &amp;lt;readonly/&amp;gt;
+    &amp;lt;/disk&amp;gt;
+    &amp;lt;interface type=&apos;bridge&apos;&amp;gt;
+      &amp;lt;source bridge=&apos;br0&apos;/&amp;gt;
+      &amp;lt;model type=&apos;virtio&apos;/&amp;gt;
+    &amp;lt;/interface&amp;gt;
+    &amp;lt;input type=&apos;tablet&apos; bus=&apos;usb&apos;/&amp;gt;
+    &amp;lt;input type=&apos;mouse&apos; bus=&apos;ps2&apos;/&amp;gt;
+    &amp;lt;input type=&apos;keyboard&apos; bus=&apos;ps2&apos;/&amp;gt;
+    &amp;lt;graphics type=&apos;vnc&apos; port=&apos;-1&apos; autoport=&apos;yes&apos; listen=&apos;0.0.0.0&apos;&amp;gt;
+      &amp;lt;listen type=&apos;address&apos; address=&apos;0.0.0.0&apos;/&amp;gt;
+    &amp;lt;/graphics&amp;gt;
+  &amp;lt;/devices&amp;gt;
+&amp;lt;/domain&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;win7&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;domain type=&apos;kvm&apos;&amp;gt;
+  &amp;lt;name&amp;gt;win7&amp;lt;/name&amp;gt;
+  &amp;lt;memory unit=&apos;KiB&apos;&amp;gt;2097152&amp;lt;/memory&amp;gt;
+  &amp;lt;currentMemory unit=&apos;KiB&apos;&amp;gt;2097152&amp;lt;/currentMemory&amp;gt;
+  &amp;lt;vcpu placement=&apos;static&apos;&amp;gt;2&amp;lt;/vcpu&amp;gt;
+  &amp;lt;os&amp;gt;
+    &amp;lt;type arch=&apos;x86_64&apos;&amp;gt;hvm&amp;lt;/type&amp;gt;
+    &amp;lt;boot dev=&apos;cdrom&apos;/&amp;gt;
+    &amp;lt;boot dev=&apos;hd&apos;/&amp;gt;
+  &amp;lt;/os&amp;gt;
+  &amp;lt;features&amp;gt;
+    &amp;lt;acpi/&amp;gt;
+    &amp;lt;apic/&amp;gt;
+    &amp;lt;hyperv&amp;gt;
+      &amp;lt;relaxed state=&apos;on&apos;/&amp;gt;
+      &amp;lt;vapic state=&apos;on&apos;/&amp;gt;
+      &amp;lt;spinlocks state=&apos;on&apos; retries=&apos;4096&apos;/&amp;gt;
+      &amp;lt;vpindex state=&apos;on&apos;/&amp;gt;
+      &amp;lt;runtime state=&apos;on&apos;/&amp;gt;
+      &amp;lt;synic state=&apos;on&apos;/&amp;gt;
+      &amp;lt;reset state=&apos;on&apos;/&amp;gt;
+    &amp;lt;/hyperv&amp;gt;
+    &amp;lt;vmport state=&apos;off&apos;/&amp;gt;
+  &amp;lt;/features&amp;gt;
+  &amp;lt;cpu mode=&apos;host-model&apos; check=&apos;partial&apos;&amp;gt;
+    &amp;lt;model fallback=&apos;allow&apos;/&amp;gt;
+  &amp;lt;/cpu&amp;gt;
+  &amp;lt;clock offset=&apos;localtime&apos;&amp;gt;
+    &amp;lt;timer name=&apos;rtc&apos; tickpolicy=&apos;catchup&apos;/&amp;gt;
+    &amp;lt;timer name=&apos;pit&apos; tickpolicy=&apos;delay&apos;/&amp;gt;
+    &amp;lt;timer name=&apos;hpet&apos; present=&apos;no&apos;/&amp;gt;
+    &amp;lt;timer name=&apos;hypervclock&apos; present=&apos;yes&apos;/&amp;gt;
+  &amp;lt;/clock&amp;gt;
+  &amp;lt;on_poweroff&amp;gt;destroy&amp;lt;/on_poweroff&amp;gt;
+  &amp;lt;on_reboot&amp;gt;restart&amp;lt;/on_reboot&amp;gt;
+  &amp;lt;on_crash&amp;gt;restart&amp;lt;/on_crash&amp;gt;
+  &amp;lt;pm&amp;gt;
+    &amp;lt;suspend-to-mem enabled=&apos;no&apos;/&amp;gt;
+    &amp;lt;suspend-to-disk enabled=&apos;no&apos;/&amp;gt;
+  &amp;lt;/pm&amp;gt;
+  &amp;lt;devices&amp;gt;
+    &amp;lt;emulator&amp;gt;/usr/bin/kvm&amp;lt;/emulator&amp;gt;
+    &amp;lt;disk type=&apos;file&apos; device=&apos;disk&apos;&amp;gt;
+      &amp;lt;driver name=&apos;qemu&apos; type=&apos;qcow2&apos; cache=&apos;writeback&apos;/&amp;gt;
+      &amp;lt;source file=&apos;/vmhosts/kvm/centos7.0.qcow2&apos;/&amp;gt;
+      &amp;lt;target dev=&apos;sda&apos; bus=&apos;sata&apos;/&amp;gt;
+    &amp;lt;/disk&amp;gt;
+    &amp;lt;disk type=&apos;file&apos; device=&apos;cdrom&apos;&amp;gt;
+      &amp;lt;driver name=&apos;qemu&apos; type=&apos;raw&apos; cache=&apos;none&apos;/&amp;gt;
+      &amp;lt;source file=&apos;/iso/win7.iso&apos;/&amp;gt;
+      &amp;lt;target dev=&apos;hda&apos; bus=&apos;ide&apos;/&amp;gt;
+      &amp;lt;readonly/&amp;gt;
+    &amp;lt;/disk&amp;gt;
+    &amp;lt;interface type=&apos;bridge&apos;&amp;gt;
+      &amp;lt;source bridge=&apos;br0&apos;/&amp;gt;
+      &amp;lt;model type=&apos;rt8139&apos;/&amp;gt;
+    &amp;lt;/interface&amp;gt;
+    &amp;lt;input type=&apos;tablet&apos; bus=&apos;usb&apos;/&amp;gt;
+    &amp;lt;input type=&apos;mouse&apos; bus=&apos;ps2&apos;/&amp;gt;
+    &amp;lt;input type=&apos;keyboard&apos; bus=&apos;ps2&apos;/&amp;gt;
+    &amp;lt;graphics type=&apos;vnc&apos; port=&apos;-1&apos; autoport=&apos;yes&apos; listen=&apos;0.0.0.0&apos;&amp;gt;
+      &amp;lt;listen type=&apos;address&apos; address=&apos;0.0.0.0&apos;/&amp;gt;
+    &amp;lt;/graphics&amp;gt;
+  &amp;lt;/devices&amp;gt;
+&amp;lt;/domain&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;定义虚拟机&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;virsh define centos7.0.xml
+virsh list --all
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;启动虚拟机&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;virsh start centos7.0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;安装系统&lt;/p&gt;
+&lt;p&gt;通过vnc客户端连接&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;vncviwer localhost:5900
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;安装好系统，装完必要的环境之后可以把存储(centos7.0.qcow2)备份。之后再需要系统时直接拷贝过来使用即可。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;常用命令&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;virsh list #显示本地活动虚拟机
+virsh list –-all #显示本地所有的虚拟机（活动的+不活动的）
+virsh define ubuntu.xml #通过配置文件定义一个虚拟机（这个虚拟机还不是活动的）
+virsh start ubuntu #启动名字为ubuntu的非活动虚拟机
+virsh create ubuntu.xml # 创建虚拟机（创建后，虚拟机立即执行，成为活动主机）
+virsh suspend ubuntu # 暂停虚拟机
+virsh resume ubuntu # 启动暂停的虚拟机
+virsh shutdown ubuntu # 正常关闭虚拟机
+virsh destroy ubuntu # 强制关闭虚拟机
+virsh dominfo ubuntu #显示虚拟机的基本信息
+virsh domname 2 # 显示id号为2的虚拟机名
+virsh domid ubuntu # 显示虚拟机id号
+virsh domuuid ubuntu # 显示虚拟机的uuid
+virsh domstate ubuntu # 显示虚拟机的当前状态
+virsh dumpxml ubuntu # 显示虚拟机的当前配置文件（可能和定义虚拟机时的配置不同，因为当虚拟机启动时，需要给虚拟机分配id号、uuid、vnc端口号等等）
+virsh setmem ubuntu 512000 #给不活动虚拟机设置内存大小
+virsh setvcpus ubuntu 4 # 给不活动虚拟机设置cpu个数
+virsh edit ubuntu # 编辑配置文件（一般是在刚定义完虚拟机之后）
+
+libvirt还提供了一个shell:virsh，直接执行名virsh即可获得一个特殊的shell:virsh，在这个virsh里面可以执行上面的命令与本地libvirt交互，还可以通过命令connect命令连接远程libvirt，与之交互，例如：connect xen+ssh://root@10.0.0.11。另外可以只执行一条远程libvirt命令：virsh –c xen+ssh://root@10.0.0.11 list –all
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1&gt;快照管理&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;# virsh --help | grep snapshot
+snapshot-create                Create a snapshot from XML
+snapshot-create-as             Create a snapshot from a set of args
+snapshot-current               Get or set the current snapshot
+snapshot-delete                Delete a domain snapshot
+snapshot-dumpxml               Dump XML for a domain snapshot
+snapshot-edit                  edit XML for a snapshot
+snapshot-info                  snapshot information
+snapshot-list                  List snapshots for a domain
+snapshot-parent                Get the name of the parent of a snapshot
+snapshot-revert                Revert a domain to a snapshot
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;举例：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# virsh list
+ Id    Name                           State
+----------------------------------------------------
+ 1     win7                           running
+
+# virsh snapshot-create-as win7 snapshot-haozip_360_npp_wps
+Domain snapshot snapshot-haozip_360_npp_wps created
+
+# qemu-img info win7.qcow2
+image: win7.qcow2
+file format: qcow2
+virtual size: 100G (107374182400 bytes)
+disk size: 14G
+cluster_size: 65536
+Snapshot list:
+ID        TAG                 VM SIZE                DATE       VM CLOCK
+1         snapshot-haozip_360_npp_wps   1.8G 2018-03-07 10:14:03   01:15:31.438
+Format specific information:
+    compat: 1.1
+    lazy refcounts: false
+    refcount bits: 16
+    corrupt: false
+
+# virsh snapshot-list win7
+ Name                 Creation Time             State
+------------------------------------------------------------
+ snapshot-haozip_360_npp_wps 2018-03-07 10:14:03 +0800 running
+
+# virsh snapshot-info win7 --snapshotname snapshot-haozip_360_npp_wps
+Name:           snapshot-haozip_360_npp_wps
+Domain:         win7
+Current:        yes
+State:          running
+Location:       internal
+Parent:         -
+Children:       0
+Descendants:    0
+Metadata:       yes
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;虚拟磁盘扩容&lt;/h1&gt;
+&lt;p&gt;磁盘扩容或添加之后要到虚拟机内部做分区、格式化、自动挂在等操作。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;磁盘扩容&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# qemu-img resize win7.qcow +10G
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;磁盘添加&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# qemu-img create -f qcow2 win7_1 10G
+# virsh shutdown win7
+# virsh edit win7
+&amp;lt;disk&amp;gt;&amp;lt;/disk&amp;gt;在原有的disk下面添加一个disk配置：
+-- 修改file路径
+-- target中的dev修改为vdb
+-- 删除address
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1&gt;图形界面&lt;/h1&gt;
+&lt;p&gt;通过执行名virt-manager，启动libvirt的图形界面，在图形界面下可以一步一步的创建虚拟机，管理虚拟机，还可以直接控制虚拟机的桌面。​&lt;/p&gt;
+</content:encoded></item><item><title>PostgreSQL共享缓存区管理</title><link>https://yfshi.github.io/posts/postgresql%E5%85%B1%E4%BA%AB%E7%BC%93%E5%AD%98%E5%8C%BA%E7%AE%A1%E7%90%86/</link><guid isPermaLink="true">https://yfshi.github.io/posts/postgresql%E5%85%B1%E4%BA%AB%E7%BC%93%E5%AD%98%E5%8C%BA%E7%AE%A1%E7%90%86/</guid><pubDate>Thu, 11 Jan 2018 15:30:31 GMT</pubDate><content:encoded>&lt;h1&gt;共享缓冲区&lt;/h1&gt;
+&lt;p&gt;PostgreSQL中的buffer主要是用来将外存中的数据内容读入到内存中，加速运算过程中对数据的访问速度，同时将数据的修改进行缓存，在必要时再将其写出到外存，避免频繁的I/O，以提高效率。
+Buffer的种类有很多如Audit buffers、Clog buffers、Data buffers和Xlog buffers，此处所介绍的buffer管理是针对Data buffers而言的。&lt;/p&gt;
+&lt;h1&gt;数据结构&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;BufferTag&lt;/li&gt;
+&lt;li&gt;BufferDesc&lt;/li&gt;
+&lt;li&gt;BufferStrategyControl&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;BufferTag&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;typedef struct buftag
+{
+    Oid dbid;            /* database identifier */
+    FileBlock blockNum;  /* file and blocknumber */
+} BufferTag;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;BufferDesc&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;typedef struct sbufdesc
+{
+    BufferTag   tag;              /* ID of page contained in buffer */
+    RelFileNode rnode;            /* relation this block belongs to */
+    BufFlags    flags;            /* see bit definitions above */
+    uint16      usage_count;      /* usage counter for clock sweep code */
+    unsigned    refcount;         /* # of backends holding pins on buffer */
+    int         wait_backend_pid; /* backend PID of pin-count waiter */
+
+    slock_t     buf_hdr_lock;     /* protects the above fields */
+
+    int         buf_id;           /* buffer&apos;s index number (from 0) */
+    int         freeNext;         /* link in freelist chain */
+
+    LWLockId    io_in_progress_lock; /* to wait for I/O to complete */
+    LWLockId    content_lock;     /* to lock access to buffer contents */
+} BufferDesc;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;引用计数（BufferDesc.refcount）&lt;/h2&gt;
+&lt;p&gt;引用计数（refcount）用于跟踪访问buffer的后台数量，防止错误的将正在被使用的Buffer淘汰。当使用Buffer时，需要将其引用计数（refcount）加1（PinBuffer）。当Buffer不再使用，需要将其引用计数（refcount）减1（UnpinBuffer）。这里需要注意，由于一个后台可以多次访问同一个Buffer，因此后台通过PrivateRefCount来记录自己的引用次数，只有当自己对一个Buffer的引用减少到0，才会真正去修改refcount。PrivateRefCount在后台PinBuffer时将其值加1，UnpinBuffer时将其值减1。&lt;/p&gt;
+&lt;h2&gt;使用计数（BufferDesc.usage_count）&lt;/h2&gt;
+&lt;p&gt;usage_count用来标记Buffer被使用的次数，usage_count值越大，说明该Buffer经常被使用，那么在未来的一段时间里被使用的可能就比较大，所以这样的Buffer不能作为被替换的对象；相反，usage_count值越小，说明经常不被使用，可以作为替换的对象。在PostgreSQL中，只有当usage_count为0时，才可能作为替换的对象。
+usage_count是在一个后台不再使用该Buffer即UnpinBuffer将后台的PrivateRefCount减少为0的时候将其值加1，以表示该Buffer最近被一个后台使用了。对VACUUN操作来说，不会修改usage_count的值，且如果refcount和usage_count的值都为0，则将buffer放入到FreeList的尾部。&lt;/p&gt;
+&lt;h2&gt;BufferStrategyControl&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;typedef struct
+{
+    int    nextVictimBuffer; // 指向下一Buffer
+    int    firstFreeBuffer;  // 第一个空闲缓冲块id
+    int    lastFreeBuffer;   // 最后一个空闲缓冲块id
+} BufferStrategyControl;
+
+/* Pointers to shared state */
+static MT_LOCAL BufferStrategyControl
+	*StrategyControl = NULL;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;Buffer Descriptors&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&quot;/img/BufferDescriptor.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;h1&gt;主要函数&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;InitBufferPool&lt;/li&gt;
+&lt;li&gt;BufferAlloc&lt;/li&gt;
+&lt;li&gt;StrategyGetBuffer&lt;/li&gt;
+&lt;li&gt;FlushBuffer&lt;/li&gt;
+&lt;li&gt;PinBuffer&lt;/li&gt;
+&lt;li&gt;UnpinBuffer&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;InitBufferPool流程&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&quot;/img/InitBufferPool.svg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;h2&gt;BufferAlloc流程&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&quot;/img/BufferAlloc.svg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;h1&gt;缓冲区替换策略&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;FreeList&lt;/li&gt;
+&lt;li&gt;Clock-sweep&lt;/li&gt;
+&lt;li&gt;buffer-ring&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;FreeList&lt;/h2&gt;
+&lt;p&gt;当执行DROP TABLE时，可以确定该表的所有buffer都会失效，因此将此表的所有buffer都放入到Freelist的头部，这样可以在下一次分配buffer时，直接从Freelist中得到buffer，而不需要执行Clock Sweep算法。&lt;/p&gt;
+&lt;h2&gt;Clock-sweep&lt;/h2&gt;
+&lt;p&gt;当Buffer的refcount计数变成0的时候，代表当前系统没有后台引用此数据块。在PostgreSQL中，为了能够减低锁的粒度、提高并发性，引用计数等于0的的Buffer并没有被放入Freelist中。在随机访问大量磁盘块、并且没有VACUUM的干扰下，Freelist几乎是空的（除了刚刚启动时）。这里的策略主要是为了避免不必要的持有操作Freelist的互斥锁。
+由于大部分时候Buffer不会立即被放入到Freelist中，因此使用了一种被称为Clock Sweep的算法来分配Buffer。此算法类似教科书中时钟算法，每当需要使用Clock Sweep算法选择一个Buffer时，就从上次分配的Buffer的下一个位置开始，搜索引用计数为0（既没有被pin的Buffer）且usage_count为0的Buffer。如果该Buffer不满足上述条件，就将usage_count减1。&lt;/p&gt;
+&lt;h2&gt;Clock-sweep&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&quot;/img/Clock-sweep.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;在上图中Clock Sweep算法从4号buffer开始查找（记录在StrategyControl结构体中）可用的buffer。4号buffer因为引用计数大于0，因此不能被替换。5号buffer虽然没有人引用，但是其usage_count大于0，因此表示此buffer使用频率较高，因此将usage_count减1，并查看6号buffer。6号buffer的引用计数和usage_count都为0，因此选择将6号buffer淘汰。记录下一次搜索的位置是7号，并退出选择算法。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2&gt;buffer-ring&lt;/h2&gt;
+&lt;p&gt;批量读或者vacuum等操作可能会需要占据大量的buffer，影响其他正常业务。buffer-ring机制在批量读等占用的buffer数量达到某个程度（比如总buffer的1/4）时，分配给该操作固定的buffer数量，之后只能使用为其分配的buffer，而不能替换其他buffer。&lt;/p&gt;
+</content:encoded></item><item><title>PostgreSQL内存上下文</title><link>https://yfshi.github.io/posts/postgresql%E5%86%85%E5%AD%98%E4%B8%8A%E4%B8%8B%E6%96%87/</link><guid isPermaLink="true">https://yfshi.github.io/posts/postgresql%E5%86%85%E5%AD%98%E4%B8%8A%E4%B8%8B%E6%96%87/</guid><pubDate>Thu, 11 Jan 2018 15:05:42 GMT</pubDate><content:encoded>&lt;h1&gt;内存管理体系结构&lt;/h1&gt;
+&lt;p&gt;&lt;img src=&quot;/img/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;h1&gt;内存上下文&lt;/h1&gt;
+&lt;p&gt;内存上下文（MemoryContext）借鉴了操作系统的一些概念。&lt;/p&gt;
+&lt;p&gt;操作系统为每个进程分配了进程执行环境，进程之间互不影响，由操作系统来对环境进行切换，进程可以在其进程环境中调用内存操作函数：malloc、free、realloc等。&lt;/p&gt;
+&lt;p&gt;类似的，一个内存上下文实际上相当于一个进程环境，PostgreSQL以类似的方式提供了在内存上下文进行内存操作的函数：palloc、pfree、repalloc等。&lt;/p&gt;
+&lt;p&gt;每个进程/线程有多个私有的内存上下文，组成上下文树。&lt;/p&gt;
+&lt;hr /&gt;
+&lt;h1&gt;内存上下文树&lt;/h1&gt;
+&lt;p&gt;&lt;img src=&quot;/img/%E5%86%85%E5%AD%98%E4%B8%8A%E4%B8%8B%E6%96%87.jpg&quot; alt=&quot;内存上下文&quot; /&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;每个线程都有多个内存上上下文，组成树形结构。线程所有的内存操作都在各种语义的上下文中进行。&lt;/li&gt;
+&lt;li&gt;释放上下文节点会释放其所有的子节点。&lt;/li&gt;
+&lt;li&gt;线程退出时释放TopMemoryContext。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;h1&gt;术语&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;MemoryContext&lt;/li&gt;
+&lt;li&gt;AllocSetContext&lt;/li&gt;
+&lt;li&gt;Block&lt;/li&gt;
+&lt;li&gt;Chunk&lt;/li&gt;
+&lt;li&gt;超大块&lt;/li&gt;
+&lt;li&gt;Chunk Free List&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;h1&gt;内存上下文结构&lt;/h1&gt;
+&lt;p&gt;&lt;img src=&quot;/img/%E5%86%85%E5%AD%98%E4%B8%8A%E4%B8%8B%E6%96%87%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;h1&gt;数据结构&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;MemoryContext&lt;/li&gt;
+&lt;li&gt;MemoryContextMethods&lt;/li&gt;
+&lt;li&gt;AllocSet&lt;/li&gt;
+&lt;li&gt;AllocBlockData&lt;/li&gt;
+&lt;li&gt;AllocChunkData&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;h2&gt;MemoryContext&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;typedef struct MemoryContextData
+{
+    NodeTag       type;         /* identifies exacts kind of context */
+    MemoryContextMethods *methods;  /* virtual function table */
+    MemoryContext parent;        /* NULL if no parent (toplevel context) */
+    MemoryContext firstchild;    /* head of linked list of children */
+    MemoryContext nextchild;     /* next child of same parent */
+    char         *name;          /* context name (just for debugging) */
+} MemoryContextData;
+
+typedef struct MemoryContextData *MemoryContext;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;MemoryContext中的methods字段是一个MemoryContextMethods类型，它是由一系列的函数指针组成的集合，其中包含了对内存上下文操作的函数。对不同的MemoryContext实现，可以设置不同的方法集合。目前MemoryContext中只有AllocSetContext一种实现，因此PostgreSQL中只有针对AllocSetContext的一种操作函数集合，由全局变量AllocSetMethods表示。&lt;/p&gt;
+&lt;hr /&gt;
+&lt;h2&gt;MemoryContextMethods&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;typedef struct MemoryContextMethods
+{
+    void       *(*alloc) (MemoryContext context, Size size);
+    /* call this free_p in case someone #define&apos;s free() */
+    void        (*free_p) (MemoryContext context, void *pointer);
+    void       *(*realloc) (MemoryContext context, void *pointer, Size size);
+    void        (*init) (MemoryContext context);
+    void        (*reset) (MemoryContext context);
+    void        (*delete) (MemoryContext context);
+    void        (*reuse) (MemoryContext context);
+    Size        (*get_chunk_space) (MemoryContext context, void *pointer);
+    bool        (*is_empty) (MemoryContext context);
+    void        (*stats) (MemoryContext context);
+    bool        (*is_realempty)(MemoryContext context);
+#ifdef MEMORY_CONTEXT_CHECKING
+    void        (*check) (MemoryContext context);
+#endif
+} MemoryContextMethods;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;hr /&gt;
+&lt;h2&gt;方法集&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;static MemoryContextMethods AllocSetMethods = {
+    AllocSetAlloc,
+    AllocSetFree,
+    AllocSetRealloc,
+    AllocSetInit,
+    AllocSetReset,
+    AllocSetDelete,
+    AllocSetReuse,
+    AllocSetGetChunkSpace,
+    AllocSetIsEmpty,
+    AllocSetStats,
+    AllocSetIsRealEmpty
+#ifdef MEMORY_CONTEXT_CHECKING
+    ,AllocSetCheck
+#endif
+};
+&lt;/code&gt;&lt;/pre&gt;
+&lt;hr /&gt;
+&lt;p&gt;MemoryContext是一个抽象类，可以有多个实现，目前只有AllocSetContext一个实现。MemoryContext并不管理实际上的内存分配，仅仅用作对MemoryContext树的控制。管理一个内存上下文中的内存块时通过AllocSet结构来完成的，MemoryContext作为AllocSet的头部信息存在。&lt;/p&gt;
+&lt;hr /&gt;
+&lt;h2&gt;AllocSet&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;typedef struct AllocSetContext
+{
+    MemoryContextData header;  /* Standard memory-context fields */
+    /* Info about storage allocated in this context: */
+    AllocBlock  blocks;        /* head of list of blocks in this set */
+    AllocChunk  freelist[ALLOCSET_NUM_FREELISTS]; /* free chunk lists */
+    bool        isReset;       /* T = no space alloced since last reset */
+    /* Allocation parameters for this context: */
+    Size        initBlockSize; /* initial block size */
+    Size        maxBlockSize;  /* maximum block size */
+    Size        nextBlockSize; /* next block size to allocate */
+    AllocBlock  keeper;        /* if not NULL, keep this block over resets */
+} AllocSetContext;
+
+typedef AllocSetContext *AllocSet;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;blocks是内存块链表，freelist是内存片链表。AllocSet所管理的内存区域被分成若干个内存块（AllocBlockData结构），每个内存块又被分成多个内存片（AllocChunkData结构）。palloc申请到的内存实际上都是内存片（除了超大块）。&lt;/p&gt;
+&lt;hr /&gt;
+&lt;h2&gt;AllocBlockData&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;typedef struct AllocBlockData
+{
+    AllocSet    aset;     /* aset that owns this block */
+    AllocBlock  next;     /* next block in aset&apos;s blocks list */
+    char       *freeptr;  /* start of free space in this block */
+    char       *endptr;   /* end of space in this block */
+} AllocBlockData;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;hr /&gt;
+&lt;h2&gt;AllocChunkData&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;typedef struct AllocChunkData
+{
+    /* aset is the owning aset if allocated, or the freelist link if free */
+    void       *aset;
+    /* size is always the size of the usable space in the chunk */
+    Size        size;
+#ifdef MEMORY_CONTEXT_CHECKING
+    /* when debugging memory usage, also store actual requested size */
+    /* this is zero in a free chunk */
+    Size        requested_size;
+#endif
+} AllocChunkData;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;hr /&gt;
+&lt;p&gt;&lt;img src=&quot;/img/%E5%86%85%E5%AD%98%E4%B8%8A%E4%B8%8B%E6%96%87%E7%BB%93%E6%9E%84.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;h1&gt;重要函数&lt;/h1&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;函数&lt;/th&gt;
+&lt;th&gt;功能&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;MemoryContextCreate&lt;/td&gt;
+&lt;td&gt;创建上下文节点&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;AllocSetContextCreate&lt;/td&gt;
+&lt;td&gt;创建上下文实例&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;MemoryContextDelete&lt;/td&gt;
+&lt;td&gt;删除内存上下文&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;MemoryContextReset&lt;/td&gt;
+&lt;td&gt;重置内存上下文&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;MemoryContextSwitchTo&lt;/td&gt;
+&lt;td&gt;切换当前上下文&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;palloc&lt;/td&gt;
+&lt;td&gt;在当前上下文中申请内存&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;pfree&lt;/td&gt;
+&lt;td&gt;释放内存&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;repalloc&lt;/td&gt;
+&lt;td&gt;在当前上下文中重新申请内存&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr /&gt;
+&lt;h2&gt;总体流程&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&quot;/img/%E5%86%85%E5%AD%98%E4%B8%8A%E4%B8%8B%E6%96%87%E6%80%BB%E4%BD%93%E5%BA%94%E7%94%A8.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;h2&gt;palloc流程&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&quot;/img/palloc.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;h2&gt;pfree流程&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&quot;/img/pfree.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;h1&gt;重要的内存上下文&lt;/h1&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;内存上下文&lt;/th&gt;
+&lt;th&gt;生命周期&lt;/th&gt;
+&lt;th&gt;描述&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;TopMemoryContext&lt;/td&gt;
+&lt;td&gt;session&lt;/td&gt;
+&lt;td&gt;根节点&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;PostmasterContext&lt;/td&gt;
+&lt;td&gt;session&lt;/td&gt;
+&lt;td&gt;postmaster工作上下文&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;CacheMemoryContext&lt;/td&gt;
+&lt;td&gt;session&lt;/td&gt;
+&lt;td&gt;backend的relcache、catcache等使用&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;MessageContext&lt;/td&gt;
+&lt;td&gt;session&lt;/td&gt;
+&lt;td&gt;保存从前端传来的命令以及派生的存储，比如查询计划树和查询分析树&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;TopTransactionContext&lt;/td&gt;
+&lt;td&gt;transaction&lt;/td&gt;
+&lt;td&gt;一般保存跨越多个子事务的状态和控制信息&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;CurTransactionContext&lt;/td&gt;
+&lt;td&gt;transaction&lt;/td&gt;
+&lt;td&gt;当前事务上下文&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr /&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;内存上下文&lt;/th&gt;
+&lt;th&gt;生命周期&lt;/th&gt;
+&lt;th&gt;描述&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;PortalContext&lt;/td&gt;
+&lt;td&gt;portal&lt;/td&gt;
+&lt;td&gt;全局变量，指向当前portal&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ErrorContext&lt;/td&gt;
+&lt;td&gt;session&lt;/td&gt;
+&lt;td&gt;错误处理上下文， errstart、errfinish、errmsg等在此分配内存&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr /&gt;
+&lt;h1&gt;打印内存上下文树&lt;/h1&gt;
+&lt;p&gt;in smmgr/aset.c, add &lt;code&gt;#include &quot;utils/memutils.h&quot;&lt;/code&gt;
+in AllocSetContextCreate function, add&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;fprintf(stderr, &quot;pid=%d, Create Memory Context name is %s, parent context is %s\n&quot;,
+		MyProcPid, name, (parent == NULL ? &quot;null&quot; : parent-&amp;gt;name));
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;in mmgr/mcxt.c, add &lt;code&gt;#include &quot;miscadmin.h&quot;&lt;/code&gt;
+in MemoryContextDelete function, add&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;fprintf(stderr, &quot;pid=%d, delete memory context name is %s, parent is %s\n&quot;,
+		MyProcPid, context-&amp;gt;name, (context-&amp;gt;parent == NULL? &apos;null&apos; : context-&amp;gt;parent-&amp;gt;name));
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;in MemoryContextReset function, add&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;fprintf(stderr, &quot;pid=%d, reset memory context name is %s, parent is %s\n&quot;,
+		MyProcPid, context-&amp;gt;name, (context-&amp;gt;parent == NULL? &apos;null&apos; : context-&amp;gt;parent-&amp;gt;name));
+&lt;/code&gt;&lt;/pre&gt;
+&lt;hr /&gt;
+&lt;h1&gt;代码结构&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;src/backend/utils/mmgr/mcxt.c
+src/backend/utils/mmgr/aset.c
+src/include/utils/memutils.h
+src/include/nodes/memnodes.h
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>大数阶乘</title><link>https://yfshi.github.io/posts/%E5%A4%A7%E6%95%B0%E9%98%B6%E4%B9%98/</link><guid isPermaLink="true">https://yfshi.github.io/posts/%E5%A4%A7%E6%95%B0%E9%98%B6%E4%B9%98/</guid><pubDate>Tue, 24 Oct 2017 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;对于比较小的数n，可以通过递归或循环将计算结果保存为整形。但是如果n很大的时候，比如1000，那么n!肯定超出整形数据所能表示的范围。因此必须采用其他方法解决。一般是采用数组模拟。实现代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+#include &amp;lt;math.h&amp;gt;
+
+#define STORE_STEP_SIZE 100
+
+static int s_store_size = 0;
+
+#define EXTENT_STORE(s) { \
+	s_store_size += STORE_STEP_SIZE; \
+	s = realloc(s, sizeof(int) * s_store_size); \
+}
+
+#define DESTROY_STORE(s) { free(s); }
+
+/*
+ * digit:
+ * 9x + x/10 &amp;lt;= INT_MAX
+ * x = 10INT_MAX/91
+ */
+static void fact(int digit)
+{
+	int i, j;
+	int temp;
+	int cvalue;
+	int size;
+	int *store;
+
+	if (digit &amp;lt; 1 || digit &amp;gt;= 10*((int)pow(2,31)/91))
+	{
+		printf(&quot;digit(%d) is too smaller or too big\n&quot;, digit);
+		return;
+	}
+
+	/* 1! */
+	if (digit == 1)
+	{
+		printf(&quot;1\n&quot;);
+		return;
+	}
+
+	EXTENT_STORE(store);
+	if (store == NULL)
+	{
+		printf(&quot;faile...\n&quot;);
+		DESTROY_STORE(store);
+		return;
+	}
+
+	store[0] = 1;
+	size = 1;
+
+	for (i=2; i&amp;lt;=digit; i++)
+	{
+		for (cvalue=0, j=1; j&amp;lt;=size; j++)
+		{
+			temp = store[j-1] * i + cvalue;
+			store[j-1] = temp % 10;
+			cvalue = temp / 10;
+		}
+		while (cvalue &amp;gt; 0)
+		{
+			if (size &amp;gt;= s_store_size)
+			{
+				EXTENT_STORE(store);
+				if (store == NULL)
+				{
+					printf(&quot;fail...\n&quot;);
+					DESTROY_STORE(store);
+					return;
+				}
+			}
+			store[++size - 1] = cvalue % 10;
+			cvalue /= 10;
+		}
+	}
+
+	for (i=size-1; i&amp;gt;=0; i--)
+		printf(&quot;%d&quot;, store[i]);
+	printf(&quot;\n&quot;);
+	
+	/* store&apos;s size and current size */
+	//printf(&quot;s_store_size=%d, size=%d\n&quot;, s_store_size, size);
+
+	DESTROY_STORE(store);
+}
+
+int main(int argc, char **argv)
+{
+	if (argc &amp;lt; 2)
+	{
+		printf(&quot;Usage: %s &amp;lt;digit&amp;gt;\n&quot;, argv[0]);
+		return -1;
+	}
+
+	fact(atoi(argv[1]));
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>gdb</title><link>https://yfshi.github.io/posts/gdb/</link><guid isPermaLink="true">https://yfshi.github.io/posts/gdb/</guid><pubDate>Mon, 23 Oct 2017 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;信号处理&lt;/h1&gt;
+&lt;p&gt;gdb对信号处理有三类动作：停止、打印、传给程序。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;info handle # 查看所有信号的处理方式
+handle SIGUSR2 nostop noprint pass #设置信号处理方式
+&lt;/code&gt;&lt;/pre&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;动作&lt;/th&gt;
+&lt;th&gt;解释&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;print&lt;/td&gt;
+&lt;td&gt;收到信号打印&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;noprint&lt;/td&gt;
+&lt;td&gt;收到信号不打印&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;stop&lt;/td&gt;
+&lt;td&gt;收到信号中断&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;notop&lt;/td&gt;
+&lt;td&gt;收到信号不中断&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;pass&lt;/td&gt;
+&lt;td&gt;收到信号传递给程序&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;nopass&lt;/td&gt;
+&lt;td&gt;收到信号不传递给程序&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h1&gt;设置源代码路径&lt;/h1&gt;
+&lt;p&gt;在A机器上gcc编译的执行文件test，放到B机器去执行。在B机器上gdb调试test，怎么在gdb中查看源代码。&lt;/p&gt;
+&lt;p&gt;有几种方法：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;把源代码放到编译机完全相同的路径&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ readelf -P .debug_str test
+$ mkdir &amp;lt;code_dir&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;使用gdb的substitute-path路径映射功能&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;set substitute-path &amp;lt;FROM&amp;gt; &amp;lt;TO&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;FROM是编译时的代码路径。上述命令等于替换路径前缀，用TO替换FROM。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ readelf -P .debug_str test
+$ gdb ./test
+(gdb) set substitute-path /home/gdb/code/test /current-code
+(gdb) list
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;使用gdb的direcotory功能，把direcotry指定的路径加入到源代码搜索路径，缺点是不能递归搜索&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;(gdb) show directories 
+Source directories searched: $cdir:$cwd
+(gdb) directory /code
+(gdb) show directories 
+Source directories searched: /home/postgres:$cdir:$cwd
+(gdb) list
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;把二进制文件移动到源代码路径&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;编译时增加&lt;code&gt;-fdebug-prefix-map=old_path=new_path&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;在编译阶段用new_path替代old_path，这种方式比较暴力。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1&gt;多进程调试&lt;/h1&gt;
+&lt;p&gt;set follow-fork-mode [parent | child]&lt;/p&gt;
+&lt;p&gt;set detach-on-fork [on|off]&lt;/p&gt;
+&lt;h1&gt;多线程调试&lt;/h1&gt;
+&lt;p&gt;调试多线程时，有时需要控制某些线程停在断点，有些线程继续执行。有时需要控制线程的运行顺序。有时需要中断某个线程，切换到其他线程。这些都可以通过gdb实现。&lt;/p&gt;
+&lt;p&gt;gdb调试线程的常用命令如下：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;gdb命令&lt;/th&gt;
+&lt;th&gt;描述&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;info thread&lt;/td&gt;
+&lt;td&gt;显示所有线程&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;thread ID&lt;/td&gt;
+&lt;td&gt;切换到ID指定的线程&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;break xxx.c:10 thread all&lt;/td&gt;
+&lt;td&gt;所有线程都在xxx.c文件的第10行断点，all可以换成单个线程ID&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;thread apply all COMMON&lt;/td&gt;
+&lt;td&gt;所有线程都执行COMMOND命令，也可以把all换成单个线程ID&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;set scheduler-locking off/on/step&lt;/td&gt;
+&lt;td&gt;在调试某一线程时，其他线程是否执行。off：不锁定任何线程，默认值。on：锁定其他线程，只有当前线程运行。step：在step单步调试时，只有被调试线程运行。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;set non-stop on/off&lt;/td&gt;
+&lt;td&gt;当调试一个线程时，其他线程是否运行。默认off。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;set pagination on/off&lt;/td&gt;
+&lt;td&gt;在使用backtrace时，在分页时是否停止。默认on。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;set target-async on/off&lt;/td&gt;
+&lt;td&gt;同步和异步。同步，gdb在输出提示符之前等待程序报告一些线程已经终止的信息。而异步的则是直接返回。默认off。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;non-stop模式调试后台程序：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ gdb
+(gdb) set non-stop on
+(gdb) set pagination off
+(gdb) set target-async on
+(gdb) attach 82373
+(gdb) info thread
+(gdb) thread apply all continue &amp;amp;
+(gdb) thread 10
+(gdb) continue &amp;amp;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;注意：在使用non-stop模式调试时，凡是执行continue操作时最好加上&amp;amp;放入后台。否则如果continue之后当前线程没有产生断点，则回不到交互模式。&lt;/p&gt;
+&lt;h1&gt;打印相关&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;set print address -- Set printing of addresses
+set print array -- Set prettyprinting of arrays
+set print array-indexes -- Set printing of array indexes
+set print asm-demangle -- Set demangling of C++/ObjC names in disassembly listings
+set print demangle -- Set demangling of encoded C++/ObjC names when displaying symbols
+set print elements -- Set limit on string chars or array elements to print
+set print frame-arguments -- Set printing of non-scalar frame arguments
+set print inferior-events -- Set printing of inferior events (e.g.
+set print max-symbolic-offset -- Set the largest offset that will be printed in &amp;lt;symbol+1234&amp;gt; form
+set print null-stop -- Set printing of char arrays to stop at first null char
+set print object -- Set printing of object&apos;s derived type based on vtable info
+set print pascal_static-members -- Set printing of pascal static members
+set print pretty -- Set prettyprinting of structures
+set print repeats -- Set threshold for repeated print elements
+set print sevenbit-strings -- Set printing of 8-bit characters in strings as \nnn
+set print static-members -- Set printing of C++ static members
+set print symbol-filename -- Set printing of source filename and line number with &amp;lt;symbol&amp;gt;
+set print thread-events -- Set printing of thread events (such as thread start and exit)
+set print union -- Set printing of unions interior to structures
+set print vtbl -- Set printing of C++ virtual function tables
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;LIBRARY_PATH与LD_LIBRARY_PATH&lt;/h1&gt;
+&lt;p&gt;&lt;code&gt;LIBRARY_PATH&lt;/code&gt;环境变量用于在程序编译期间查找动态链接库时指定查找共享库的路径。如果不指定&lt;code&gt;LIBRARY_PATH&lt;/code&gt;，可以在gcc编译时通过-L指定共享库路径。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;LD_LIBRARY_PATH&lt;/code&gt;环境变量用于在程序加载运行期间查找动态链接库时指定除了系统默认路径之外的其他路径。注意，&lt;code&gt;LD_LIBRARY_PATH&lt;/code&gt;中指定的路径会在系统默认路径之前进行查找。&lt;/p&gt;
+&lt;p&gt;使用方法：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;export LIBRARY_PATH=`pwd`:$LIBRARY_PATH
+export LD_LIBRARY_PATH=`pwd`:$LIBRARY_PATH
+或
+LIBRARY_PATH=`pwd`:$LIBRARY_PATH make
+LD_LIBRARY_PATH=`pwd`:$LIBRARY_PATH make
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;C_INCLUDE_PATH、CPLUS_INCLUDE_PATH&lt;/h1&gt;
+&lt;p&gt;与LIBRARY_PATH类似，gcc编译期间查找指定的头文件路径。也可以在gcc加上-I参数指定头文件路径。&lt;/p&gt;
+&lt;p&gt;使用方法：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;export C_INCLUDE_PATH=`pwd`/include:$C_INCLUDE_PATH
+或
+C_INCLUDE_PATH=`pwd`/include make
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>Shell</title><link>https://yfshi.github.io/posts/shell/</link><guid isPermaLink="true">https://yfshi.github.io/posts/shell/</guid><pubDate>Mon, 23 Oct 2017 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;&lt;code&gt;--&lt;/code&gt;&lt;/h1&gt;
+&lt;p&gt;shell内置命令，表示选项的结束，也就是说后面都是参数，不在有选项。主要是为了避免后面的参数以&lt;code&gt;-&lt;/code&gt;开头的时候被识别为选项。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;cat &quot;abc-Rdef&quot; | grep -R
+cat &quot;abc-Rdef&quot; | grep -- -R
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;删除以‘-’开头的文件&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;rm -f -f
+rm -f -- -f
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;&lt;code&gt;-&lt;/code&gt;&lt;/h1&gt;
+&lt;p&gt;&lt;code&gt;tar -cvf - * | tar -xvf - -C /tmp&lt;/code&gt;复制当前目录并且时间不变。&lt;/p&gt;
+&lt;h1&gt;eval&lt;/h1&gt;
+&lt;p&gt;eval解析两次，第一次替换变量，第二次执行。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;a=&quot;ls -l&quot;
+eval $a
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;变量的间接引用 ${!var}&lt;/h1&gt;
+&lt;p&gt;即以变量名作为新的变量，取新变量的值&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;function test() {
+	v=$1
+	echo ${!v}
+}
+x=10
+test x
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;getopt与getopts&lt;/h1&gt;
+&lt;p&gt;getopt可以处理unix和GNU格式的参数。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/bash
+
+GETOPT_ARGS=`getopt -o abc:d::e -al aaa,bbb,ccc:,ddd::,eee -- &quot;$@&quot;`
+eval set -- &quot;$GETOPT_ARGS&quot;
+
+echo &quot;after getopt: $0 $@&quot;
+
+while [ -n &quot;$1&quot; ]
+do
+	case $1 in
+		-a|--aaa) echo &quot;option $1&quot;; shift;;
+		-b|--bbb) echo &quot;option $1&quot;; shift;;
+		-c|--ccc) echo &quot;option $1 $2&quot;; shift 2;;
+		-d|--ddd)
+			case $2 in
+				&quot;&quot;) echo &quot;option $1&quot;; shift 2;;
+				*) echo &quot;option $1 $2&quot;; shift 2;;
+			esac
+			;;
+		-e|--eee) echo &quot;option $1&quot;; shift;;
+		--) shift; break;;
+		*) echo &quot;unknown: $1&quot;; exit 1;;
+	esac
+done
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;getopts处理unix格式的参数。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/bash
+
+while getopts abc:d:e opt
+do
+	case &quot;$opt&quot; in
+		a) echo &quot;-a&quot;;;
+		b) echo &quot;-b&quot;;;
+		c) echo &quot;-c $OPTARG&quot;;;
+		d) echo &quot;-d $OPTARG&quot;;;
+		e) echo &quot;-e&quot;;;
+		*) echo &quot;unkown&quot;
+			exit 2;;
+	esac
+done
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;上面是一段shell中命令行处理的实现。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/bash
+
+DBHOME=&quot;$GPHOME&quot;
+UPDATEFILE=&quot;&quot;
+HOSTFILE=&quot;&quot;
+
+ROOTDIR=`pwd`
+BASEDIR=$(cd `dirname $0`; pwd)
+PROGRAM=${0##*/}
+
+Usage() {
+	echo &quot;$PROGRAM is a local dongle update tool.&quot;
+	echo
+	echo &quot;Usage:&quot;
+	echo &quot;  $PROGRAM [OPTION] UPDATEFILE&quot;
+	echo
+	echo &quot;Options:&quot;
+	echo &quot;  -d DBHOME         Database installation path, default \&quot;\$GPHOME\&quot;.&quot;
+	echo &quot;  -f HOSTFILE       This specifies the file that lists the hosts&quot;
+	echo &quot;                    onto which you want to install Greenplum Database.&quot;
+}
+
+# show help
+if [ &quot;x$1&quot; = &quot;x--help&quot; ] || [ &quot;x$1&quot; = &quot;x-?&quot; ]; then
+	Usage
+	exit 0
+fi
+
+while getopts &quot;d:f:&quot; opt;
+do
+	case $opt in
+		d)
+			DBHOME=$OPTARG
+			;;
+		f)
+			HOSTFILE=$OPTARG
+			;;
+		?)
+			echo &quot;Invalid options: -$OPTARG&quot;
+			exit 1;;
+	esac
+done
+
+# UPDATEFILE
+eval UPDATEFILE=&quot;$&quot;&quot;$OPTIND&quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;exec与文件描述符&lt;/h1&gt;
+&lt;p&gt;对于Linux而言，所有对设备和文件的操作都使用文件描述符来进行的。
+通常，一个进程启动时，会打开3个文件描述符：标准输入、标准输出、标准错误。对应的描述符分别是0、1、2。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;exec分配文件描述符&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;exec 6&amp;lt;&amp;gt;hello.txt   # 以读写方式绑定文件到描述符6
+echo &quot;hello&quot; &amp;gt;&amp;amp;6    # 写入“hello”，这里将会从文件开头进行覆盖
+echo &quot;world&quot; &amp;gt;&amp;amp;6    # 写入“world”，新的一行
+exec 6&amp;gt;&amp;amp;-           # 关闭写，实际上也不能读了
+exec 6&amp;lt;&amp;amp;-           # 关闭读，实际上也不能写了
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;输出重定向&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;exec 1&amp;gt;hello.txt    # 将标准输出重定向到文件，从此之后该进程的输出都将被写入”hello.txt“
+echo &quot;hello&quot;
+echo &quot;wolrd&quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;恢复重定向&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;exec 100&amp;gt;&amp;amp;1
+exec 1&amp;gt;hello.txt
+echo &quot;hello&quot;
+echo &quot;world&quot;
+exec 1&amp;gt;&amp;amp;100 100&amp;gt;&amp;amp;-
+echo &quot;reset&quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;输入重定向&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;exec 100&amp;lt;&amp;amp;0
+exec &amp;lt;hello.txt
+read $line1
+echo $line1
+read $line2
+echo $line2
+exec 0&amp;lt;&amp;amp;100 100&amp;gt;&amp;amp;-
+read $line3
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;例子&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/bash
+
+# 把标准输出和标准错误绑定到指定文件，并使用两个临时描述符变量保存标准输出和标准错误，用于恢复
+openlog() {
+	file=$1
+	exec 6&amp;gt;&amp;amp;1     # 把6绑定到标准输出，即把标准输出1复制到6
+	exec 7&amp;gt;&amp;amp;2     # 把7绑定到标准错误
+	exec 1&amp;gt;$file  # 把标准输出绑定到文件  exec 1&amp;gt;$file 是绑定追加
+	exec 2&amp;gt;$file  # 把标准错误绑定到文件
+}
+
+# 恢复标准输出和标准错误，关闭临时描述符6和7
+closelog() {
+	exec 1&amp;gt;&amp;amp;6 6&amp;gt;&amp;amp;-
+	exec 2&amp;gt;&amp;amp;7 7&amp;gt;&amp;amp;-
+}
+
+openlog logfile
+
+echo &quot;==================&quot;
+ls /proc/self/fd
+echo &quot;==================&quot;
+echo &quot;hello&quot;
+echo &quot;world&quot;
+
+closelog
+
+echo &quot;==================&quot;
+ls /proc/self/fd
+echo &quot;==================&quot;
+echo &quot;111&quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;多进程&lt;/h1&gt;
+&lt;p&gt;如下，每个进程的任务就是等待10秒，进程任务完成之后再启动一个新的进程，保证并发数是8。
+通过命名管道控制进程数量。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/bash
+
+tmpfifo=$$.fifo
+
+trap &quot;exec 1000&amp;gt;&amp;amp;-;exec 1000&amp;lt;&amp;amp;-;exit 0&quot; 2 3 15
+
+mkfifo $tmpfifo
+exec 1000&amp;lt;&amp;gt;$tmpfifo
+rm -f $tmpfifo
+
+for ((i=1;i&amp;lt;=8;i++))
+do
+	echo &amp;gt;&amp;amp;1000
+done
+
+while true
+do
+	let t++
+	read -u 1000
+	{
+		sleep 10
+		echo &amp;gt;&amp;amp;1000
+	} &amp;amp;
+done
+
+wait
+
+echo &quot;done!!!&quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;格式判断&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/bash
+
+check_format() {
+    local type=$1
+    local var=$2
+    local ret=0
+
+    [ $# -ne 2 ] &amp;amp;&amp;amp; return 1
+
+    case $type in
+        &quot;STRING&quot;)
+            [ &quot;x$var&quot; = &quot;x&quot; ] &amp;amp;&amp;amp; ret=2
+            ;;  
+        &quot;NUMBER&quot;)
+            echo $var | grep -Ev &apos;^[0-9]{1,}$&apos; &amp;gt; /dev/null 2&amp;gt;&amp;amp;1 &amp;amp;&amp;amp; ret=2
+            ;;  
+        *)  
+            ret=2
+    esac
+
+    return $ret
+}
+
+[ `check_format NUMBER asdfsa` -ne 0 ] &amp;amp;&amp;amp; exit 1
+
+exit 0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;字符串处理&lt;/h1&gt;
+&lt;h2&gt;字符串分割&lt;/h2&gt;
+&lt;p&gt;shell如何用指定的分隔符来分割字符串为一个数组？这里介绍两种方法&lt;/p&gt;
+&lt;p&gt;方法一&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/bash
+string=&quot;hello,shell,word&quot;
+array=(${string//,/ })
+for var in ${array[@]}
+do
+	echo $var
+done
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;方法二&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/bash
+string=&quot;hello,shell,word&quot;
+OLD_IFS=&quot;$IFS&quot;
+IFS=&quot;,&quot;
+array=($string)
+IFS=&quot;$OLD_IFS&quot;
+for var in ${array[@]}
+do
+	echo $var
+done
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;字符串截取&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;格式&lt;/th&gt;
+&lt;th&gt;说明&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;${string:start:length}&lt;/td&gt;
+&lt;td&gt;从 string 字符串的左边第 start 个字符开始，向右截取 length 个字符。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;${string:start}&lt;/td&gt;
+&lt;td&gt;从 string 字符串的左边第 start 个字符开始截取，直到最后。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;${string:0-start:length}&lt;/td&gt;
+&lt;td&gt;从 string 字符串的右边第 start 个字符开始，向右截取 length 个字符。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;${string:0-start}&lt;/td&gt;
+&lt;td&gt;从 string 字符串的右边第 start 个字符开始截取，直到最后。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;${string#*chars}&lt;/td&gt;
+&lt;td&gt;从 string 字符串第一次出现 *chars 的位置开始，截取 *chars 右边的所有字符。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;${string##*chars}&lt;/td&gt;
+&lt;td&gt;从 string 字符串最后一次出现 *chars 的位置开始，截取 *chars 右边的所有字符。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;${string%chars*}&lt;/td&gt;
+&lt;td&gt;从 string 字符串第一次出现 *chars 的位置开始，截取 *chars 左边的所有字符。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;${string%%chars*}&lt;/td&gt;
+&lt;td&gt;从 string 字符串最后一次出现 *chars 的位置开始，截取 *chars 左边的所有字符。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3&gt;从指定位置开始截取&lt;/h3&gt;
+&lt;pre&gt;&lt;code&gt;${string:start:length}
+${string:0-start:length}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;string是要截取的字符串，start是起始位置，length是要截取的长度（省略表示直到字符串的末尾）。&lt;/p&gt;
+&lt;p&gt;注意：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;从左边开始计数，其实数字是0；从右边开始计数，其实数字是1。&lt;/li&gt;
+&lt;li&gt;不管从哪边开始计数，截取方向都是从左到右。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;例：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/bash
+
+url=&quot;abcdefghijklmn&quot;
+echo ${url:2}
+echo ${url:5:3}       
+echo ${url:0-3}
+echo ${url:0-10:5}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;输出：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;cdefghijklmn
+fgh
+lmn
+efghi
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;从指定字符串开始截取&lt;/h3&gt;
+&lt;p&gt;这种截取方式无法指定长度，只能从指定字符串截取到字符串末尾。可以截取指定字符串右边的所有字符，也可以截取左边的所有字符。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;${string#*chars}
+${string##*chars}
+${string%chars*}
+${string%%chars*}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;其中，string是要截取的字符串，chars是指定的字符串，&lt;code&gt;*&lt;/code&gt;是通配符的一种，表示任意长度的字符串。&lt;code&gt;*chars&lt;/code&gt;连起来使用的意思是忽略左边的所有字符，知道遇见chars。&lt;/p&gt;
+&lt;p&gt;例：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/bash
+
+url=&quot;1234123412341234&quot;
+echo ${url#*23}
+echo ${url##*23}
+echo ${url%23*}
+echo ${url%%23*}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;ssh&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;$ ssh -T -o StrictHostKeyChecking=no &amp;lt;&amp;lt;EOF
+# 不允许定义和使用变量，可以读取外部变量，不能给外部变量赋值
+# 可以定义函数，函数内部不能使用变量和参数，不能使用外部函数
+# 此处执行子shell无效，等同与在ssh之外执行，如`ls`和$(ls)
+EOF
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>希尔排序</title><link>https://yfshi.github.io/posts/%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F/</link><guid isPermaLink="true">https://yfshi.github.io/posts/%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F/</guid><pubDate>Sun, 22 Oct 2017 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;介绍&lt;/h1&gt;
+&lt;p&gt;希尔排序，也称递减增量排序算法，是插入排序的一种高速而稳定的改进版本。&lt;/p&gt;
+&lt;p&gt;希尔排序是基于插入排序的以下两点性质而提出改进方法的：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;插入排序在对几乎已经排好序的数据操作时， 效率高， 即可以达到线性排序的效率&lt;/li&gt;
+&lt;li&gt;插入排序一般来说是低效的， 因为插入排序每次只能将数据移动一位&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1&gt;排序效果&lt;/h1&gt;
+&lt;p&gt;&lt;img src=&quot;/img/%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F.gif&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;h1&gt;实现&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;...
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>归并排序</title><link>https://yfshi.github.io/posts/%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/</link><guid isPermaLink="true">https://yfshi.github.io/posts/%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/</guid><pubDate>Sun, 22 Oct 2017 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;介绍&lt;/h1&gt;
+&lt;p&gt;归并排序（Merge sort，台湾译作：合并排序）是建立在归并操作上的一种有效的排序算法。该算法是采用分治法（Divide and Conquer）的一个非常典型的应用。&lt;/p&gt;
+&lt;h1&gt;步骤&lt;/h1&gt;
+&lt;ol&gt;
+&lt;li&gt;申请空间，使其大小为两个已经排序序列之和，该空间用来存放合并后的序列&lt;/li&gt;
+&lt;li&gt;设定两个指针，最初位置分别为两个已经排序序列的起始位置&lt;/li&gt;
+&lt;li&gt;比较两个指针所指向的元素，选择相对小的元素放入到合并空间，并移动指针到下一位置&lt;/li&gt;
+&lt;li&gt;重复步骤3直到某一指针达到序列尾&lt;/li&gt;
+&lt;li&gt;将另一序列剩下的所有元素直接复制到合并序列尾&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1&gt;排序效果&lt;/h1&gt;
+&lt;p&gt;&lt;img src=&quot;/img/%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F.gif&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;h1&gt;实现&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;...
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>冒泡排序</title><link>https://yfshi.github.io/posts/%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F/</link><guid isPermaLink="true">https://yfshi.github.io/posts/%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F/</guid><pubDate>Sun, 22 Oct 2017 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;介绍&lt;/h1&gt;
+&lt;p&gt;冒泡排序（Bubble Sort）一种简单的排序算法。它重复地走访过要排序的数列，一次比较两个元素，如果他们的顺序错误就把他们交换过来。走访数列的工作重复地进行直到没有再需要交换。这个算法的名字由来是因为越小的元素会经由交换慢慢“浮”到数列的顶端。&lt;/p&gt;
+&lt;h1&gt;步骤&lt;/h1&gt;
+&lt;ol&gt;
+&lt;li&gt;比较相邻的元素。如果第一个比第二个大，就交换他们两个。&lt;/li&gt;
+&lt;li&gt;对每一对相邻元素作同样的工作，从开始第一对到结尾的最后一对。在这一点，最后的元素应该会是最大的数。&lt;/li&gt;
+&lt;li&gt;针对所有的元素重复以上的步骤，除了最后一个。&lt;/li&gt;
+&lt;li&gt;持续每次对越来越少的元素重复上面的步骤，直到没有任何一对数字需要比较。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1&gt;排序效果&lt;/h1&gt;
+&lt;p&gt;&lt;img src=&quot;/img/%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F.gif&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;h1&gt;实现&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+
+static void RandInitArray(int *arr, int num);
+static void PrintArray(int *arr, int num);
+static void BubbleSortAsc(int *arr, int num);
+
+#define ARR_SIZE 20
+
+int main()
+{
+	int arr[ARR_SIZE];
+
+	RandInitArray(arr, ARR_SIZE);
+
+	PrintArray(arr, ARR_SIZE);
+
+	BubbleSortAsc(arr, ARR_SIZE);
+
+	PrintArray(arr, ARR_SIZE);
+
+	return 0;
+}
+
+static void RandInitArray(int *arr, int num)
+{
+	int i;
+
+	for (i=0; i&amp;lt;num; i++)
+		arr[i] = random()%100;
+}
+
+static void PrintArray(int *arr, int num)
+{
+	int i;
+
+	for (i=0; i&amp;lt;num; i++)
+		printf(&quot;%d &quot;, arr[i]);
+	printf(&quot;\n&quot;);
+}
+
+static void BubbleSortAsc(int *arr, int num)
+{
+	int i, j;
+	int move;
+	int tmp;
+
+	for (i=0; i&amp;lt;num-1; i++)
+	{
+		move = 0;
+		for (j=0; j&amp;lt;num-1-i; j++)
+		{
+			if (arr[j] &amp;gt; arr[j+1])
+			{
+				move = 1;
+				tmp = arr[j];
+				arr[j] = arr[j+1];
+				arr[j+1] = tmp;
+			}
+		}
+		if (move == 0)
+			return;
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;排序方法比较&lt;/h1&gt;
+&lt;p&gt;&lt;img src=&quot;/img/%E6%8E%92%E5%BA%8F%E5%A4%8D%E6%9D%82%E5%BA%A6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+</content:encoded></item><item><title>堆排序</title><link>https://yfshi.github.io/posts/%E5%A0%86%E6%8E%92%E5%BA%8F/</link><guid isPermaLink="true">https://yfshi.github.io/posts/%E5%A0%86%E6%8E%92%E5%BA%8F/</guid><pubDate>Sun, 22 Oct 2017 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;介绍&lt;/h1&gt;
+&lt;p&gt;堆积排序（Heapsort）是指利用堆这种数据结构所设计的一种排序算法。堆是一个近似完全二叉树的结构，并同时满足&lt;em&gt;堆性质&lt;/em&gt;：即子结点的键值或索引总是小于（或者大于）它的父节点。&lt;/p&gt;
+&lt;h1&gt;步骤&lt;/h1&gt;
+&lt;p&gt;略&lt;/p&gt;
+&lt;h1&gt;排序效果&lt;/h1&gt;
+&lt;p&gt;&lt;img src=&quot;/img/%E5%A0%86%E6%8E%92%E5%BA%8F.gif&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;h1&gt;实现&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+
+static void RandInitArray(int *arr, int num);
+static void PrintArray(int *arr, int num);
+static void HeapSortAsc(int *arr, int num);
+static void HeapShiftDown(int *arr, int start, int end);
+static void swap(int *x, int *y);
+
+#define ARR_SIZE 20
+
+int main()
+{
+	int arr[ARR_SIZE];
+
+	RandInitArray(arr, ARR_SIZE);
+
+	PrintArray(arr, ARR_SIZE);
+
+	HeapSortAsc(arr, ARR_SIZE);
+
+	PrintArray(arr, ARR_SIZE);
+
+	return 0;
+}
+
+static void RandInitArray(int *arr, int num)
+{
+	int i;
+
+	for (i=0; i&amp;lt;num; i++)
+		arr[i] = random()%10000;
+}
+
+static void PrintArray(int *arr, int num)
+{
+	int i;
+
+	for (i=0; i&amp;lt;num; i++)
+		printf(&quot;%d &quot;, arr[i]);
+	printf(&quot;\n&quot;);
+}
+
+static void HeapSortAsc(int *arr, int num)
+{
+	int i;
+
+	for (i=num/2-1; i&amp;gt;=0; i--)
+		HeapShiftDown(arr, i, num - 1);
+
+	for (i=num-1; i&amp;gt;0; i--)
+	{
+		swap(&amp;amp;arr[0], &amp;amp;arr[i]);
+		HeapShiftDown(arr, 0, i - 1);
+	}
+}
+
+static void HeapShiftDown(int *arr, int start, int end)
+{
+	int dead = start;
+	int son = dead * 2 + 1;
+
+	while (son &amp;lt;= end)
+	{
+		if (son + 1 &amp;lt; end &amp;amp;&amp;amp; arr[son] &amp;lt; arr[son+1])
+			son += 1;
+
+		if (arr[dead] &amp;gt; arr[son])
+			break;
+		else
+		{
+			swap(&amp;amp;arr[dead], &amp;amp;arr[son]);
+			dead = son;
+			son = dead * 2 + 1;
+		}
+	}
+}
+
+static void swap(int *x, int *y)
+{
+	int tmp = *x;
+	*x = *y;
+	*y = tmp;
+}
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>快速排序</title><link>https://yfshi.github.io/posts/%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F/</link><guid isPermaLink="true">https://yfshi.github.io/posts/%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F/</guid><pubDate>Sun, 22 Oct 2017 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;介绍&lt;/h1&gt;
+&lt;p&gt;快速排序是由东尼·霍尔所发展的一种排序算法。在平均状况下，排序 &lt;em&gt;n&lt;/em&gt; 个项目要&lt;strong&gt;Ο&lt;/strong&gt;(&lt;em&gt;n&lt;/em&gt; log &lt;em&gt;n&lt;/em&gt;)次比较。在最坏状况下则需要&lt;strong&gt;Ο&lt;/strong&gt;(&lt;em&gt;n&lt;/em&gt;2)次比较，但这种状况并不常见。事实上，快速排序通常明显比其他&lt;strong&gt;Ο&lt;/strong&gt;(&lt;em&gt;n&lt;/em&gt; log &lt;em&gt;n&lt;/em&gt;) 算法更快，因为它的内部循环（inner loop）可以在大部分的架构上很有效率地被实现出来，且在大部分真实世界的数据，可以决定设计的选择，减少所需时间的二次方项之可能性。&lt;/p&gt;
+&lt;h1&gt;步骤&lt;/h1&gt;
+&lt;ol&gt;
+&lt;li&gt;从数列中挑出一个元素，称为 “基准”（pivot），&lt;/li&gt;
+&lt;li&gt;重新排序数列，所有元素比基准值小的摆放在基准前面，所有元素比基准值大的摆在基准的后面（相同的数可以到任一边）。在这个分区退出之后，该基准就处于数列的中间位置。这个称为**分区（partition）**操作。&lt;/li&gt;
+&lt;li&gt;递归地把小于基准值元素的子数列和大于基准值元素的子数列排序。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1&gt;排序效果&lt;/h1&gt;
+&lt;p&gt;&lt;img src=&quot;/img/%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F.gif&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;h1&gt;实现&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+
+static void RandInitArray(int *arr, int num);
+static void PrintArray(int *arr, int num);
+static void QuickSortAsc(int *arr, int left, int right);
+
+#define ARR_SIZE 20
+
+int main()
+{
+	int arr[ARR_SIZE];
+
+	RandInitArray(arr, ARR_SIZE);
+
+	PrintArray(arr, ARR_SIZE);
+
+	QuickSortAsc(arr, 0, ARR_SIZE-1);
+
+	PrintArray(arr, ARR_SIZE);
+
+	return 0;
+}
+
+static void RandInitArray(int *arr, int num)
+{
+	int i;
+	for (i=0; i&amp;lt;num; i++)
+		arr[i] = random()%100;
+}
+
+static void PrintArray(int *arr, int num)
+{
+	int i;
+	for (i=0; i&amp;lt;num; i++)
+		printf(&quot;%d &quot;, arr[i]);
+	printf(&quot;\n&quot;);
+}
+
+static void QuickSortAsc(int *arr, int left, int right)
+{
+	int low, high;
+	int pivot;
+
+	if (left &amp;lt; right)
+	{
+		low = left;
+		high = right;
+		pivot = arr[low];
+
+		while (low &amp;lt; high)
+		{
+			while (low &amp;lt; high &amp;amp;&amp;amp; pivot &amp;lt;= arr[high])
+				high--;
+			arr[low] = arr[high];
+
+			while (low &amp;lt; high &amp;amp;&amp;amp; pivot &amp;gt; arr[low])
+				low++;
+			arr[high] = arr[low];
+		}
+		arr[low] = pivot;
+
+		QuickSortAsc(arr, left, low-1);
+		QuickSortAsc(arr, low+1, right);
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>插入排序</title><link>https://yfshi.github.io/posts/%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F/</link><guid isPermaLink="true">https://yfshi.github.io/posts/%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F/</guid><pubDate>Sun, 22 Oct 2017 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;介绍&lt;/h1&gt;
+&lt;p&gt;插入排序（Insertion Sort）的工作原理是通过构建有序序列，对于未排序数据，在已排序序列中从后向前扫描，找到相应位置并插入。插入排序在实现上，通常采用in-place排序（即只需用到O(1)的额外空间的排序），因而在从后向前扫描过程中，需要反复把已排序元素逐步向后挪位，为最新元素提供插入空间。&lt;/p&gt;
+&lt;h1&gt;步骤&lt;/h1&gt;
+&lt;ol&gt;
+&lt;li&gt;从第一个元素开始，该元素可以认为已经被排序&lt;/li&gt;
+&lt;li&gt;取出下一个元素，在已经排序的元素序列中从后向前扫描&lt;/li&gt;
+&lt;li&gt;如果该元素（已排序）大于新元素，将该元素移到下一位置&lt;/li&gt;
+&lt;li&gt;重复步骤3，直到找到已排序的元素小于或者等于新元素的位置&lt;/li&gt;
+&lt;li&gt;将新元素插入到该位置中&lt;/li&gt;
+&lt;li&gt;重复步骤2&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1&gt;排序效果&lt;/h1&gt;
+&lt;p&gt;&lt;img src=&quot;/img/%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F.gif&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;h1&gt;实现&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;...
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>选择排序</title><link>https://yfshi.github.io/posts/%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F/</link><guid isPermaLink="true">https://yfshi.github.io/posts/%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F/</guid><pubDate>Sun, 22 Oct 2017 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;介绍&lt;/h1&gt;
+&lt;p&gt;选择排序(Selection sort)是一种简单直观的排序算法。它的工作原理如下。首先在未排序序列中找到最小元素，存放到排序序列的起始位置，然后，再从剩余未排序元素中继续寻找最小元素，然后放到排序序列末尾。以此类推，直到所有元素均排序完毕。&lt;/p&gt;
+&lt;h1&gt;排序效果&lt;/h1&gt;
+&lt;p&gt;&lt;img src=&quot;/img/%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F.gif&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;h1&gt;实现&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+
+static void RandInitArray(int *arr, int num);
+static void PrintArray(int *arr, int num);
+static void SelectSortAsc(int *arr, int num);
+
+#define ARR_SIZE 20
+
+int main()
+{
+	int arr[ARR_SIZE];
+
+	RandInitArray(arr, ARR_SIZE);
+
+	PrintArray(arr, ARR_SIZE);
+
+	SelectSortAsc(arr, ARR_SIZE);
+
+	PrintArray(arr, ARR_SIZE);
+
+	return 0;
+}
+
+static void RandInitArray(int *arr, int num)
+{
+	int i;
+	for (i=0; i&amp;lt;num; i++)
+		arr[i] = random()%100;
+}
+
+static void PrintArray(int *arr, int num)
+{
+	int i;
+	for (i=0; i&amp;lt;num; i++)
+		printf(&quot;%d &quot;, arr[i]);
+	printf(&quot;\n&quot;);
+}
+
+static void SelectSortAsc(int *arr, int num)
+{
+	int i, j;
+	int min, tmp;
+
+	for (i=0; i&amp;lt;num-1; i++)
+	{
+		min = i;
+
+		for (j=i+1; j&amp;lt;num; j++)
+		{
+			if (arr[min] &amp;gt; arr[j])
+				min = j;
+		}
+
+		if (min != i)
+		{
+			tmp = arr[min];
+			arr[min] = arr[i];
+			arr[i] = tmp;
+		}
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>centos/redhat搭建yum源</title><link>https://yfshi.github.io/posts/%E6%90%AD%E5%BB%BAyum%E6%BA%90/</link><guid isPermaLink="true">https://yfshi.github.io/posts/%E6%90%AD%E5%BB%BAyum%E6%BA%90/</guid><pubDate>Mon, 25 Sep 2017 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;创建仓库&lt;/h1&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;把所有的光盘或iso文件（ios可能有两个或多个）中的rpm包拷贝出来&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;使用createrepo创建仓库&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ mkdir -p /opt/yum/centos6.7/Packages
+$ mount /dev/cdrom /mnt
+$ createrepo -v -g /mnt/repodata/*-comps.xml /opt/yum/centos6.7
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;createrepo的-g的作用是加载分组信息&lt;code&gt;yum grouplist&lt;/code&gt;，可以用下面两条命令实现同样的功能：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ createrepo -v /opt/yum/centos6.7
+# cp /mnt/repodata/*-comps.xml* /opt/yum/centos6.7/repodata/
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1&gt;http&lt;/h1&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;启动httpd&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;service httpd start
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;把仓库放到http工作目录&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mv /opt/yum/centos6.7 /var/www/html
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1&gt;设置repo文件&lt;/h1&gt;
+&lt;p&gt;新建repo文件&lt;code&gt;touch /etc/yum.repo/local.repo&lt;/code&gt;，或者直接在原有的repo文件中添加，内容如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[http_server]
+name=This is a http repo
+baseurl=http://localhost/home/yum/centos6.7
+enabled=1
+gpgcheck=0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;可以把原来的Centos-Base.repo中的源都加上&lt;code&gt;enable=0&lt;/code&gt;禁用，否则会先去找这个文件中的路径&lt;/p&gt;
+&lt;h1&gt;常用命令&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;yum clean all
+yum list
+yum install xxx.rpm
+yum install -y xxx.rpm
+yum uninstall xxx
+yum grouplist
+yum groupinstall xxx
+yum groupinstall -y xxx
+yum ungroup xxx
+yum makecache
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;Q&amp;amp;A&lt;/h1&gt;
+&lt;h2&gt;升级python导致yum不可用&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;/usr/bin/yum&lt;/code&gt;第一行指定该脚本所使用的python版本，一般是&lt;code&gt;#!/usr/bin/python&lt;/code&gt;，python升级之后&lt;code&gt;/usr/bin/python&lt;/code&gt;是升级之后的python，和&lt;code&gt;/usr/bin/yum&lt;/code&gt;不兼容。&lt;/p&gt;
+&lt;p&gt;可以修改&lt;code&gt;/usr/bin/yum&lt;/code&gt;第一行为原来的python版本，比如&lt;code&gt;#!/usr/bin/python2.6&lt;/code&gt;&lt;/p&gt;
+</content:encoded></item><item><title>hostname的那点事</title><link>https://yfshi.github.io/posts/hostname%E7%9A%84%E9%82%A3%E7%82%B9%E4%BA%8B/</link><guid isPermaLink="true">https://yfshi.github.io/posts/hostname%E7%9A%84%E9%82%A3%E7%82%B9%E4%BA%8B/</guid><pubDate>Tue, 19 Sep 2017 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;hostname的本质&lt;/h1&gt;
+&lt;p&gt;hostname是Linux下的一个内核参数,保存在/proc/sys/kernel/hostname下,它的值是Linux启动时从rc.sysinit读取的.而/etc/rc.d/rc.sysinit中HOSTNAME的取值来自于/etc/sysconfig/network下的HOSTNAME.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Linux的启动过程:&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;加载BIOS&lt;/li&gt;
+&lt;li&gt;读取MBR&lt;/li&gt;
+&lt;li&gt;Boot Loader / Grup&lt;/li&gt;
+&lt;li&gt;加载内核&lt;/li&gt;
+&lt;li&gt;用户层init依据inittab文件来设定运行等级&lt;/li&gt;
+&lt;li&gt;init进程执行rc.sysinit&lt;/li&gt;
+&lt;li&gt;启动内核驱动模块&lt;/li&gt;
+&lt;li&gt;执行不同运行级别的脚本程序(/etc/rc.d/rc$RUNLEVEL)&lt;/li&gt;
+&lt;li&gt;执行/etc/rc.d/rc.local&lt;/li&gt;
+&lt;li&gt;执行/bin/login程序,进入登录状态&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;/etc/sysconifg/network内容如下:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;NETWORKING=yes
+HOSTNAME==server-111
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;/etc/rc.d/rc.sysinit相关代码如下:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;......
+HOSTNAME=$(/bin/hostname)
+
+set -m
+
+if [ -f /etc/sysconfig/network ]; then
+    . /etc/sysconfig/network
+fi
+if [ -z &quot;$HOSTNAME&quot; -o &quot;$HOSTNAME&quot; = &quot;(none)&quot; ]; then
+    HOSTNAME=localhost
+fi
+......
+# Set the hostname.
+update_boot_stage RChostname
+......
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;修改hostname&lt;/h1&gt;
+&lt;p&gt;修改hostname有几种方式:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;hostname DB-Server&lt;/code&gt; -- 运行后立即生效(新会话生效),系统重启后会丢失所做的修改&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;echo DB-Server &amp;gt; /proc/sys/kernel/hostname&lt;/code&gt; -- 运行后立即生效(新会话生效),系统重启后会丢失所做的修改&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sysctl kernel.hostname=DB-Server&lt;/code&gt; -- 运行后立即生效(新会话生效),系统重启后会丢失所做的修改&lt;/li&gt;
+&lt;li&gt;修改&lt;code&gt;/etc/sysconfig/network&lt;/code&gt;下的&lt;code&gt;HOSTNAME&lt;/code&gt;变量 -- 需重启系统生效,永久性修改&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;修改了hostname后,如何使其立即生效而不用重启操作系统？&lt;/p&gt;
+&lt;p&gt;先按照步骤四修改,然后从前3步中任选一个执行&lt;/p&gt;
+&lt;h1&gt;hostname与/etc/hosts&lt;/h1&gt;
+&lt;p&gt;hosts的作用相当于DNS,提供IP地址到hostname的对应.早期的互联网计算机数量少,单机hosts文件里足够存放所有联网计算机.不过随着互联网的发展,这就远远不够了.于是就出现了分布式的DNS系统.由DNS服务器来提供类似的IP地址到域名的对应.具体可以man hosts查看相关信息.&lt;/p&gt;
+&lt;p&gt;Linux系统在向DNS服务器发出域名解析请求之前会查询/etc/hosts文件,如果里面有相应的记录,就会使用hosts里面的记录.
+/etc/hosts文件通常里面包含这一条记录127.0.0.1 localhost.localdomain localhost.hosts文件格式是一行一条记录,分别是IP地址、hostname、aliases,三者用空白字符分隔,aliases可选.&lt;/p&gt;
+&lt;p&gt;127.0.0.1到localhost这一条建议不要修改,因为很多应用程序会用到这个,比如sendmail,修改之后这些程序可能就无法正常运行.&lt;/p&gt;
+&lt;p&gt;但是,其实hostname也不是说跟/etc/hosts一点关系都没有.在/etc/rc.d/rc.sysinit中,有如下逻辑判断,当hostname为localhost后localhost.localdomain时,将会使用接口IP地址对应的hostname来重新设置系统的hostname.&lt;/p&gt;
+</content:encoded></item></channel></rss>
